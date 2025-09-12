@@ -25,7 +25,11 @@
     .card .price {font-size:22px; font-weight:700; margin:8px 0 12px;}
     .card ul {padding-left:18px;}
     .card.featured {border-color:#16a34a; box-shadow:0 8px 24px rgba(0,0,0,.06);}
-    .badge {position:absolute; top:-10px; right:-10px; background:#16a34a; color:#fff; padding:6px 10px; border-radius:999px; font-size:12px;}
+    .plan-badge {
+      position:absolute; top:-10px; right:-10px;
+      background:#16a34a; color:#fff; padding:6px 10px;
+      border-radius:999px; font-size:12px;
+    }
     .footer {text-align:center; padding:20px; border-top:1px solid #eee; color:#666; margin-top:40px;}
     .lang {display:flex; gap:8px; align-items:center;}
     .lang button {border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:8px; cursor:pointer;}
@@ -114,6 +118,87 @@
 
     /* 히어로 타이틀 줄바꿈 품질 */
     .hero h1{ line-height:1.2; }
+
+
+    /* 카드 하단에 버튼 고정 */
+    .plans .grid { align-items: stretch; }         /* 카드 높이 동일하게 늘이기 */
+    .plans .card {
+      display: flex;
+      flex-direction: column;                      /* 세로 배치 */
+    }
+    .plans .card .btn {
+      margin-top: auto;                            /* 남는 공간을 위로 밀어 버튼을 아래로 */
+      width: max-content;                          /* 버튼 너비 고정(내용 만큼) */
+    }
+
+    /* (선택) 카드 내부 간격 조금 다듬기 */
+    .plans .card .price { margin: 8px 0 12px; }
+    .plans .card ul { margin-bottom: 16px; }
+
+    /* 플랜 카드: 불릿 사이 간격/가독성 */
+    .plans .card ul {
+      padding-left: 20px;      /* 기본 들여쓰기 */
+      margin: 12px 0 16px;     /* 리스트 위/아래 여백 */
+    }
+    .plans .card ul li {
+      margin-bottom: 8px;      /* 불릿 간 간격 */
+      line-height: 1.5;        /* 가독성 향상 */
+    }
+    .plans .card ul li:last-child {
+      margin-bottom: 0;        /* 마지막 항목은 간격 제거 */
+    }
+
+    /* 카드 하단에 버튼 고정(이미 추가된 경우 중복 OK) */
+    .plans .grid { align-items: stretch; }
+    .plans .card {
+      display: flex;
+      flex-direction: column;
+    }
+    .plans .card .btn {
+      margin-top: auto;
+      width: max-content;
+    }
+
+    .card .price { display:flex; align-items:baseline; gap:6px; margin:8px 0 12px; }
+    .card .price .amount { font-size:22px; font-weight:700; }
+    .card .price .per { font-size:14px; color:#666; }
+
+    /* ===== About 섹션 ===== */
+    .about { padding:64px 20px; max-width:1100px; margin:0 auto; }
+    .about .sub { color:#666; margin-top:6px; }
+    .about-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:22px;
+    }
+    .about-card{
+      border:1px solid #eee; border-radius:14px; padding:20px;
+      background:#fff; transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .about-card:hover{
+      transform:translateY(-2px); border-color:#16a34a33;
+      box-shadow:0 10px 28px rgba(0,0,0,.06);
+    }
+    .about-card h3{ margin:0 0 8px; font-size:18px; }
+    .about-card p{ margin:0; color:#444; line-height:1.55; }
+    .about .badges{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .about .badge{
+      background:#f3f4f6; border:1px solid #e5e7eb; border-radius:999px;
+      padding:6px 10px; font-size:12px; color:#374151;
+    }
+    @media (max-width:900px){ .about-grid{ grid-template-columns:1fr; } }
+
+    /* ===== About 섹션: 배지를 카드 하단에 고정 ===== */
+    .about-grid { align-items: stretch; }             /* 카드 높이 동일화 */
+    .about-card{
+      display:flex;                                   /* 세로 플렉스 */
+      flex-direction:column;
+      height:100%;                                    /* grid 셀 높이 채우기 */
+    }
+    .about-card p{ margin:0 0 16px; line-height:1.55; }
+    .about-card .badges{
+      margin-top:auto;                                /* 남는 공간을 위로 밀어 배지를 아래로 */
+      padding-top:2px;                               /* 본문과 간격 */
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +213,7 @@
     <!-- 데스크톱 내비 -->
     <nav class="nav-links">
       <a href="/" data-i18n="nav_home">Home</a>
+      <a href="#about" data-i18n="nav_about">About</a>
       <a href="#plans" data-i18n="nav_pricing">Pricing</a>
       <a href="#how" data-i18n="nav_how">How We Work</a>
       <a href="#rewards" data-i18n="nav_rewards">Reward Program</a>
@@ -163,7 +249,7 @@
   </section>
 
   <section id="how" class="how">
-    <h2 data-i18n="how_title">우리는 이렇게 합니다</h2>
+    <h2 data-i18n="how_title">저희의 솔루션</h2>
     <ul class="checks">
       <li data-i18n="how_da"><strong>고(高) DA 위주</strong>의 웹사이트에 백링크 구축</li>
       <li data-i18n="how_pbn">우리가 구축·관리하는 <strong>PBN</strong>에 컨텐츠 업로드</li>
@@ -171,12 +257,59 @@
     </ul>
   </section>
 
+  <section id="about" class="about">
+    <h2 data-i18n="about_title">About Us</h2>
+    <p class="sub" data-i18n="about_sub">링크 빌딩을 데이터로, 결과는 투명하게.</p>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <h3 data-i18n="about_c1_title">자체 수집·라벨링 데이터</h3>
+        <p data-i18n="about_c1_body">
+          내부 크롤링과 큐레이션으로 <strong>고 DR/권위</strong> 도메인 풀을 구축했습니다.
+          주제 적합성·유기 트래픽·스팸 시그널을 라벨링해 안전한 배치를 보장합니다.
+        </p>
+        <div class="badges">
+          <span class="badge" data-i18n="about_badge_data">도메인 데이터셋</span>
+          <span class="badge" data-i18n="about_badge_quality">품질 점검</span>
+        </div>
+      </div>
+
+      <div class="about-card">
+        <h3 data-i18n="about_c2_title">브랜드 블로그 & 큐레이션 파트너</h3>
+        <p data-i18n="about_c2_body">
+          <strong>브랜드 보유 블로그</strong>와 신뢰할 수 있는 <strong>큐레이션 파트너 매체</strong>를 통해
+          게스트 포스트·리뷰·리소스 링크 등 자연스러운 포맷으로 노출합니다.
+        </p>
+        <div class="badges">
+          <span class="badge" data-i18n="about_badge_brand">브랜드 채널</span>
+          <span class="badge" data-i18n="about_badge_editorial">에디토리얼</span>
+        </div>
+      </div>
+
+      <div class="about-card">
+        <h3 data-i18n="about_c3_title">화이트햇 리워드 생태계</h3>
+        <p data-i18n="about_c3_body">
+          공정한 <strong>화이트햇 리워드 프로그램</strong>으로 인플루언서 풀을 운영하고,
+          누구나 퍼블릭에서 캠페인에 <strong>대량 참여</strong>할 수 있게 합니다(투명한 조건·가이드 제공).
+        </p>
+        <div class="badges">
+          <span class="badge" data-i18n="about_badge_web3">인플루언서 풀</span>
+          <span class="badge" data-i18n="about_badge_open">오픈 참여</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
   <section id="plans" class="plans">
     <h2 data-i18n="plans_title">플랜</h2>
     <div class="grid">
       <div class="card">
         <h3 data-i18n="plan_basic_name">Basic Plan</h3>
-        <p class="price">$49.99</p>
+        <p class="price">
+          <span class="amount">$19.99</span>
+          <span class="per" data-i18n="per_month">/month</span>
+        </p>
         <ul>
           <li data-i18n="plan_basic_f1">DA 10+ 중심 링크</li>
           <li data-i18n="plan_basic_f2">PBN 업로드 1회</li>
@@ -186,18 +319,24 @@
       </div>
       <div class="card featured">
         <h3 data-i18n="plan_growth_name">Growth Plan</h3>
-        <p class="price">$99.99</p>
+        <p class="price">
+          <span class="amount">$49.99</span>
+          <span class="per" data-i18n="per_month">/month</span>
+        </p>
         <ul>
           <li data-i18n="plan_growth_f1">DA 20+ 중심 링크</li>
           <li data-i18n="plan_growth_f2">PBN 업로드 3회</li>
           <li data-i18n="plan_growth_f3">앵커 전략 컨설팅</li>
         </ul>
         <a class="btn" href="#contact" data-i18n="select">선택</a>
-        <div class="badge" data-i18n="most_popular">Most Popular</div>
+        <div class="plan-badge" data-i18n="most_popular">Most Popular</div>
       </div>
       <div class="card">
         <h3 data-i18n="plan_priority_name">Priority Plan</h3>
-        <p class="price">$149.99</p>
+        <p class="price">
+          <span class="amount">$79.99</span>
+          <span class="per" data-i18n="per_month">/month</span>
+        </p>
         <ul>
           <li data-i18n="plan_priority_f1">DA 30+ 프리미엄 링크</li>
           <li data-i18n="plan_priority_f2">PBN 업로드 6회</li>
@@ -206,7 +345,13 @@
         <a class="btn" href="#contact" data-i18n="select">선택</a>
       </div>
     </div>
+    <p style="margin-top:8px;color:#666;font-size:14px" data-i18n="billing_note">
+      Billed monthly. Cancel anytime.
+    </p>
   </section>
+
+
+
 
   <section id="contact" class="contact">
     <h2 data-i18n="contact_title">Contact Us</h2>
@@ -243,6 +388,12 @@
       </a>
       <a class="social-btn" href="https://x.com/your_handle" target="_blank" rel="noopener" aria-label="X (Twitter)">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.244 2H22l-7.45 8.57L22 22h-4.96l-5.12-7.9L6.06 22H2l7.86-8.78L2 2h4.95l5.01 7.72L18.244 2Zm-1.07 18h1.71L7.91 4H6.2l10.974 16Z"/></svg>
+      </a>
+      <!-- Instagram -->
+      <a class="social-btn" href="https://instagram.com/your_handle" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM18.75 5a1.25 1.25 0 1 1-1.5 1.5A1.25 1.25 0 0 1 18.75 5Z"/>
+        </svg>
       </a>
     </div>
   </section>
@@ -288,23 +439,24 @@
       cta_start: "시작하기",
       cta_free: "무료 상담",
       // 본문
-      how_title: "우리는 이렇게 합니다",
-      how_da: "고(高) DA 위주의 웹사이트에 백링크 구축",
-      how_pbn: "우리가 구축·관리하는 <strong>PBN</strong>에 컨텐츠 업로드",
-      how_reward: "리워드 프로그램 (준비중)",
+      how_title: "저희의 솔루션",
+      how_da: "권위 높은(제3자 지표 기준) 웹사이트에 백링크 구축",
+      how_pbn: "큐레이션된 파트너 네트워크(브랜드 보유·제휴 매체)에 콘텐츠 배포",
+      how_reward: "웹3.0 리워드 프로그램 (준비중)",
       plans_title: "플랜",
       plan_basic_name: "Basic Plan",
-      plan_basic_f1: "DA 10+ 중심 링크",
-      plan_basic_f2: "PBN 업로드 1회",
-      plan_basic_f3: "월 리포트 제공",
+      plan_basic_f1: "DR 약 10+",
+      plan_basic_f2: "오픈 커뮤니티, 게스트 포스트 (보조 배치 ≤ 2)",
+      plan_basic_f3: "월 리포트",
       plan_growth_name: "Growth Plan",
-      plan_growth_f1: "DA 20+ 중심 링크",
-      plan_growth_f2: "PBN 업로드 3회",
-      plan_growth_f3: "앵커 전략 컨설팅",
+      plan_growth_f1: "DR 약 20+",
+      plan_growth_f2: "혼합: 오픈+에디토리얼 (보조 배치 ≤ 4)",
+      plan_growth_f3: "월 리포트, 앵커, 내부링크 전략 컨설팅",
       plan_priority_name: "Priority Plan",
-      plan_priority_f1: "DA 30+ 프리미엄 링크",
-      plan_priority_f2: "PBN 업로드 6회",
-      plan_priority_f3: "전담 매니저 & 월 1회 콜",
+      plan_priority_f1: "DR 약 30+ 프리미엄",
+      plan_priority_f2: "에디토리얼, 니치 우선 (보조 배치 ≤ 6)",
+      plan_priority_f3: "월 리포트, 앵커, 내부링크 전략 컨설팅, 전담 매니저, 24시간 내 이메일 응답",
+      metrics_note: "참고:DR(Ahrefs)는 다른 벤더 지표로, 숫자는 대략적 기준입니다. 실제 배치는 품질 검수·주제 적합성·유기 트래픽 등을 함께 고려해 결정됩니다.",
       select: "선택",
       most_popular: "Most Popular",
       contact_title: "문의하기",
@@ -313,6 +465,23 @@
       rewards_title: "리워드 프로그램",
       rewards_desc: "곧 공개됩니다: 백링크 캠페인 참여 및 추천으로 혜택을 받으세요.",
       rewards_cta: "지갑을 연결하고 알림 받기",
+      per_month: "/월",
+      billing_note: "월 단위 과금, 언제든 해지 가능",
+      nav_about: "About",
+      about_title: "팀 소개",
+      about_sub: "링크 빌딩을 데이터로, 결과는 투명하게.",
+      about_c1_title: "자체 수집·라벨링 데이터",
+      about_c1_body: "내부 크롤링과 큐레이션으로 고 DR/권위 도메인 풀을 구축했습니다. 주제 적합성·유기 트래픽·스팸 시그널을 라벨링해 안전한 배치를 보장합니다.",
+      about_c2_title: "브랜드 블로그 & 큐레이션 파트너",
+      about_c2_body: "브랜드 보유 블로그와 신뢰할 수 있는 큐레이션 파트너 매체를 통해 게스트 포스트·리뷰·리소스 링크 등 자연스러운 포맷으로 노출합니다.",
+      about_c3_title: "화이트햇 리워드 생태계",
+      about_c3_body: "공정한 화이트햇 리워드 프로그램을 통해 누구나 공개적으로 캠페인에 자유롭게 참여할 수 있도록 투명한 조건과 가이드를 제공합니다. 보상은 웹3.0 기반으로 지갑 연동 후 USDT로 지급됩니다.",
+      about_badge_data: "도메인 데이터셋",
+      about_badge_quality: "품질 점검",
+      about_badge_brand: "브랜드 채널",
+      about_badge_editorial: "에디토리얼",
+      about_badge_web3: "Web3 · USDT",
+      about_badge_open: "오픈 참여",
     },
     en: {
       brand: "LinkPepper",
@@ -330,22 +499,23 @@
       cta_free: "Free Consultation",
       // body
       how_title: "How We Work",
-      how_da: "Build backlinks on high-DA websites",
-      how_pbn: "Publish content on our managed <strong>PBN</strong>",
-      how_reward: "Reward program (coming soon)",
+      how_da: "Build backlinks on authoritative websites (based on third-party metrics)",
+      how_pbn: "Distribute content across our curated partner network (brand-owned & partner sites)",
+      how_reward: "Web3.0 Reward program (coming soon)",
       plans_title: "Plans",
       plan_basic_name: "Basic Plan",
-      plan_basic_f1: "Focus on DA 10+ links",
-      plan_basic_f2: "1× PBN upload",
+      plan_basic_f1: "Roughly DR 10+",
+      plan_basic_f2: "Open communities and guest posts (support placements ≤ 2)",
       plan_basic_f3: "Monthly report",
       plan_growth_name: "Growth Plan",
-      plan_growth_f1: "Focus on DA 20+ links",
-      plan_growth_f2: "3× PBN uploads",
-      plan_growth_f3: "Anchor strategy consulting",
+      plan_growth_f1: "Roughly DR 20+",
+      plan_growth_f2: "Mixed: open + editorial (support placements ≤ 4)",
+      plan_growth_f3: "Monthly report + Anchor + internal linking strategy",
       plan_priority_name: "Priority Plan",
-      plan_priority_f1: "Premium links DA 30+",
-      plan_priority_f2: "6× PBN uploads",
-      plan_priority_f3: "Dedicated manager & monthly call",
+      plan_priority_f1: "Roughly DR 30+",
+      plan_priority_f2: "Editorial and niche prioritized (support placements ≤ 6)",
+      plan_priority_f3: "Monthly report + Anchor + internal linking strategy + Dedicated manager with email reply within 24h",
+      metrics_note: "Note: DR (Ahrefs) is a different vendor metric. Numbers are approximate; final placements consider quality review, topical fit, and traffic.",
       select: "Select",
       most_popular: "Most Popular",
       contact_title: "Contact Us",
@@ -354,6 +524,23 @@
       rewards_title: "Reward Program",
       rewards_desc: "Coming soon: Earn perks by engaging with our backlink campaigns and referrals.",
       rewards_cta: "Connect wallet to get notified",
+      per_month: "/month",
+      billing_note: "Billed monthly. Cancel anytime.",
+      nav_about: "About",
+      about_title: "About Us",
+      about_sub: "Data-driven link building with transparent results.",
+      about_c1_title: "In-house Data & Labeling",
+      about_c1_body: "We curate and label a pool of high-authority (high DR) domains. We score topical fit, organic traffic, and spam signals to ensure safe placements.",
+      about_c2_title: "Brand Blogs & Curation Partners",
+      about_c2_body: "We publish via brand-owned blogs and trusted curation partners using natural formats—guest posts, reviews, and resource links.",
+      about_c3_title: "White-hat Reward Ecosystem",
+      about_c3_body: "We run a fair, white-hat reward program that enables open, large-scale public participation with clear rules and guidance. Rewards are Web3-based and paid in USDT after wallet connection.",
+      about_badge_data: "Domain dataset",
+      about_badge_quality: "Quality checks",
+      about_badge_brand: "Brand channels",
+      about_badge_editorial: "Editorial",
+      about_badge_web3: "Web3 · USDT",
+      about_badge_open: "Open participation",
     }
   };
 
