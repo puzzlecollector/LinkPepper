@@ -131,10 +131,24 @@
 
   <!-- 헤더 -->
   <header class="nav">
+
+    {% if meta.lang == "ko" %}
+      {% url 'home_ko' as home_url %}
+      {% url 'rewards_ko' as rewards_url %}
+      {% url 'events_ko' as events_url %}
+      {% url 'rewards_apply_ko' as apply_url %}
+    {% else %}
+      {% url 'home_en' as home_url %}
+      {% url 'rewards_en' as rewards_url %}
+      {% url 'events_en' as events_url %}
+      {% url 'rewards_apply_en' as apply_url %}
+    {% endif %}
+
+
     <div class="brand-green">LinkPepper</div>
     <nav class="nav-links">
-      <a href="{% url 'home_en' %}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
-      <a href="{% url 'rewards_en' %}" style="font-weight:700;color:var(--green)">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+      <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+      <a href="{{ rewards_url }}" style="font-weight:700;color:var(--green)">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
       <a class="btn" href="#wallet">{% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}</a>
       <a class="btn-outline" href="#stake">{% if meta.lang == 'ko' %}페퍼 스테이킹{% else %}Stake Pepper{% endif %}</a>
     </nav>

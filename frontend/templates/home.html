@@ -287,6 +287,16 @@
 </head>
 <body>
   <header class="nav">
+    {% if meta.lang == "ko" %}
+      {% url 'home_ko' as home_url %}
+      {% url 'events_ko' as events_url %}
+      {% url 'rewards_ko' as rewards_url %}
+    {% else %}
+      {% url 'home_en' as home_url %}
+      {% url 'events_en' as events_url %}
+      {% url 'rewards_en' as rewards_url %}
+    {% endif %}
+
     <div class="brand brand-green" data-i18n="brand">LinkPepper</div>
 
     <!-- 햄버거 버튼 -->
@@ -294,13 +304,17 @@
       ☰
     </button>
 
+
+
+
     <!-- 데스크톱 내비 -->
     <nav class="nav-links">
-      <a href="/" data-i18n="nav_home">Home</a>
+      <a href="{{ home_url }}" data-i18n="nav_home">Home</a>
       <a href="#about" data-i18n="nav_about">About</a>
       <a href="#plans" data-i18n="nav_pricing">Pricing</a>
       <a href="#how" data-i18n="nav_how">How We Work</a>
-      <a href="{% url 'rewards_en' %}" data-i18n="nav_rewards">Reward Program</a>
+      <a href="{{ rewards_url }}" data-i18n="nav_rewards">Reward Program</a>
+      <a href="{{ events_url }}" data-i18n="nav_events">Events</a>
       <a href="#contact" data-i18n="nav_contact">Contact</a>
       <a class="btn" href="#wallet" data-i18n="nav_connect">Connect Wallet</a>
       <a class="btn-outline" href="#stake" data-i18n="nav_stake">Stake Pepper</a>
@@ -314,10 +328,11 @@
 
     <!-- 모바일 드로어 -->
     <div class="nav-drawer" id="nav-drawer">
-      <a href="/" data-i18n="nav_home">Home</a>
+      <a href="{{ home_url }}" data-i18n="nav_home">Home</a>
       <a href="#plans" data-i18n="nav_pricing">Pricing</a>
       <a href="#how" data-i18n="nav_how">How We Work</a>
-      <a href="{% url 'rewards_en' %}" data-i18n="nav_rewards">Reward Program</a>
+      <a href="{{ rewards_url }}" data-i18n="nav_rewards">Reward Program</a>
+      <a href="{{ events_url }}" data-i18n="nav_events">Events</a>
       <a href="#contact" data-i18n="nav_contact">Contact</a>
       <a class="btn" href="#wallet" data-i18n="nav_connect">Connect Wallet</a>
       <a class="btn-outline" href="#stake" data-i18n="nav_stake">Stake Pepper</a>
@@ -604,6 +619,7 @@
       about_badge_web3: "Web3 · USDT",
       about_badge_open: "오픈 참여",
       nav_stake: "페퍼 스테이킹",
+      nav_events: "이벤트"
     },
     en: {
       brand: "LinkPepper",
@@ -664,6 +680,7 @@
       about_badge_web3: "Web3 · USDT",
       about_badge_open: "Open participation",
       nav_stake: "Stake Pepper",
+      nav_events: "Events",
     }
   };
 

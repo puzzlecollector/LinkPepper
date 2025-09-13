@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import home_en, home_ko, rewards_en, rewards_ko, rewards_apply_en, rewards_apply_ko
+from core.views import home_en, home_ko, rewards_en, rewards_ko, rewards_apply_en, rewards_apply_ko, events_en, events_ko
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,7 @@ urlpatterns = [
 
     path("rewards/apply/", rewards_apply_en, name="rewards_apply_en"),
     path("rewards/apply/ko/", rewards_apply_ko, name="rewards_apply_ko"),
+
+    path("events/", events_en, name="events_en"),
+    path("ko/events/", events_ko, name="events_ko"),
 ]

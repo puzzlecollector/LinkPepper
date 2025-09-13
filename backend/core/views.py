@@ -92,3 +92,27 @@ def rewards_apply_ko(request):
         "url": f"{base}/rewards/apply/ko/",
     }
     return render(request, "rewards_apply.html", {"meta": meta})
+
+def _meta_for_events(lang, request):
+    m = _meta_for(lang, request).copy()
+    if lang == "ko":
+        m.update({
+            "title": "LinkPepper | 이벤트 · 공지",
+            "og_title": "LinkPepper | 이벤트 · 공지",
+            "canonical": f"{_base_url(request)}/ko/events/",
+            "url": f"{_base_url(request)}/ko/events/",
+        })
+    else:
+        m.update({
+            "title": "LinkPepper | Events & Announcements",
+            "og_title": "LinkPepper | Events & Announcements",
+            "canonical": f"{_base_url(request)}/events/",
+            "url": f"{_base_url(request)}/events/",
+        })
+    return m
+
+def events_en(request):
+    return render(request, "events.html", {"meta": _meta_for_events("en", request)})
+
+def events_ko(request):
+    return render(request, "events.html", {"meta": _meta_for_events("ko", request)})
