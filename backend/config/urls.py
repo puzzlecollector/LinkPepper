@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import home
+from core.views import home_en, home_ko   # ← 함수 자체를 임포트
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", home, name="home"),
+    path("", home_en, name="home_en"),
+    path("ko/", home_ko, name="home_ko") # https://linkpepper.com/ko/
 ]

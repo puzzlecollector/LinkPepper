@@ -4,7 +4,69 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LinkPepper: SEO Solutions</title>
+  <title>{{ meta.title }}</title>
+
+  <link rel="canonical" href="{{ meta.canonical }}">
+  <meta name="robots" content="index,follow">
+  <meta name="author" content="LinkPepper">
+  <meta name="description" content="{{ meta.description }}">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LinkPepper">
+  <meta property="og:title" content="{{ meta.og_title }}">
+  <meta property="og:description" content="{{ meta.og_description }}">
+  <meta property="og:url" content="{{ meta.url }}">
+  <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ meta.og_title }}">
+  <meta name="twitter:description" content="{{ meta.og_description }}">
+  <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+
+  <!-- Favicons -->
+  <link rel="icon" href="{% static 'img/favicon.ico' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+
+  <!-- Hreflang -->
+  <link rel="alternate" href="{{ meta.url|cut:'ko/' }}" hreflang="x-default">
+  <link rel="alternate" href="{{ meta.url|cut:'ko/' }}" hreflang="en">
+  <link rel="alternate" href="{{ meta.url }}" hreflang="ko">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"LinkPepper",
+    "url":"{{ meta.url }}",
+    "logo":"{% static 'img/logo-square-1024.png' %}",
+    "sameAs":[
+      "https://x.com/your_handle",
+      "https://instagram.com/your_handle",
+      "https://t.me/your_handle"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "url":"{{ meta.url|cut:'ko/' }}",
+    "name":"LinkPepper",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"{{ meta.url|cut:'ko/' }}search?q={query}",
+      "query-input":"required name=query"
+    }
+  }
+  </script>
+
+
+
   <style>
     body {margin:0; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;}
     .nav {display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid #eee;}
@@ -199,6 +261,28 @@
       padding-top:2px;                               /* 본문과 간격 */
       display:flex; gap:8px; flex-wrap:wrap;
     }
+    /* --- Contact info pill --- */
+    .contact-info {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .contact-info .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      background: #f9fafb;
+      color: #111;
+      font-size: 14px;
+    }
+    .contact-info .pill svg { width: 18px; height: 18px; }
+    .contact-info a { color:#111; text-decoration:none; }
+    .contact-info a:hover { color:#16a34a; text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -223,8 +307,8 @@
 
     <!-- 언어 -->
     <div class="lang">
-      <button id="btn-en" type="button">🇺🇸 English</button>
-      <button id="btn-ko" type="button">🇰🇷 한국어</button>
+      <a id="btn-en" href="{% url 'home_en' %}">🇺🇸 English</a>
+      <a id="btn-ko" href="{% url 'home_ko' %}">🇰🇷 한국어</a>
     </div>
 
     <!-- 모바일 드로어 -->
@@ -241,7 +325,7 @@
 
   <section class="hero">
     <h1 data-i18n="hero_title">강력한 백링크로 검색 순위를 끌어올리세요</h1>
-    <p data-i18n="hero_sub">화이트햇 중심, 투명 리포트, 확실한 성과.</p>
+    <p data-i18n="hero_sub">화이트햇 중심, 투명 리포트, 확실한 성과. SEO.</p>
     <div class="cta">
       <a class="btn" href="#plans" data-i18n="cta_start">시작하기</a>
       <a class="btn-outline" href="#contact" data-i18n="cta_free">무료 상담</a>
@@ -307,11 +391,11 @@
       <div class="card">
         <h3 data-i18n="plan_basic_name">Basic Plan</h3>
         <p class="price">
-          <span class="amount">$19.99</span>
+          <span class="amount">$39.99</span>
           <span class="per" data-i18n="per_month">/month</span>
         </p>
         <ul>
-          <li data-i18n="plan_basic_f1">DA 10+ 중심 링크</li>
+          <li data-i18n="plan_basic_f1">DA 30+ 중심 링크</li>
           <li data-i18n="plan_basic_f2">PBN 업로드 1회</li>
           <li data-i18n="plan_basic_f3">월 리포트 제공</li>
         </ul>
@@ -320,11 +404,11 @@
       <div class="card featured">
         <h3 data-i18n="plan_growth_name">Growth Plan</h3>
         <p class="price">
-          <span class="amount">$49.99</span>
+          <span class="amount">$69.99</span>
           <span class="per" data-i18n="per_month">/month</span>
         </p>
         <ul>
-          <li data-i18n="plan_growth_f1">DA 20+ 중심 링크</li>
+          <li data-i18n="plan_growth_f1">DA 50+ 중심 링크</li>
           <li data-i18n="plan_growth_f2">PBN 업로드 3회</li>
           <li data-i18n="plan_growth_f3">앵커 전략 컨설팅</li>
         </ul>
@@ -334,11 +418,11 @@
       <div class="card">
         <h3 data-i18n="plan_priority_name">Priority Plan</h3>
         <p class="price">
-          <span class="amount">$79.99</span>
+          <span class="amount">$99.99</span>
           <span class="per" data-i18n="per_month">/month</span>
         </p>
         <ul>
-          <li data-i18n="plan_priority_f1">DA 30+ 프리미엄 링크</li>
+          <li data-i18n="plan_priority_f1">DA 70+ 프리미엄 링크</li>
           <li data-i18n="plan_priority_f2">PBN 업로드 6회</li>
           <li data-i18n="plan_priority_f3">전담 매니저 & 월 1회 콜</li>
         </ul>
@@ -395,6 +479,41 @@
           <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM18.75 5a1.25 1.25 0 1 1-1.5 1.5A1.25 1.25 0 0 1 18.75 5Z"/>
         </svg>
       </a>
+
+      <!-- YouTube -->
+      <a class="social-btn" href="https://www.youtube.com/@your_handle" target="_blank" rel="noopener" aria-label="YouTube">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M23 7.5c0-1.2-.9-2.2-2-2.4C18.9 4.7 15 4.5 12 4.5s-6.9.2-9 .6C1.9 5.3 1 6.3 1 7.5 1 9 1 15 1 16.5c0 1.2.9 2.2 2 2.4 2.1.4 6 .6 9 .6s6.9-.2 9-.6c1.1-.2 2-1.2 2-2.4V7.5ZM10 9.3l5.7 3.2L10 15.7V9.3Z"/>
+        </svg>
+      </a>
+
+      <!-- TikTok -->
+      <a class="social-btn" href="https://www.tiktok.com/@your_handle" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M14 3v9.2a3.7 3.7 0 1 1-3.7-3.7c.3 0 .6 0 .9.1V6.2A7.2 7.2 0 0 0 10.3 6 7.7 7.7 0 1 0 18 13.7V9.9c.9.9 2.3 1.8 4 2.1V9.2c-1.7-.4-3.3-1.6-4-3.2V3h-4Z"/>
+        </svg>
+      </a>
+
+      <!-- Naver Blog -->
+      <a class="social-btn" href="https://blog.naver.com/your_handle"
+         target="_blank" rel="noopener" aria-label="Naver Blog">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" role="img">
+          <!-- 전면 'N' (현재 글자색을 따름) -->
+          <path d="M7 7h3.1l6 8.6V7H18v10h-3.1l-6-8.6V17H7V7z"/>
+        </svg>
+      </a>
+
+    </div>
+
+    <div class="contact-info" aria-label="Customer Support">
+      <div class="pill">
+        <!-- envelope -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5v11A2.5 2.5 0 0 1 19.5 20h-15A2.5 2.5 0 0 1 2 17.5v-11Zm2 .3v.1l8 5 8-5v-.1a.5.5 0 0 0-.5-.3h-15a.5.5 0 0 0-.5.3Zm16 2.9-6.9 4.3a2 2 0 0 1-2.2 0L4 9.7v7.8c0 .3.2.5.5.5h15c.3 0 .5-.2.5-.5V9.7Z"/>
+        </svg>
+        <strong>CS</strong> :
+        <a href="mailto:LinkPepper11235@proton.me">LinkPepper11235@proton.me</a>
+      </div>
     </div>
   </section>
 
@@ -435,25 +554,25 @@
       nav_connect: "지갑 연결",
       // 히어로
       hero_title: "강력한 백링크로 검색 순위를 끌어올리세요",
-      hero_sub: "화이트햇 중심, 투명 리포트, 확실한 성과.",
+      hero_sub: "화이트햇 중심, 투명 리포트, 확실한 성과, 검색 엔진 최적화.",
       cta_start: "시작하기",
       cta_free: "무료 상담",
       // 본문
-      how_title: "저희의 솔루션",
+      how_title: "저희의 SEO 솔루션",
       how_da: "권위 높은(제3자 지표 기준) 웹사이트에 백링크 구축",
       how_pbn: "큐레이션된 파트너 네트워크(브랜드 보유·제휴 매체)에 콘텐츠 배포",
       how_reward: "웹3.0 리워드 프로그램 (준비중)",
       plans_title: "플랜",
       plan_basic_name: "Basic Plan",
-      plan_basic_f1: "DR 약 10+",
+      plan_basic_f1: "DR 약 20+",
       plan_basic_f2: "오픈 커뮤니티, 게스트 포스트 (보조 배치 ≤ 2)",
       plan_basic_f3: "월 리포트",
       plan_growth_name: "Growth Plan",
-      plan_growth_f1: "DR 약 20+",
+      plan_growth_f1: "DR 약 40+",
       plan_growth_f2: "혼합: 오픈+에디토리얼 (보조 배치 ≤ 4)",
       plan_growth_f3: "월 리포트, 앵커, 내부링크 전략 컨설팅",
       plan_priority_name: "Priority Plan",
-      plan_priority_f1: "DR 약 30+ 프리미엄",
+      plan_priority_f1: "DR 약 60+ 프리미엄",
       plan_priority_f2: "에디토리얼, 니치 우선 (보조 배치 ≤ 6)",
       plan_priority_f3: "월 리포트, 앵커, 내부링크 전략 컨설팅, 전담 매니저, 24시간 내 이메일 응답",
       metrics_note: "참고:DR(Ahrefs)는 다른 벤더 지표로, 숫자는 대략적 기준입니다. 실제 배치는 품질 검수·주제 적합성·유기 트래픽 등을 함께 고려해 결정됩니다.",
@@ -494,7 +613,7 @@
       nav_connect: "Connect Wallet",
       // hero
       hero_title: "Get Powerful Backlinks To Boost Your Ranking",
-      hero_sub: "White-hat first. Transparent reports. Real results.",
+      hero_sub: "White-hat first. Transparent reports. Real results. SEO.",
       cta_start: "Get Started",
       cta_free: "Free Consultation",
       // body
@@ -504,15 +623,15 @@
       how_reward: "Web3.0 Reward program (coming soon)",
       plans_title: "Plans",
       plan_basic_name: "Basic Plan",
-      plan_basic_f1: "Roughly DR 10+",
+      plan_basic_f1: "Roughly DR 20+",
       plan_basic_f2: "Open communities and guest posts (support placements ≤ 2)",
       plan_basic_f3: "Monthly report",
       plan_growth_name: "Growth Plan",
-      plan_growth_f1: "Roughly DR 20+",
+      plan_growth_f1: "Roughly DR 40+",
       plan_growth_f2: "Mixed: open + editorial (support placements ≤ 4)",
       plan_growth_f3: "Monthly report + Anchor + internal linking strategy",
       plan_priority_name: "Priority Plan",
-      plan_priority_f1: "Roughly DR 30+",
+      plan_priority_f1: "Roughly DR 60+",
       plan_priority_f2: "Editorial and niche prioritized (support placements ≤ 6)",
       plan_priority_f3: "Monthly report + Anchor + internal linking strategy + Dedicated manager with email reply within 24h",
       metrics_note: "Note: DR (Ahrefs) is a different vendor metric. Numbers are approximate; final placements consider quality review, topical fit, and traffic.",
@@ -534,7 +653,7 @@
       about_c2_title: "Brand Blogs & Curation Partners",
       about_c2_body: "We publish via brand-owned blogs and trusted curation partners using natural formats—guest posts, reviews, and resource links.",
       about_c3_title: "White-hat Reward Ecosystem",
-      about_c3_body: "We run a fair, white-hat reward program that enables open, large-scale public participation with clear rules and guidance. Rewards are Web3-based and paid in USDT after wallet connection.",
+      about_c3_body: "We run a fair, white-hat reward program that enables open, large-scale public participation with clear rules and guidance. Rewards are Web3-based and paid in USDT (stablecoin) after wallet connection.",
       about_badge_data: "Domain dataset",
       about_badge_quality: "Quality checks",
       about_badge_brand: "Brand channels",
@@ -622,10 +741,12 @@
       // 초기 언어: 저장된 값 → URL ?lang= → 브라우저 언어
       const url = new URL(window.location.href);
       const urlLang = url.searchParams.get("lang");
-      const saved = localStorage.getItem("lang");
-      const browserIsKo = (navigator.language || "").toLowerCase().startsWith("ko");
+      const pathIsKo = window.location.pathname.startsWith("/ko/");
+      const initial = urlLang || (pathIsKo ? "ko" : "en");   // ✅ 경로 기준 기본 언어
+      //const saved = localStorage.getItem("lang");
+      //const browserIsKo = (navigator.language || "").toLowerCase().startsWith("ko");
       // const initial = urlLang || saved || (browserIsKo ? "ko" : "en");
-      const initial = urlLang || "en";
+      //const initial = urlLang || "en";
       applyLang(initial);
 
 
