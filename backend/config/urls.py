@@ -16,10 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import home_en, home_ko   # ← 함수 자체를 임포트
+from core.views import home_en, home_ko, rewards_en, rewards_ko, rewards_apply_en, rewards_apply_ko
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path("", home_en, name="home_en"),
-    path("ko/", home_ko, name="home_ko") # https://linkpepper.com/ko/
+    path("ko/", home_ko, name="home_ko"), # https://linkpepper.com/ko/
+
+    path("rewards/", rewards_en, name="rewards_en"),
+    path("ko/rewards/", rewards_ko, name="rewards_ko"),
+
+    path("rewards/apply/", rewards_apply_en, name="rewards_apply_en"),
+    path("rewards/apply/ko/", rewards_apply_ko, name="rewards_apply_ko"),
 ]

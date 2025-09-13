@@ -1,0 +1,171 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ meta.title }}</title>
+
+  <link rel="canonical" href="{{ meta.canonical }}">
+  <meta name="robots" content="index,follow">
+  <meta name="author" content="LinkPepper">
+  <meta name="description" content="{{ meta.description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LinkPepper">
+  <meta property="og:title" content="{{ meta.og_title }}">
+  <meta property="og:description" content="{{ meta.og_description }}">
+  <meta property="og:url" content="{{ meta.url }}">
+  <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+  <link rel="icon" href="{% static 'img/favicon.ico' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+
+  <style>
+    :root{ --green:#16a34a; --line:#e5e7eb; --text:#111827; --muted:#6b7280; --bg:#fff; --card:#fff; --chip:#f9fafb; --shadow:0 8px 24px rgba(0,0,0,.06); }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--text);background:var(--bg)}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1000px;margin:0 auto;padding:20px}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+    .brand-green{color:var(--green);font-weight:800}
+    .nav-links{display:flex;gap:16px;align-items:center}
+    .btn{padding:10px 14px;border-radius:10px;background:var(--green);color:#fff;display:inline-block}
+    .btn-outline{padding:10px 14px;border-radius:10px;border:1px solid var(--green);color:var(--green);display:inline-block;background:#fff}
+    .lang{display:flex;gap:8px}
+    .lang a{border:1px solid var(--line);padding:6px 10px;border-radius:8px}
+
+    .page-title{padding:40px 20px;text-align:center}
+    .page-title h1{margin:0 0 6px;font-size:34px}
+    .muted{color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+    .form{max-width:780px;margin:0 auto}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .row.full{grid-template-columns:1fr}
+    label{font-size:14px;color:#374151;margin-bottom:6px;display:block}
+    input, select, textarea{
+      width:100%;padding:12px 14px;border:1px solid #cfd4da;border-radius:10px;font-size:15px;outline:none;
+      transition:border-color .12s ease, box-shadow .12s ease;
+    }
+    input:focus,select:focus,textarea:focus{ border-color:#16a34a; box-shadow:0 0 0 4px rgba(22,163,74,.12); }
+    .help{font-size:12px;color:var(--muted);margin-top:6px}
+    .fee{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--chip);padding:6px 10px;border-radius:999px;font-size:13px}
+    .submit-row{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+    .notice{margin-top:12px;color:var(--muted);font-size:14px}
+    @media (max-width:900px){ .row{grid-template-columns:1fr} .page-title h1{font-size:26px} }
+    .footer {text-align:center; padding:20px; border-top:1px solid #eee; color:#666; margin-top:40px;}
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header class="nav">
+    <div class="brand-green">LinkPepper</div>
+    <nav class="nav-links">
+      <a href="{% url 'home_en' %}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+      <a href="{% url 'rewards_en' %}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+      <a class="btn" href="#wallet">{% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}</a>
+      <a class="btn-outline" href="#stake">{% if meta.lang == 'ko' %}스테이킹{% else %}Stake{% endif %}</a>
+    </nav>
+    <div class="lang">
+      {% if meta.lang == "ko" %}
+        <a href="{% url 'rewards_apply_en' %}">🇺🇸 English</a>
+        <a href="{% url 'rewards_apply_ko' %}" style="border-color:var(--green);color:var(--green)">🇰🇷 한국어</a>
+      {% else %}
+        <a href="{% url 'rewards_apply_en' %}" style="border-color:var(--green);color:var(--green)">🇺🇸 English</a>
+        <a href="{% url 'rewards_apply_ko' %}">🇰🇷 한국어</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- 타이틀 -->
+  <section class="page-title">
+    <h1>{% if meta.lang == 'ko' %}리워드 프로그램 신청{% else %}Apply for Reward Program{% endif %}</h1>
+    <p class="muted">
+      {% if meta.lang == 'ko' %}
+        간단한 정보만 남겨 주세요. <strong>24시간 내로 회신</strong>드립니다.
+      {% else %}
+        Leave a few details. We’ll <strong>reply within 24 hours</strong>.
+      {% endif %}
+    </p>
+  </section>
+
+  <!-- 폼 카드 -->
+  <main class="container">
+    <div class="card">
+      <form class="form" method="post" action="#">
+        {% csrf_token %}
+
+        <div class="row">
+          <!-- 전화번호 (선택) -->
+          <div>
+            <label for="phone">{% if meta.lang == 'ko' %}전화번호 (선택){% else %}Phone (optional){% endif %}</label>
+            <input id="phone" name="phone" type="tel" placeholder="+82 10 1234 1234">
+            <div class="help">
+              {% if meta.lang == 'ko' %}예시 형식: +82 10 1234 1234{% else %}Example: +82 10 1234 1234{% endif %}
+            </div>
+          </div>
+
+          <!-- 이메일 -->
+          <div>
+            <label for="email">{% if meta.lang == 'ko' %}이메일{% else %}Email{% endif %}</label>
+            <input id="email" name="email" type="email" required placeholder="name@example.com">
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- 타입 선택 -->
+          <div>
+            <label for="task_type">{% if meta.lang == 'ko' %}캠페인 유형{% else %}Campaign Type{% endif %}</label>
+            <select id="task_type" name="task_type" required>
+              <option value="link">{% if meta.lang == 'ko' %}링크 공유 리워드{% else %}Link Sharing Reward{% endif %}</option>
+              <option value="visit">{% if meta.lang == 'ko' %}방문 리워드{% else %}Visit Reward{% endif %}</option>
+            </select>
+          </div>
+
+          <!-- 보상 풀 -->
+          <div>
+            <label for="pool">{% if meta.lang == 'ko' %}보상 풀 (USDT){% else %}Reward Pool (USDT){% endif %}</label>
+            <input id="pool" name="pool" type="number" min="1" step="1" required placeholder="e.g. 2500">
+          </div>
+        </div>
+
+        <!-- 캠페인 설명 -->
+        <div class="row full">
+          <div>
+            <label for="desc">{% if meta.lang == 'ko' %}간단한 캠페인 설명 (선택){% else %}Brief Campaign Description (optional){% endif %}</label>
+            <textarea id="desc" name="desc" rows="4" placeholder="{% if meta.lang == 'ko' %}예: simplequant.net 방문 후 '퀀트' 키워드 포함 포스트 작성{% else %}Ex: Write post incl. 'quant' keyword after visiting simplequant.net{% endif %}"></textarea>
+          </div>
+        </div>
+
+        <!-- 수수료/응답 안내 -->
+        <div class="fee">
+          <span class="pill">
+            <!-- coins icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 4.69 2 8v8c0 3.31 4.48 6 10 6s10-2.69 10-6V8c0-3.31-4.48-6-10-6Zm0 2c4.41 0 8 .9 8 4s-3.59 4-8 4-8-.9-8-4 3.59-4 8-4Z"/></svg>
+            {% if meta.lang == 'ko' %}서비스 수수료: <strong>30&nbsp;USDT</strong>{% else %}Service fee: <strong>30&nbsp;USDT</strong>{% endif %}
+          </span>
+          <span class="pill">
+            <!-- clock icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm1 10.41V7a1 1 0 1 0-2 0v6a1 1 0 0 0 .55.89l4 2a1 1 0 1 0 .9-1.78L13 12.41Z"/></svg>
+            {% if meta.lang == 'ko' %}<strong>24시간 내 답변</strong> 드립니다.{% else %}We <strong>reply within 24h</strong>.{% endif %}
+          </span>
+        </div>
+
+        <div class="submit-row">
+          <button class="btn" type="submit">{% if meta.lang == 'ko' %}신청 보내기{% else %}Submit Application{% endif %}</button>
+          <button class="btn-outline" type="reset">{% if meta.lang == 'ko' %}초기화{% else %}Reset{% endif %}</button>
+        </div>
+
+        <p class="notice">
+          {% if meta.lang == 'ko' %}
+            제출 후 담당자가 내용을 검토해 이메일로 후속 안내를 드립니다.
+          {% else %}
+            After submission, our team will review and follow up via email.
+          {% endif %}
+        </p>
+      </form>
+    </div>
+    <footer class="footer">© <span data-i18n="brand" class="brand-green">LinkPepper</span></footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ meta.title }}</title>
+
+  <link rel="canonical" href="{{ meta.canonical }}">
+  <meta name="robots" content="index,follow">
+  <meta name="author" content="LinkPepper">
+  <meta name="description" content="{{ meta.description }}">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LinkPepper">
+  <meta property="og:title" content="{{ meta.og_title }}">
+  <meta property="og:description" content="{{ meta.og_description }}">
+  <meta property="og:url" content="{{ meta.url }}">
+  <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ meta.og_title }}">
+  <meta name="twitter:description" content="{{ meta.og_description }}">
+  <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'img/favicon.ico' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+
+  <style>
+    :root{
+      --green:#16a34a; --line:#e5e7eb; --text:#111827; --muted:#6b7280;
+      --bg:#ffffff; --chip:#f9fafb; --card:#ffffff; --shadow:0 8px 24px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--text);background:var(--bg)}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+    .brand-green{color:var(--green);font-weight:800}
+    .nav-links{display:flex;gap:16px;align-items:center}
+    .btn{padding:10px 14px;border-radius:10px;background:var(--green);color:#fff;display:inline-block}
+    .btn-outline{padding:10px 14px;border-radius:10px;border:1px solid var(--green);color:var(--green);display:inline-block;background:#fff}
+    .lang{display:flex;gap:8px}
+    .lang a{border:1px solid var(--line);padding:6px 10px;border-radius:8px}
+
+    .page-title{padding:40px 20px;text-align:center}
+    .page-title h1{margin:0 0 8px;font-size:34px}
+    .muted{color:var(--muted)}
+    .section{padding:24px 20px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+    .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+    .task-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+    .pill{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);background:var(--chip);padding:6px 10px;border-radius:999px;font-size:13px}
+    .task-title{font-size:18px;font-weight:700;margin:0 0 6px}
+    .list{display:flex;flex-direction:column;gap:8px}
+    .example{border:1px dashed var(--line);border-radius:10px;padding:10px}
+    .small{font-size:13px;color:var(--muted)}
+    form .row{display:flex;gap:10px;flex-wrap:wrap}
+    input[type="text"],input[type="url"],textarea{width:100%;padding:12px 14px;border:1px solid #cfd4da;border-radius:10px;font-size:14px}
+    .submit-row{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+    .pagination{display:flex;gap:6px;justify-content:center;margin-top:14px}
+    .pagination a,.pagination span{min-width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:#fff}
+    .pagination .active{border-color:var(--green);color:var(--green);font-weight:700}
+    .section-title{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+    .progress{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:var(--green);width:25%}
+    .users{display:flex;flex-direction:column;gap:6px}
+    .users .user{padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+    .cta-center{text-align:center;margin:26px 0}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} .page-title h1{font-size:26px} }
+    .example .comment{ margin-bottom:8px; line-height:1.55; }
+    .example .meta{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      font-size:13px; color:var(--muted);
+    }
+    .example .meta .dot{ color:#c4c9cf; }
+    .pill.soft{
+      display:inline-flex; align-items:center; gap:6px;
+      border:1px solid var(--line); background:var(--chip);
+      padding:4px 8px; border-radius:999px; color:#374151;
+    }
+    .pill.soft .label{ color:#6b7280; font-weight:600; font-size:12px; }
+    .pill.score{
+      display:inline-flex; align-items:center; gap:6px;
+      background:#ecfdf5; border:1px solid #d1fae5; color:#065f46;
+      padding:4px 10px; border-radius:999px; font-weight:700;
+    }
+    .meta-link{ color:#111; text-decoration:underline; }
+    .meta-link:hover{ color:var(--green); }
+    /* 리스트/유저 영역을 카드 안에서만 스크롤 */
+    .scroller{
+      max-height: 230px;        /* 카드 안에서 보이는 높이 */
+      overflow-y: auto;         /* 내용 많아지면 세로 스크롤 */
+      padding-right: 6px;       /* 스크롤바 겹침 여유 */
+    }
+
+    /* (선택) 모바일에서 살짝 더 낮춰 균형 맞추기 */
+    @media (max-width: 900px){
+      .scroller{ max-height: 200px; }
+    }
+
+    /* (선택) 스크롤바 미세 스타일 */
+    .scroller::-webkit-scrollbar{ width: 8px; }
+    .scroller::-webkit-scrollbar-thumb{
+      background:#e5e7eb; border-radius: 999px;
+    }
+    .scroller:hover::-webkit-scrollbar-thumb{
+      background:#cbd5e1;
+    }
+    .info-line{
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 4px;
+    }
+    .info-chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border:1px solid var(--line); background:var(--chip);
+      border-radius:999px; font-size:13px; color:var(--text);
+    }
+    .info-chip .k{ color:var(--muted); font-weight:600; }
+    .info-chip.reward{
+      background:#ecfdf5; border-color:#d1fae5; color:#065f46; font-weight:700;
+    }
+    .info-chip svg{ width:14px; height:14px; }
+    .sub-note{ font-size:12px; color:var(--muted); margin-top:4px; }
+    .footer {text-align:center; padding:20px; border-top:1px solid #eee; color:#666; margin-top:40px;}
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header class="nav">
+    <div class="brand-green">LinkPepper</div>
+    <nav class="nav-links">
+      <a href="{% url 'home_en' %}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+      <a href="{% url 'rewards_en' %}" style="font-weight:700;color:var(--green)">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+      <a class="btn" href="#wallet">{% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}</a>
+      <a class="btn-outline" href="#stake">{% if meta.lang == 'ko' %}페퍼 스테이킹{% else %}Stake Pepper{% endif %}</a>
+    </nav>
+    <div class="lang">
+      {% if meta.lang == "ko" %}
+        <a href="{% url 'rewards_en' %}">🇺🇸 English</a>
+        <a href="{% url 'rewards_ko' %}" style="border-color:var(--green);color:var(--green)">🇰🇷 한국어</a>
+      {% else %}
+        <a href="{% url 'rewards_en' %}" style="border-color:var(--green);color:var(--green)">🇺🇸 English</a>
+        <a href="{% url 'rewards_ko' %}">🇰🇷 한국어</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- 타이틀 -->
+  <section class="page-title">
+    <h1>{% if meta.lang == 'ko' %}리워드 프로그램{% else %}Reward Program{% endif %}</h1>
+    <p class="muted">
+      {% if meta.lang == 'ko' %}
+        화이트햇 활동으로 USDT를 적립하세요.
+      {% else %}
+        Earn USDT for white-hat contributions.
+      {% endif %}
+    </p>
+  </section>
+
+  <main class="container">
+    <div class="grid">
+
+      <!-- 좌측: 1) 링크 공유 과제 -->
+      <section class="section">
+        <div class="card">
+          <div class="task-head">
+            <span class="pill">{% if meta.lang == 'ko' %}링크 공유 과제{% else %}Link Sharing Task{% endif %}</span>
+          </div>
+
+          <h3 class="task-title">simplequant.net</h3>
+          <p>
+            {% if meta.lang == 'ko' %}
+              사이트를 방문·이용한 뒤 <strong>“퀀트”</strong>, <strong>“암호화폐”</strong> 키워드를 포함해 포스트를 작성해 주세요.
+            {% else %}
+              Visit and use the site, then write a post including keywords like <strong>“quant”</strong> and <strong>“crypto”</strong>.
+            {% endif %}
+          </p>
+          <div class="info-line">
+            <!-- 기간 / Period -->
+            <span class="info-chip">
+              <!-- calendar icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v11A2.5 2.5 0 0 1 19.5 20h-15A2.5 2.5 0 0 1 2 17.5v-11A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 8.5h-15a.5.5 0 0 0-.5.5v5.5c0 .3.2.5.5.5h15c.3 0 .5-.2.5-.5V11a.5.5 0 0 0-.5-.5ZM5 9h14V6.5a.5.5 0 0 0-.5-.5H4.5a.5.5 0 0 0-.5.5V9Z"/>
+              </svg>
+              <span class="k">{% if meta.lang == 'ko' %}기간{% else %}Period{% endif %}</span>
+              <span>
+                {% if meta.lang == 'ko' %}
+                  2025.09.13 00:00 UTC – 2025.09.30 00:00 UTC
+                {% else %}
+                  2025-09-13 00:00 UTC – 2025-09-30 00:00 UTC
+                {% endif %}
+              </span>
+            </span>
+
+            <!-- 리워드 풀 / Reward pool -->
+            <span class="info-chip reward">
+              <!-- coins icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 4.69 2 8v8c0 3.31 4.48 6 10 6s10-2.69 10-6V8c0-3.31-4.48-6-10-6Zm0 2c4.41 0 8 .9 8 4s-3.59 4-8 4-8-.9-8-4 3.59-4 8-4Zm0 14c-4.41 0-8-.9-8-4V9.76c1.86 1.5 5 2.24 8 2.24s6.14-.74 8-2.24V14c0 3.1-3.59 4-8 4Z"/>
+              </svg>
+              <span class="k">{% if meta.lang == 'ko' %}리워드 풀{% else %}Reward pool{% endif %}</span>
+              <strong>2,500&nbsp;USDT</strong>
+            </span>
+          </div>
+
+          <!-- 예시 포스트 -->
+          <div class="list scroller" style="margin-top:10px">
+            <div class="example">
+              <div class="comment">Fun website. I learnt some stuff lol</div>
+              <div class="meta">
+                <a class="meta-link" href="https://x.com/aiphabtc11235/status/1966875708015472907" target="_blank" rel="noopener">Proof of Work</a>
+                <span class="pill soft"><span class="label">User</span> <code>0x6E8960fb316C7202CbFe4277bBc30e9f95443bdf</code></span>
+                <span class="pill score"><span class="label">Score</span> 150</span>
+              </div>
+            </div>
+
+            <div class="example">
+              <div class="comment">방금 글 올렸습니다. 키워드 포함 완료!</div>
+              <div class="meta">
+                <a class="meta-link" href="https://x.com/aiphabtc11235/status/1966875708015472907" target="_blank" rel="noopener">Proof of Work</a>
+                <span class="pill soft"><span class="label">User</span> <code>0xAbCDEF1234567890abcdEf1234567890ABcDeF12</code></span>
+                <span class="pill score"><span class="label">Score</span> 120</span>
+              </div>
+            </div>
+
+            <!-- #3 (이전엔 .list 밖에 있던 걸 안으로 이동) -->
+            <div class="example">
+              <div class="comment">みんな、こんにちは :)</div>
+              <div class="meta">
+                <a class="meta-link" href="https://x.com/aiphabtc11235/status/1966875708015472907" target="_blank" rel="noopener">Proof of Work</a>
+                <span class="pill soft"><span class="label">User</span> <code>GV1MkAGyG3q9C7gBx8DWW3qnTMjgk9SYFmRNYTrqVEPa</code></span>
+                <span class="pill score"><span class="label">Score</span> 70</span>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- 제출 폼 -->
+          <form method="post" action="#" style="margin-top:12px">
+            {% csrf_token %}
+            <div class="row">
+              <input type="url" name="post_url" placeholder="{% if meta.lang == 'ko' %}본인 포스트 URL{% else %}Your post URL{% endif %}" required>
+              <textarea name="comment" rows="3" placeholder="{% if meta.lang == 'ko' %}추가 코멘트(선택){% else %}Optional comment{% endif %}"></textarea>
+              <input type="text" name="wallet" placeholder="{% if meta.lang == 'ko' %}월렛 주소 (예: 0x...){% else %}Wallet address (e.g., 0x...){% endif %}" required>
+            </div>
+            <div class="submit-row">
+              <button class="btn" type="submit">{% if meta.lang == 'ko' %}제출{% else %}Submit{% endif %}</button>
+              <button class="btn-outline" type="reset">{% if meta.lang == 'ko' %}초기화{% else %}Reset Input{% endif %}</button>
+            </div>
+          </form>
+
+          <!-- 페이지네이션 -->
+          <div class="pagination">
+            <a href="#">&lt;</a>
+            <span class="active">1</span>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">&gt;</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 우측: 2) 링크 방문 과제 -->
+      <aside class="section">
+        <div class="card">
+          <div class="task-head">
+            <span class="pill">{% if meta.lang == 'ko' %}링크 방문 과제{% else %}Visit Task{% endif %}</span>
+          </div>
+
+          <h3 class="task-title">{% if meta.lang == 'ko' %}“비트코인 심플퀀트” 검색{% else %}Search “Bitcoin SimpleQuant”{% endif %}</h3>
+          <p>
+            {% if meta.lang == 'ko' %}
+              구글에서 <strong>“비트코인 심플퀀트”</strong>를 검색 후 사이트에 방문하세요. 페이지 맨 아래에 <strong>“코드: xxxxxx”</strong>가 있습니다. 해당 코드를 제출해 주세요.
+            {% else %}
+              On Google, search <strong>“Bitcoin SimpleQuant”</strong>, visit the site, scroll to the bottom, and find <strong>“Code: xxxxxx”</strong>. Submit that code.
+            {% endif %}
+          </p>
+          <div class="info-line">
+            <!-- 기간 / Period -->
+            <span class="info-chip">
+              <!-- calendar icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v11A2.5 2.5 0 0 1 19.5 20h-15A2.5 2.5 0 0 1 2 17.5v-11A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 8.5h-15a.5.5 0 0 0-.5.5v5.5c0 .3.2.5.5.5h15c.3 0 .5-.2.5-.5V11a.5.5 0 0 0-.5-.5ZM5 9h14V6.5a.5.5 0 0 0-.5-.5H4.5a.5.5 0 0 0-.5.5V9Z"/>
+              </svg>
+              <span class="k">{% if meta.lang == 'ko' %}기간{% else %}Period{% endif %}</span>
+              <span>
+                {% if meta.lang == 'ko' %}
+                  2025.09.01 00:00 UTC – 2025.10.10 00:00 UTC
+                {% else %}
+                  2025-09-01 00:00 UTC – 2025-10-10 00:00 UTC
+                {% endif %}
+              </span>
+            </span>
+
+            <!-- 선착순 / Quota -->
+            <span class="info-chip">
+              <!-- users icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16 11a4 4 0 1 0-3.999-4A4 4 0 0 0 16 11Zm-8 2a3 3 0 1 0-2.999-3A3 3 0 0 0 8 13Zm8 1c-2.673 0-8 1.337-8 4v2h16v-2c0-2.663-5.327-4-8-4Zm-8 .5C6.008 14.5 2 15.84 2 18v2h6v-2c0-1.18.475-2.045 1.21-2.75A8.3 8.3 0 0 0 8 14.5Z"/>
+              </svg>
+              <span class="k">{% if meta.lang == 'ko' %}선착순{% else %}Quota{% endif %}</span>
+              <span>
+                {% if meta.lang == 'ko' %}
+                  20명 · 현재 <strong>40%</strong> 달성
+                {% else %}
+                  20 spots · <strong>40%</strong> filled
+                {% endif %}
+              </span>
+            </span>
+
+            <!-- 보상 / Reward -->
+            <span class="info-chip reward">
+              <!-- coin icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 4.69 2 8v8c0 3.31 4.48 6 10 6s10-2.69 10-6V8c0-3.31-4.48-6-10-6Zm0 2c4.41 0 8 .9 8 4s-3.59 4-8 4-8-.9-8-4 3.59-4 8-4Zm0 14c-4.41 0-8-.9-8-4V9.76c1.86 1.5 5 2.24 8 2.24s6.14-.74 8-2.24V14c0 3.1-3.59 4-8 4Z"/>
+              </svg>
+              <span class="k">{% if meta.lang == 'ko' %}보상{% else %}Reward{% endif %}</span>
+              <strong>2&nbsp;USDT</strong>
+            </span>
+          </div>
+
+
+          <!-- 진행도 -->
+          <div class="progress" aria-label="progress"><i style="width:40%"></i></div>
+
+          <!-- 통과 유저 예시 -->
+          <div class="users scroller" style="margin-top:12px">
+            <div class="user">0x6E8960fb316C7202CbFe4277bBc30e9f95443bdf</div>
+            <div class="user">GV1MkAGyG3q9C7gBx8DWW3qnTMjgk9SYFmRNYTrqVEPa</div>
+            <div class="user">0xaE712D8039DE05959112a0DB33b8E005C01740ce</div>
+            <div class="user">0x56Eddb7aa87536c09CCc2793473599fD21A8b17F</div>
+            <div class="user">0xb4f4Af1d8d953f907B0259378a17Ce2fC8BF1b85</div>
+            <div class="user">0x145320a1c58b49840D0e5D831a4Cf18BeeAC3170</div>
+            <div class="user">0xBEa9730dBB3955DE829344b741e1133FB182055A</div>
+            <div class="user">0x894207844E9764F104a8A6d89A082E43974a0687</div>
+          </div>
+
+          <!-- 코드 제출 -->
+          <form method="post" action="#" style="margin-top:12px">
+            {% csrf_token %}
+            <div class="row">
+              <input type="text" name="code" placeholder="{% if meta.lang == 'ko' %}코드 xxxxxx 입력{% else %}Enter code xxxxxx{% endif %}" required>
+              <input type="text" name="wallet2" placeholder="{% if meta.lang == 'ko' %}월렛 주소 (예: 0x...){% else %}Wallet address (e.g., 0x...){% endif %}" required>
+            </div>
+            <div class="submit-row">
+              <button class="btn" type="submit">{% if meta.lang == 'ko' %}제출{% else %}Submit{% endif %}</button>
+            </div>
+          </form>
+
+          <div class="pagination">
+              <a href="#">&lt;</a>
+              <span class="active">1</span>
+              <a href="#">2</a>
+              <a href="#">3</a>
+              <a href="#">4</a>
+              <a href="#">5</a>
+              <a href="#">&gt;</a>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- 3) 리워드 프로그램 신청하기 -->
+    <div class="cta-center">
+      <a class="btn" href="{% if meta.lang == 'ko' %}{% url 'rewards_apply_ko' %}{% else %}{% url 'rewards_apply_en' %}{% endif %}">
+        {% if meta.lang == 'ko' %}리워드 프로그램 신청하기{% else %}Apply for the Reward Program{% endif %}
+      </a>
+    </div>
+
+    <footer class="footer">© <span data-i18n="brand" class="brand-green">LinkPepper</span></footer>
+  </main>
+</body>
+</html>
