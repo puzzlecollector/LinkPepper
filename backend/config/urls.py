@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path("", home_en, name="home_en"),
-    path("ko/", home_ko, name="home_ko"), # https://linkpepper.com/ko/
+    path("ko/", home_ko, name="home_ko"),
 
     path("rewards/", rewards_en, name="rewards_en"),
     path("ko/rewards/", rewards_ko, name="rewards_ko"),

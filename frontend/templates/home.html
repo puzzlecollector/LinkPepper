@@ -8,12 +8,12 @@
 
   <link rel="canonical" href="{{ meta.canonical }}">
   <meta name="robots" content="index,follow">
-  <meta name="author" content="LinkPepper">
+  <meta name="author" content="LinkHash">
   <meta name="description" content="{{ meta.description }}">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LinkPepper">
+  <meta property="og:site_name" content="LinkHash">
   <meta property="og:title" content="{{ meta.og_title }}">
   <meta property="og:description" content="{{ meta.og_description }}">
   <meta property="og:url" content="{{ meta.url }}">
@@ -41,7 +41,7 @@
   {
     "@context":"https://schema.org",
     "@type":"Organization",
-    "name":"LinkPepper",
+    "name":"LinkHash",
     "url":"{{ meta.url }}",
     "logo":"{% static 'img/logo-square-1024.png' %}",
     "sameAs":[
@@ -56,7 +56,7 @@
     "@context":"https://schema.org",
     "@type":"WebSite",
     "url":"{{ meta.url|cut:'ko/' }}",
-    "name":"LinkPepper",
+    "name":"LinkHash",
     "potentialAction":{
       "@type":"SearchAction",
       "target":"{{ meta.url|cut:'ko/' }}search?q={query}",
@@ -297,7 +297,7 @@
       {% url 'rewards_en' as rewards_url %}
     {% endif %}
 
-    <div class="brand brand-green" data-i18n="brand">LinkPepper</div>
+    <div class="brand brand-green" data-i18n="brand">LinkHash</div>
 
     <!-- 햄버거 버튼 -->
     <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
@@ -529,7 +529,7 @@
           <path d="M2 6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5v11A2.5 2.5 0 0 1 19.5 20h-15A2.5 2.5 0 0 1 2 17.5v-11Zm2 .3v.1l8 5 8-5v-.1a.5.5 0 0 0-.5-.3h-15a.5.5 0 0 0-.5.3Zm16 2.9-6.9 4.3a2 2 0 0 1-2.2 0L4 9.7v7.8c0 .3.2.5.5.5h15c.3 0 .5-.2.5-.5V9.7Z"/>
         </svg>
         <strong>CS</strong> :
-        <a href="mailto:LinkPepper11235@proton.me">LinkPepper11235@proton.me</a>
+        <a href="mailto:LinkHash11235@proton.me">LinkHash11235@proton.me</a>
       </div>
     </div>
   </section>
@@ -555,13 +555,13 @@
   </div>
 
 
-  <footer class="footer">© <span data-i18n="brand" class="brand-green">LinkPepper</span></footer>
+  <footer class="footer">© <span data-i18n="brand" class="brand-green">LinkHash</span></footer>
 
 
   <script>
   const i18n = {
     ko: {
-      brand: "LinkPepper",
+      brand: "LinkHash",
       // 내비(한글)
       nav_home: "홈",
       nav_pricing: "가격",
@@ -622,7 +622,7 @@
       nav_events: "이벤트"
     },
     en: {
-      brand: "LinkPepper",
+      brand: "LinkHash",
       // nav (영문)
       nav_home: "Home",
       nav_pricing: "Pricing",
