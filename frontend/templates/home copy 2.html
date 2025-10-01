@@ -1,0 +1,618 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=1280, initial-scale=1">
+        <title>{{ meta.title|default:"LinkHash | Web3 SEO Rewards" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'Data-driven backlinks & web3 rewards platform.' }}">
+        <!-- OG/Twitter -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{% static 'img/favicon-32x32.png' %}"
+        >
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="{% static 'img/favicon-16x16.png' %}"
+        >
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+        <!-- Swiper CSS -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.css"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        >
+        <style>
+      /* ======= THEME ======= */
+      :root{
+        --bg:#0a0b0d; --bg-elev:#0f1115;
+        --panel:#11141a; --panel-2:#0e1318;
+        --grid:#0b0f13; --line:#1a212d;
+        --text:#e6f1ee; --muted:#9fb0aa;
+        --green:#16a34a;            /* Matrixish green only */
+        --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px;
+        --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 16px 40px rgba(0,0,0,.45);
+        --noise:transparent url('data:image/svg+xml;utf8,\
+          <svg xmlns="http://www.w3.org/2000/svg" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\
+          <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+          <rect width=\"120\" height=\"120\" filter=\"url(%23n)\" opacity=\".04\"/></svg>') repeat;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+        letter-spacing:.2px; background-attachment: fixed;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:1200px; margin:0 auto; padding:0 20px;}
+
+      /* ===== NAV ===== */
+      .nav{position:sticky; top:0; z-index:60; backdrop-filter: blur(10px);
+        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+      .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; color:#d8ffe7; text-shadow:0 0 18px rgba(35,209,106,.24);}
+      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+      .nav .links{display:flex; gap:24px; align-items:center;}
+      .nav .links a{color:#cfe7dd; opacity:.9}
+      .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+      /* ===== HERO ===== */
+      .hero{position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,.06);}
+      .hero::before{
+        content:""; position:absolute; inset:-10%; background:
+          radial-gradient(70rem 40rem at 20% -10%, rgba(22,163,74,.18), transparent 60%),
+          radial-gradient(60rem 40rem at 120% 10%, rgba(22,163,74,.10), transparent 60%);
+        filter: blur(40px); z-index:0; opacity:.6;
+      }
+      .hero .container{height:680px; display:flex; align-items:center; position:relative; z-index:1;}
+      .hero h1{font-size:58px; line-height:1.1; margin:0 0 14px; letter-spacing:0.4px;}
+      .hero p{color:var(--muted); font-size:18px; margin:0 0 28px;}
+      .hero .cta{display:flex; gap:14px;}
+      .hero .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(22,163,74,.14); border:1px solid rgba(35,209,106,.35); color:#aef2c9; font-weight:700; margin-bottom:16px;}
+
+      /* ===== PINNED STAGE ===== */
+      .stage{position:relative; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);}
+      .stage .pin-wrap{height:520vh; position:relative;} /* longer to slow scroll */
+      .stage .sticky{position:sticky; top:0; height:86vh; display:flex; align-items:center; justify-content:center;}
+      #stage3d{width:100%; height:100%; display:block}
+      .stage .panels{position:absolute; inset:0; pointer-events:none;}
+      .stage .panel{
+        position:absolute; left:50%; transform:translateX(-50%);
+        width:860px; padding:18px 22px; text-align:center;
+        background:linear-gradient(180deg, rgba(10,12,16,.8), rgba(12,14,18,.4));
+        border:1px solid rgba(255,255,255,.06); border-radius:16px; box-shadow:var(--shadow-md);
+        opacity:0;
+      }
+      .stage .panel h3{margin:0 0 8px; font-size:28px;}
+      .stage .panel p{margin:0; color:#b4c5bf}
+
+      /* ===== EXPLAINERS ===== */
+      .section{padding:88px 0; background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.65)), var(--noise);}
+      .section h2{font-size:36px; margin:0 0 12px;}
+      .section p.lead{color:#9fb0aa; margin:0 0 28px;}
+      .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+      .card{background:linear-gradient(180deg, #0f1419, #0c1116); border:1px solid rgba(255,255,255,.06); border-radius:16px; box-shadow:var(--shadow-lg); padding:22px; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;}
+      .card:hover{transform:translateY(-3px); border-color:rgba(35,209,106,.35); box-shadow:0 40px 80px rgba(22,163,74,.18)}
+      .card h3{margin:0 0 8px;} .card p{margin:0; color:#b9c9c3}
+      .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+      .chip{padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px; display:inline-flex; align-items:center; gap:6px;}
+
+      /* ===== PROJECTS ===== */
+      .projects{padding:90px 0 110px; background:radial-gradient(90rem 50rem at -15% 10%, rgba(22,163,74,.10), transparent 60%), linear-gradient(180deg, #0a0d11, #0b0e12);}
+      .projects h2{font-size:34px; margin:0 0 6px;} .projects .sub{color:#9fb0aa; margin:0 0 22px;}
+      .project-card{width:360px; height:460px; display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(180deg, #0d1217, #0b0f14); border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);}
+      .project-card .thumb{position:relative; height:190px; background:#0b1117; overflow:hidden;}
+      .project-card .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.92; transform:scale(1.03)}
+      .task-badges{position:absolute; left:12px; bottom:12px; display:flex; gap:8px;}
+      .task-badge{padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(14,18,25,.8); border:1px solid rgba(255,255,255,.08);}
+      .task-badge.visit{color:#a0f2bd; border-color:#2a6f47} .task-badge.link{color:#b2f5ff; border-color:#2a455e}
+      .project-card .body{flex:1; padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px;}
+      .project-card h3{font-size:18px; margin:0} .project-card p{color:#b7c8c1; font-size:14px; margin:0 0 6px}
+      .meta{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
+      .meta .pill{background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:8px;}
+      .progress{height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:6px;}
+      .progress .bar{height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)}
+      .project-card .foot{display:flex; justify-content:flex-end; margin-top:auto;} .project-card .foot .btn{padding:10px 12px;}
+      .swiper{padding:8px} .swiper-slide{width:auto}
+
+      /* FOOTER */
+      .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10;}
+
+      @media (max-width:1140px){ .container{width:1000px} }
+      @media (max-width:1000px){ .container{width:920px} }
+        </style>
+    </head>
+    <body>
+        <!-- ===== NAV ===== -->
+        <header class="nav">
+            <div class="container row">
+                <div class="brand">
+                    <span class="dot"></span>
+                    <span>LinkHash</span>
+                </div>
+                <nav class="links">
+                    {% if meta.lang == "ko" %}
+            {% url 'home_ko' as home_url %}{% url 'events_ko' as events_url %}{% url 'rewards_ko' as rewards_url %}
+          {% else %}
+            {% url 'home_en' as home_url %}{% url 'events_en' as events_url %}{% url 'rewards_en' as rewards_url %}
+          {% endif %}
+                    <a href="{{ home_url }}">Home</a>
+                    <a href="#story">What is LinkHash</a>
+                    <a href="#explain">How it works</a>
+                    <a href="{{ rewards_url }}">Reward Program</a>
+                    <a href="{{ events_url }}">Events</a>
+                    <a class="btn-outline" href="#projects">Campaigns</a>
+                    {% if wallet_user %}
+                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                    <a class="btn" href="#">Dashboard</a>
+                    {% else %}
+                    <a class="btn" href="#">Connect Wallet</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+        <!-- ===== HERO ===== -->
+        <section class="hero">
+            <div class="container">
+                <div class="content">
+                    <div class="badge">Web3 · SEO · Rewards</div>
+                    <h1>Boost rankings with
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">transparent, white-hat</span> campaigns that pay your community.
+                    </h1>
+                    <p>Advertisers fund pools in USDT. Users complete visit & link-share tasks. Everyone sees the numbers.</p>
+                    <div class="cta">
+                        <a class="btn" href="#projects">Explore Campaigns</a>
+                        <a class="btn-outline" href="{{ rewards_url }}">How rewards work</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== PINNED 3D STAGE (Rocket → Moon) ===== -->
+        <section id="story" class="stage">
+            <div class="pin-wrap">
+                <div class="sticky">
+                    <canvas id="stage3d"></canvas>
+                    <div class="panels">
+                        <div class="panel" id="p1" style="top:10%">
+                            <h3>1) Client funds a USDT pool</h3>
+                            <p>Choose budget & dates. We open tasks with clear rules (platforms, links allowed, do/don’ts) and publish the live pool size.</p>
+                        </div>
+                        <div class="panel" id="p2" style="top:40%">
+                            <h3>2) Tasks go live & are verified</h3>
+                            <p>Contributors pick missions:
+                                <b>Visit</b> (find a code on the page) or
+                                <b>Link-share</b> (Naver, Instagram, Facebook, etc.). Anti-spam checks + review keep quality white-hat.
+                            </p>
+                        </div>
+                        <div class="panel" id="p3" style="top:70%">
+                            <h3>3) Rewards claimed instantly</h3>
+                            <p>Every approved action pays from the pool in USDT. Progress is public — pool left, participants, claim % — so both sides trust the results.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== EXPLAINERS ===== -->
+        <section id="explain" class="section">
+            <div class="container">
+                <h2>Built for two sides — one transparent system</h2>
+                <p class="lead">Data-driven placements, visible progress, and playful UX so people actually enjoy participating.</p>
+                <div class="cards">
+                    <div class="card">
+                        <h3>For Advertisers</h3>
+                        <p>Launch safe link-building with curated placements, quota controls, and live progress. Downloadable reports include placements, dates, and outcomes.</p>
+                        <div class="chips">
+                            <span class="chip">White-hat</span>
+                            <span class="chip">Topical fit</span>
+                            <span class="chip">Transparent</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>For Contributors</h3>
+                        <p>Finish small missions, earn USDT automatically. Your dashboard shows task status, proofs, and instant claim history.</p>
+                        <div class="chips">
+                            <span class="chip">Visit tasks</span>
+                            <span class="chip">Link sharing</span>
+                            <span class="chip">Instant rewards</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Safety by design</h3>
+                        <p>Heuristics block spam, duplicate links, or prohibited anchors. Disputes go to manual review with clear outcomes.</p>
+                        <div class="chips">
+                            <span class="chip">Spam guard</span>
+                            <span class="chip">Appeals</span>
+                            <span class="chip">Reporting</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== PROJECTS: CAROUSEL ===== -->
+        <section id="projects" class="projects">
+            <div class="container">
+                <h2>Live Campaigns</h2>
+                <p class="sub">Browse tasks like a shop — pick a mission, complete it, claim rewards.</p>
+                <div class="swiper" id="campaign-swiper">
+                    <div class="swiper-wrapper">
+                        {% if projects %}
+              {% for c in projects %}
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{{ c.image_url }}" alt="">
+                                    <div class="task-badges">
+                                        {% if c.has_visit %}
+                                        <span class="task-badge visit">VISIT</span>
+                                        {% endif %}
+                        {% if c.has_link %}
+                                        <span class="task-badge link">LINK</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>{{ c.title }}</h3>
+                                    <p>{{ c.summary }}</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>&nbsp; {{ c.pool_usdt }} USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>&nbsp; {{ c.participants }}
+                                        </div>
+                                    </div>
+                                    <div class="progress" aria-label="claimed progress">
+                                        <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>{{ c.claimed_percent }}% claimed</span>
+                                        <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">{{ c.cta|default:"View details" }}</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {% endfor %}
+            {% else %}
+                        <!-- Placeholders using your local images with online fallbacks -->
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{% static 'img/cards/neon-city.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1542751110-97427bbecf20?q=80&w=1200&auto=format&fit=crop'" alt="Neon city hero">
+                                    <div class="task-badges">
+                                        <span class="task-badge visit">VISIT</span>
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>SimpleQuant: Blog launch</h3>
+                                    <p>Read the post, find the hidden code in the article, submit & earn.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>&nbsp; 2,000&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>&nbsp; 842
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="63"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>63% claimed</span>
+                                        <span>2025-09-01 → 2025-10-31</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{% static 'img/cards/bitcoin-close.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=1200&auto=format&fit=crop'" alt="Bitcoin close up">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Naver review sprint</h3>
+                                    <p>Write a genuine Naver Blog review with dofollow link back.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>&nbsp; 5,000&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>&nbsp; 412
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="40"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>40% claimed</span>
+                                        <span>2025-10-05 → 2025-11-15</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{% static 'img/cards/green-office.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop'" alt="Green office">
+                                    <div class="task-badges">
+                                        <span class="task-badge visit">VISIT</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Product page engagement</h3>
+                                    <p>Scroll & interact; find the code at the end of the page.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>&nbsp; 1,500&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>&nbsp; 230
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="15"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>15% claimed</span>
+                                        <span>2025-10-10 → 2025-12-01</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+            </div>
+        </footer>
+        <!-- ===== MODULE (ESM imports) ===== -->
+        <script type="module">
+      /* Imports */
+      import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.module.js';
+      import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+      import ScrollTrigger from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger.js';
+      import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs';
+      import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
+      gsap.registerPlugin(ScrollTrigger);
+
+      /* ===== 1) Smooth scroll – LESS sensitive ===== */
+      // Slowed: smaller wheelMultiplier, slightly stronger smoothing.
+      const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.55, smoothWheel: true, normalizeWheel: true });
+      lenis.on('scroll', () => ScrollTrigger.update());
+      function raf(t){ lenis.raf(t); requestAnimationFrame(raf); } requestAnimationFrame(raf);
+      // Also make ScrollTrigger less “snappy” by using longer distances (see section CSS/percentages below)
+
+      /* ===== 2) THREE.js — Rocket → Moon (procedural, CC0 by code) ===== */
+      const canvas = document.getElementById('stage3d');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x0a0c10, 8, 18);
+
+      const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 200);
+      camera.position.set(0, 0.6, 7);
+
+      function size(){
+        const h = Math.floor(window.innerHeight*0.86);
+        renderer.setSize(window.innerWidth, h);
+        renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+        camera.aspect = window.innerWidth / h;
+        camera.updateProjectionMatrix();
+      }
+      size(); window.addEventListener('resize', size);
+
+      // Lighting with green-ish rim (Matrix vibe)
+      const key = new THREE.DirectionalLight(0x3bf27c, .9); key.position.set(3,3,4);
+      const rim = new THREE.DirectionalLight(0x1a9f4d, .7); rim.position.set(-4,1.5,-2);
+      const amb = new THREE.AmbientLight(0x1b2630, .55);
+      scene.add(key, rim, amb);
+
+      // Groups
+      const world = new THREE.Group(); scene.add(world);
+      const rocketGrp = new THREE.Group(); world.add(rocketGrp);
+
+      // Moon (to the right/top)
+      const moonGeo = new THREE.SphereGeometry(2.2, 48, 48);
+      const moonMat = new THREE.MeshStandardMaterial({
+        color:0x0d1417, roughness:0.9, metalness:0.0,
+        emissive:0x0a2215, emissiveIntensity:0.25
+      });
+      const moon = new THREE.Mesh(moonGeo, moonMat);
+      moon.position.set(3.6, 2.0, -1.0);
+      world.add(moon);
+
+      // Stars (subtle)
+      const stars = new THREE.Points(
+        new THREE.BufferGeometry().setAttribute('position',
+          new THREE.Float32BufferAttribute(Array.from({length:8000}, ()=> (Math.random()-0.5)*60), 3)),
+        new THREE.PointsMaterial({ color:0x1e2a36, size:0.02 })
+      );
+      scene.add(stars);
+
+      // Rocket (stylized): body + nose + fins + window
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.35, 0.42, 2.0, 24),
+        new THREE.MeshStandardMaterial({ color:0x0e1519, metalness:.85, roughness:.25 })
+      );
+      body.position.y = 0.4;
+      const nose = new THREE.Mesh(
+        new THREE.ConeGeometry(0.42, 0.7, 24),
+        new THREE.MeshStandardMaterial({ color:0x0e1519, metalness:.9, roughness:.22, emissive:0x0b2b18, emissiveIntensity:.2 })
+      );
+      nose.position.y = 1.75;
+
+      const windowRim = new THREE.Mesh(
+        new THREE.TorusGeometry(0.18, 0.04, 12, 36),
+        new THREE.MeshStandardMaterial({ color:0xc6ffd8, metalness:.2, roughness:.6, emissive:0x124d2c, emissiveIntensity:.35 })
+      );
+      windowRim.position.set(0.0, 0.9, 0.35);
+      windowRim.rotation.x = Math.PI/2;
+
+      const windowGlass = new THREE.Mesh(
+        new THREE.CircleGeometry(0.16, 32),
+        new THREE.MeshStandardMaterial({ color:0x19b357, metalness:.8, roughness:.15, emissive:0x0a3f22, emissiveIntensity:.35 })
+      );
+      windowGlass.position.set(0.0, 0.9, 0.36);
+
+      function fin(rot){
+        const g = new THREE.BoxGeometry(0.06, 0.5, 0.36);
+        const m = new THREE.MeshStandardMaterial({ color:0x18231c, metalness:.8, roughness:.28 });
+        const f = new THREE.Mesh(g, m);
+        f.position.set(0, -0.6, 0.0);
+        f.rotation.y = rot;
+        return f;
+      }
+      rocketGrp.add(body, nose, windowRim, windowGlass, fin(0), fin(Math.PI/2), fin(Math.PI), fin(3*Math.PI/2));
+      rocketGrp.position.set(-1.6, -0.8, 0);
+
+      // Flame (simple glowing cone) + smoke particles
+      const flame = new THREE.Mesh(
+        new THREE.ConeGeometry(0.25, 0.7, 20),
+        new THREE.MeshStandardMaterial({ color:0x23d16a, emissive:0x23d16a, emissiveIntensity:0.8, metalness:0.0, roughness:0.8, transparent:true, opacity:0.85 })
+      );
+      flame.rotation.x = Math.PI;
+      flame.position.y = -0.7;
+      rocketGrp.add(flame);
+
+      const smokeGeo = new THREE.BufferGeometry();
+      const smokeCount = 80;
+      const smokePos = new Float32Array(smokeCount*3);
+      for(let i=0;i<smokeCount;i++){ smokePos[i*3+0]=0; smokePos[i*3+1]=-0.8; smokePos[i*3+2]=0; }
+      smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePos,3));
+      const smoke = new THREE.Points(smokeGeo, new THREE.PointsMaterial({ size:0.06, color:0x23333e, transparent:true, opacity:0.5 }));
+      rocketGrp.add(smoke);
+
+      // Animate
+      const clock = new THREE.Clock();
+      function render(){
+        const t = clock.getElapsedTime();
+        rocketGrp.position.y += 0.002 + Math.sin(t*4)*0.0004;
+        flame.scale.y = 0.9 + Math.sin(t*30)*0.12;
+        flame.scale.x = flame.scale.z = 0.9 + Math.sin(t*22+1.2)*0.08;
+
+        // smoke drift
+        const arr = smoke.geometry.attributes.position.array;
+        for(let i=0;i<smokeCount;i++){
+          const base = i*3;
+          arr[base+0] += (Math.sin(t*1.2 + i)*0.003);
+          arr[base+1] -= 0.008 + (i%5)*0.0002;
+          arr[base+2] += (Math.cos(t*1.3 + i)*0.003);
+          // reset when far
+          if(arr[base+1] < -3.5){ arr[base+0]=0; arr[base+1]=-0.8; arr[base+2]=0; }
+        }
+        smoke.geometry.attributes.position.needsUpdate = true;
+
+        moon.rotation.y += 0.0008;
+        world.rotation.y += 0.0009;
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      }
+      render();
+
+      /* ===== 3) Scroll choreography (slower) ===== */
+      // Longer section height (+ gentler Lenis) already slows down perceived motion.
+      ScrollTrigger.create({
+        trigger: document.querySelector('.stage .pin-wrap'),
+        start: "top top",
+        end: "bottom bottom",
+        pin: ".stage .sticky",
+        scrub: 1.2     // add easing to the scrub for smoothness
+      });
+
+      // Camera travel is shorter and spread across the section
+      gsap.to(camera.position, {
+        z: 5.0, x: 0.6, y: 0.9,
+        scrollTrigger: { trigger: ".stage .pin-wrap", start: "top top", end: "85% top", scrub: true }
+      });
+
+      // World rotate slower across more scroll
+      gsap.to(world.rotation, {
+        y: Math.PI * 1.2,
+        scrollTrigger: { trigger: ".stage .pin-wrap", start: "10% top", end: "95% top", scrub: true }
+      });
+
+      // Panels — timings stretched so you don’t “skip” them
+      ["#p1","#p2","#p3"].forEach((sel, i)=>{
+        const inStart = 8 + i*28;  // was 10 + 25; widened gaps
+        gsap.to(sel, { opacity: 1, y: 0,
+          scrollTrigger:{ trigger: ".stage .pin-wrap", start: `${inStart}% top`, end: `${inStart+12}% top`, scrub: true }});
+        gsap.to(sel, { opacity: 0,
+          scrollTrigger:{ trigger: ".stage .pin-wrap", start: `${inStart+10}% top`, end: `${inStart+22}% top`, scrub: true }});
+      });
+
+      // Nav darkness on scroll
+      gsap.to(document.querySelector('.nav'), {
+        background: "linear-gradient(180deg, rgba(10,12,16,.85), rgba(10,12,16,.55))",
+        scrollTrigger:{ trigger: "body", start: "top top+=40", end: "bottom bottom", scrub: true }
+      });
+
+      /* ===== 4) Swiper (campaign carousel) ===== */
+      const swiper = new Swiper('#campaign-swiper', {
+        slidesPerView: "auto", spaceBetween: 18, freeMode: true, mousewheel: true, grabCursor: true
+      });
+
+      // Progress bars
+      document.querySelectorAll('.progress .bar').forEach(b=>{
+        const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
+        b.style.width = "0%";
+        gsap.to(b, { width: target, duration: 1.2, ease: "power2.out",
+          scrollTrigger: { trigger: b, start: "top 90%" }});
+      });
+        </script>
+    </body>
+</html>

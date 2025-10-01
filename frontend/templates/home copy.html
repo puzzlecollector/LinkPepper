@@ -116,7 +116,7 @@
 
     /* ===== PINNED 3D STAGE ===== */
     .stage{position:relative; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);}
-    .stage .pin-wrap{height:520vh; position:relative;} /* big scroll area */
+    .stage .pin-wrap{height:420vh; position:relative;} /* big scroll area */
     .stage .sticky{position:sticky; top:0; height:86vh; display:flex; align-items:center; justify-content:center;}
     #stage3d{width:100%; height:100%; display:block}
     .stage .panels{position:absolute; inset:0; pointer-events:none;}
@@ -237,21 +237,15 @@
                     <div class="panels">
                         <div class="panel" id="p1" style="top:10%">
                             <h3>1) Client funds a USDT pool</h3>
-                            <p>Choose budget & dates. We open tasks with clear rules (platforms, links allowed, do/don’ts) and publish the live pool size.</p>
+                            <p>We allocate budgets and open tasks with clear rules & quotas.</p>
                         </div>
                         <div class="panel" id="p2" style="top:40%">
-                            <h3>2) Tasks go live & are verified</h3>
-                            <p>
-                                Contributors pick missions:
-                                <b>Visit</b>
-                                (find a code on the page) or
-                                <b>Link-share</b>
-                                (Naver, Instagram, Facebook, etc.). Anti-spam checks + review keep everything white-hat.
-                            </p>
+                            <h3>2) Tasks go live</h3>
+                            <p>Visit tasks (find code on site) & Link‑sharing tasks (Naver, Instagram, Facebook, etc.).</p>
                         </div>
                         <div class="panel" id="p3" style="top:70%">
-                            <h3>3) Rewards claimed instantly</h3>
-                            <p>Every approved action pays from the pool in USDT. Progress is public — pool left, participants, claim % — so both sides trust the results.</p>
+                            <h3>3) Users earn instantly</h3>
+                            <p>Rewards scale with difficulty; live progress & anti‑spam checks keep it fair.</p>
                         </div>
                     </div>
                 </div>
@@ -478,7 +472,7 @@
           gsap.registerPlugin(ScrollTrigger);
 
           // ---- Lenis (SMOOTH SCROLL) correctly wired with ScrollTrigger ----
-          const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.45, smoothWheel: true, normalizeWheel: true });
+          const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.9, smoothWheel: true });
           lenis.on('scroll', () => ScrollTrigger.update());
           function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
           requestAnimationFrame(raf);

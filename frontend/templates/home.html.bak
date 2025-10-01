@@ -1,0 +1,945 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ meta.title }}</title>
+        <link rel="canonical" href="{{ meta.canonical }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description }}">
+        <!-- Open Graph -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title }}">
+        <meta property="og:description" content="{{ meta.og_description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title }}">
+        <meta name="twitter:description" content="{{ meta.og_description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{% static 'img/favicon-32x32.png' %}"
+        >
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="{% static 'img/favicon-16x16.png' %}"
+        >
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+        <!-- Hreflang -->
+        <link rel="alternate" href="{{ meta.url|cut:'ko/' }}" hreflang="x-default">
+        <link rel="alternate" href="{{ meta.url|cut:'ko/' }}" hreflang="en">
+        <link rel="alternate" href="{{ meta.url }}" hreflang="ko">
+        <!-- JSON-LD -->
+        <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"LinkHash",
+    "url":"{{ meta.url }}",
+    "logo":"{% static 'img/logo-square-1024.png' %}",
+    "sameAs":[
+      "https://x.com/your_handle",
+      "https://instagram.com/your_handle",
+      "https://t.me/your_handle"
+    ]
+  }
+        </script>
+        <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "url":"{{ meta.url|cut:'ko/' }}",
+    "name":"LinkHash",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"{{ meta.url|cut:'ko/' }}search?q={query}",
+      "query-input":"required name=query"
+    }
+  }
+        </script>
+        <style>
+    body {margin:0; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;}
+    .nav {display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid #eee;}
+    .nav .brand {font-weight:700;}
+    .nav a {margin-left:16px; text-decoration:none; color:#111;}
+    .btn {padding:10px 14px; border-radius:10px; background:#16a34a; color:#fff; text-decoration:none;}
+    .btn-outline {padding:10px 14px; border-radius:10px; border:1px solid #16a34a; color:#16a34a; text-decoration:none; margin-left:8px;}
+    .brand-green { color:#16a34a; font-weight:800; }
+    .hero {text-align:center; padding:72px 20px;}
+    .hero h1 {font-size:40px; margin-bottom:10px;}
+    .cta {margin-top:16px;}
+    .how, .plans, .contact {padding:48px 20px; max-width:1100px; margin:0 auto;}
+    .checks {list-style:none; padding:0;}
+    .checks li {margin:10px 0; padding-left:28px; position:relative;}
+    .checks li::before {content:"✓"; position:absolute; left:0; color:#16a34a; font-weight:700;}
+    .grid {display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+    .card {border:1px solid #eee; border-radius:14px; padding:20px; position:relative;}
+    .card .price {font-size:22px; font-weight:700; margin:8px 0 12px;}
+    .card ul {padding-left:18px;}
+    .card.featured {border-color:#16a34a; box-shadow:0 8px 24px rgba(0,0,0,.06);}
+    .plan-badge {
+      position:absolute; top:-10px; right:-10px;
+      background:#16a34a; color:#fff; padding:6px 10px;
+      border-radius:999px; font-size:12px;
+    }
+    .footer {text-align:center; padding:20px; border-top:1px solid #eee; color:#666; margin-top:40px;}
+    .lang {display:flex; gap:8px; align-items:center;}
+    .lang button {border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:8px; cursor:pointer;}
+    .lang button.active {border-color:#16a34a; color:#16a34a; font-weight:700;}
+    .socials { display:flex; gap:12px; align-items:center; margin-top:12px; }
+    .social-btn {
+      width:40px; height:40px; border-radius:999px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid #e5e7eb; background:#fff; text-decoration:none;
+      transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .social-btn svg { width:20px; height:20px; fill:#111; }
+    .social-btn:hover {
+      transform:translateY(-1px);
+      border-color:#16a34a; box-shadow:0 6px 18px rgba(22,163,74,.15);
+    }
+    .social-btn:hover svg { fill:#16a34a; }
+    @media (max-width:900px){ .grid {grid-template-columns:1fr;} .hero h1{font-size:28px;} }
+
+    /* Contact form */
+    .form {max-width:900px; margin:18px 0;}
+    .form .row {display:flex; gap:14px; flex-wrap:wrap;}
+    .form input, .form textarea {
+      width:100%; padding:14px 16px; border:1px solid #cfd4da; border-radius:8px; font-size:14px;
+    }
+    .form textarea {min-height:140px; resize:vertical;}
+    .form .consent {display:flex; align-items:center; gap:8px; margin:12px 0;}
+    .form .consent a {color:#555; text-decoration:underline; cursor:pointer;}
+    .form .send {display:flex; justify-content:flex-end; margin-top:8px;}
+    .form .send button {min-width:120px;}
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:50;
+    }
+    .modal{background:#fff; max-width:720px; width:92%; border-radius:12px; padding:22px 22px 26px; box-shadow:0 20px 60px rgba(0,0,0,.2);}
+    .modal h3{margin:0 0 12px 0;}
+    .modal .close{border:none; background:transparent; font-size:26px; line-height:1; cursor:pointer; position:absolute; right:18px; top:6px;}
+    .modal .content p{color:#444; margin:8px 0;}
+    .modal .content .bullet{font-weight:700; margin-top:12px;}
+    /* ===== NAV: 햄버거 & 드로어 ===== */
+    .nav { gap:14px; }
+    .nav .brand { white-space:nowrap; }
+    .nav-links { display:flex; align-items:center; gap:16px; }
+    .hamburger { display:none; font-size:22px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:6px 10px; cursor:pointer; }
+    .nav-drawer {
+      display:none; position:fixed; top:60px; right:16px; left:16px;
+      background:#fff; border:1px solid #e5e7eb; border-radius:12px; box-shadow:0 16px 40px rgba(0,0,0,.12);
+      padding:14px; z-index:40; flex-direction:column; gap:10px;
+    }
+    .nav-drawer a { padding:10px 12px; border-radius:10px; border:1px solid #f0f2f5; }
+    @media (max-width:960px){
+      .nav { align-items:center; }
+      .nav-links { display:none; }
+      .hamburger { display:inline-block; }
+      .lang { margin-left:auto; }
+    }
+
+    /* ===== FORM: 정돈 & 포커스 ===== */
+    .form { max-width:900px; margin:18px 0; }
+    .form .row { display:block; }
+    .form input, .form textarea{
+      width:100%; padding:14px 16px; border:1px solid #cfd4da; border-radius:12px; font-size:15px; outline:none;
+      transition:border-color .12s ease, box-shadow .12s ease;
+    }
+    .form input:focus, .form textarea:focus{
+      border-color:#16a34a; box-shadow:0 0 0 4px rgba(22,163,74,.12);
+    }
+    .form textarea{ min-height:160px; resize:vertical; }
+
+    /* 동의 영역 줄바꿈 & 정렬 예쁘게 */
+    .form .consent{
+      display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:start;
+      margin:16px 0 8px;
+    }
+    .form .consent input{ width:18px; height:18px; margin-top:2px; }
+    .form .consent span{ font-size:14px; color:#222; line-height:1.5; }
+    .form .consent a{ font-size:14px; color:#6b7280; text-decoration:underline; white-space:nowrap; }
+
+    .form .send{ display:flex; justify-content:flex-end; }
+    .form .send .btn{ min-width:140px; font-weight:600; border-radius:12px; }
+
+    /* 소셜 버튼도 여백 조금 */
+    .socials{ gap:10px; margin-top:18px; }
+    .social-btn{ width:44px; height:44px; border-radius:999px; }
+
+    /* 히어로 타이틀 줄바꿈 품질 */
+    .hero h1{ line-height:1.2; }
+
+
+    /* 카드 하단에 버튼 고정 */
+    .plans .grid { align-items: stretch; }         /* 카드 높이 동일하게 늘이기 */
+    .plans .card {
+      display: flex;
+      flex-direction: column;                      /* 세로 배치 */
+    }
+    .plans .card .btn {
+      margin-top: auto;                            /* 남는 공간을 위로 밀어 버튼을 아래로 */
+      width: max-content;                          /* 버튼 너비 고정(내용 만큼) */
+    }
+
+    /* (선택) 카드 내부 간격 조금 다듬기 */
+    .plans .card .price { margin: 8px 0 12px; }
+    .plans .card ul { margin-bottom: 16px; }
+
+    /* 플랜 카드: 불릿 사이 간격/가독성 */
+    .plans .card ul {
+      padding-left: 20px;      /* 기본 들여쓰기 */
+      margin: 12px 0 16px;     /* 리스트 위/아래 여백 */
+    }
+    .plans .card ul li {
+      margin-bottom: 8px;      /* 불릿 간 간격 */
+      line-height: 1.5;        /* 가독성 향상 */
+    }
+    .plans .card ul li:last-child {
+      margin-bottom: 0;        /* 마지막 항목은 간격 제거 */
+    }
+
+    /* 카드 하단에 버튼 고정(이미 추가된 경우 중복 OK) */
+    .plans .grid { align-items: stretch; }
+    .plans .card {
+      display: flex;
+      flex-direction: column;
+    }
+    .plans .card .btn {
+      margin-top: auto;
+      width: max-content;
+    }
+
+    .card .price { display:flex; align-items:baseline; gap:6px; margin:8px 0 12px; }
+    .card .price .amount { font-size:22px; font-weight:700; }
+    .card .price .per { font-size:14px; color:#666; }
+
+    /* ===== About 섹션 ===== */
+    .about { padding:64px 20px; max-width:1100px; margin:0 auto; }
+    .about .sub { color:#666; margin-top:6px; }
+    .about-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:22px;
+    }
+    .about-card{
+      border:1px solid #eee; border-radius:14px; padding:20px;
+      background:#fff; transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .about-card:hover{
+      transform:translateY(-2px); border-color:#16a34a33;
+      box-shadow:0 10px 28px rgba(0,0,0,.06);
+    }
+    .about-card h3{ margin:0 0 8px; font-size:18px; }
+    .about-card p{ margin:0; color:#444; line-height:1.55; }
+    .about .badges{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .about .badge{
+      background:#f3f4f6; border:1px solid #e5e7eb; border-radius:999px;
+      padding:6px 10px; font-size:12px; color:#374151;
+    }
+    @media (max-width:900px){ .about-grid{ grid-template-columns:1fr; } }
+
+    /* ===== About 섹션: 배지를 카드 하단에 고정 ===== */
+    .about-grid { align-items: stretch; }             /* 카드 높이 동일화 */
+    .about-card{
+      display:flex;                                   /* 세로 플렉스 */
+      flex-direction:column;
+      height:100%;                                    /* grid 셀 높이 채우기 */
+    }
+    .about-card p{ margin:0 0 16px; line-height:1.55; }
+    .about-card .badges{
+      margin-top:auto;                                /* 남는 공간을 위로 밀어 배지를 아래로 */
+      padding-top:2px;                               /* 본문과 간격 */
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    /* --- Contact info pill --- */
+    .contact-info {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .contact-info .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      background: #f9fafb;
+      color: #111;
+      font-size: 14px;
+    }
+    .contact-info .pill svg { width: 18px; height: 18px; }
+    .contact-info a { color:#111; text-decoration:none; }
+    .contact-info a:hover { color:#16a34a; text-decoration:underline; }
+        </style>
+    </head>
+    <body>
+        <header class="nav">
+            {% if meta.lang == "ko" %}
+      {% url 'home_ko' as home_url %}
+      {% url 'events_ko' as events_url %}
+      {% url 'rewards_ko' as rewards_url %}
+    {% else %}
+      {% url 'home_en' as home_url %}
+      {% url 'events_en' as events_url %}
+      {% url 'rewards_en' as rewards_url %}
+    {% endif %}
+            <div class="brand brand-green" data-i18n="brand">LinkHash</div>
+            <!-- 햄버거 버튼 -->
+            <button
+                class="hamburger"
+                id="hamburger"
+                aria-label="Open menu"
+                aria-expanded="false"
+                aria-controls="nav-drawer"
+            >
+                ☰
+            </button>
+            <!-- 데스크톱 내비 -->
+            <nav class="nav-links">
+                <a href="{{ home_url }}" data-i18n="nav_home">Home</a>
+                <a href="#about" data-i18n="nav_about">About</a>
+                <a href="#plans" data-i18n="nav_pricing">Pricing</a>
+                <a href="#how" data-i18n="nav_how">How We Work</a>
+                <a href="{{ rewards_url }}" data-i18n="nav_rewards">Reward Program</a>
+                <a href="{{ events_url }}" data-i18n="nav_events">Events</a>
+                <a href="#contact" data-i18n="nav_contact">Contact</a>
+                {% if wallet_user %}
+                <span class="btn-outline" style="cursor:default">
+                    👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}
+                </span>
+                <a class="btn" href="#" onclick="logoutWallet();return false;">Logout</a>
+                {% else %}
+                <a class="btn" href="#" onclick="connectWallet();return false;">Connect Wallet</a>
+                {% endif %}
+                <a class="btn-outline" href="#stake" data-i18n="nav_stake">Stake Pepper</a>
+            </nav>
+            <!-- 언어 -->
+            <div class="lang">
+                <a id="btn-en" href="{% url 'home_en' %}">🇺🇸 English</a>
+                <a id="btn-ko" href="{% url 'home_ko' %}">🇰🇷 한국어</a>
+            </div>
+            <!-- 모바일 드로어 -->
+            <div class="nav-drawer" id="nav-drawer">
+                <a href="{{ home_url }}" data-i18n="nav_home">Home</a>
+                <a href="#plans" data-i18n="nav_pricing">Pricing</a>
+                <a href="#how" data-i18n="nav_how">How We Work</a>
+                <a href="{{ rewards_url }}" data-i18n="nav_rewards">Reward Program</a>
+                <a href="{{ events_url }}" data-i18n="nav_events">Events</a>
+                <a href="#contact" data-i18n="nav_contact">Contact</a>
+                {% if wallet_user %}
+                <span class="btn-outline" style="cursor:default; display:inline-flex; align-items:center; justify-content:center;">
+                    👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}
+                </span>
+                <a class="btn" href="#" onclick="logoutWallet();return false;">Logout</a>
+                {% else %}
+                <a class="btn" href="#" onclick="connectWallet();return false;">Connect Wallet</a>
+                {% endif %}
+                <a class="btn-outline" href="#stake" data-i18n="nav_stake">Stake Pepper</a>
+            </div>
+        </header>
+        <section class="hero">
+            <h1 data-i18n="hero_title">강력한 백링크로 검색 순위를 끌어올리세요</h1>
+            <p data-i18n="hero_sub">화이트햇 중심, 투명 리포트, 확실한 성과. SEO.</p>
+            <div class="cta">
+                <a class="btn" href="#plans" data-i18n="cta_start">시작하기</a>
+                <a class="btn-outline" href="#contact" data-i18n="cta_free">무료 상담</a>
+            </div>
+        </section>
+        <section id="how" class="how">
+            <h2 data-i18n="how_title">저희의 솔루션</h2>
+            <ul class="checks">
+                <li data-i18n="how_da">
+                    <strong>고(高) DA 위주</strong>
+                    의 웹사이트에 백링크 구축
+                </li>
+                <li data-i18n="how_pbn">
+                    우리가 구축·관리하는
+                    <strong>PBN</strong>
+                    에 컨텐츠 업로드
+                </li>
+                <li data-i18n="how_reward">
+                    <strong>리워드 프로그램</strong>
+                    (준비중)
+                </li>
+            </ul>
+        </section>
+        <section id="about" class="about">
+            <h2 data-i18n="about_title">About Us</h2>
+            <p class="sub" data-i18n="about_sub">링크 빌딩을 데이터로, 결과는 투명하게.</p>
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3 data-i18n="about_c1_title">자체 수집·라벨링 데이터</h3>
+                    <p data-i18n="about_c1_body">
+                        내부 크롤링과 큐레이션으로
+                        <strong>고 DR/권위</strong>
+                        도메인 풀을 구축했습니다.
+          주제 적합성·유기 트래픽·스팸 시그널을 라벨링해 안전한 배치를 보장합니다.
+                    </p>
+                    <div class="badges">
+                        <span class="badge" data-i18n="about_badge_data">도메인 데이터셋</span>
+                        <span class="badge" data-i18n="about_badge_quality">품질 점검</span>
+                    </div>
+                </div>
+                <div class="about-card">
+                    <h3 data-i18n="about_c2_title">브랜드 블로그 & 큐레이션 파트너</h3>
+                    <p data-i18n="about_c2_body">
+                        <strong>브랜드 보유 블로그</strong>
+                        와 신뢰할 수 있는
+                        <strong>큐레이션 파트너 매체</strong>
+                        를 통해
+          게스트 포스트·리뷰·리소스 링크 등 자연스러운 포맷으로 노출합니다.
+                    </p>
+                    <div class="badges">
+                        <span class="badge" data-i18n="about_badge_brand">브랜드 채널</span>
+                        <span class="badge" data-i18n="about_badge_editorial">에디토리얼</span>
+                    </div>
+                </div>
+                <div class="about-card">
+                    <h3 data-i18n="about_c3_title">화이트햇 리워드 생태계</h3>
+                    <p data-i18n="about_c3_body">
+                        공정한
+                        <strong>화이트햇 리워드 프로그램</strong>
+                        으로 인플루언서 풀을 운영하고,
+          누구나 퍼블릭에서 캠페인에
+                        <strong>대량 참여</strong>
+                        할 수 있게 합니다(투명한 조건·가이드 제공).
+                    </p>
+                    <div class="badges">
+                        <span class="badge" data-i18n="about_badge_web3">인플루언서 풀</span>
+                        <span class="badge" data-i18n="about_badge_open">오픈 참여</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="plans" class="plans">
+            <h2 data-i18n="plans_title">플랜</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3 data-i18n="plan_basic_name">Basic Plan</h3>
+                    <p class="price">
+                        <span class="amount">$39.99</span>
+                        <span class="per" data-i18n="per_month">/month</span>
+                    </p>
+                    <ul>
+                        <li data-i18n="plan_basic_f1">DA 30+ 중심 링크</li>
+                        <li data-i18n="plan_basic_f2">PBN 업로드 1회</li>
+                        <li data-i18n="plan_basic_f3">월 리포트 제공</li>
+                    </ul>
+                    <a class="btn" href="#contact" data-i18n="select">선택</a>
+                </div>
+                <div class="card featured">
+                    <h3 data-i18n="plan_growth_name">Growth Plan</h3>
+                    <p class="price">
+                        <span class="amount">$69.99</span>
+                        <span class="per" data-i18n="per_month">/month</span>
+                    </p>
+                    <ul>
+                        <li data-i18n="plan_growth_f1">DA 50+ 중심 링크</li>
+                        <li data-i18n="plan_growth_f2">PBN 업로드 3회</li>
+                        <li data-i18n="plan_growth_f3">앵커 전략 컨설팅</li>
+                    </ul>
+                    <a class="btn" href="#contact" data-i18n="select">선택</a>
+                    <div class="plan-badge" data-i18n="most_popular">Most Popular</div>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="plan_priority_name">Priority Plan</h3>
+                    <p class="price">
+                        <span class="amount">$99.99</span>
+                        <span class="per" data-i18n="per_month">/month</span>
+                    </p>
+                    <ul>
+                        <li data-i18n="plan_priority_f1">DA 70+ 프리미엄 링크</li>
+                        <li data-i18n="plan_priority_f2">PBN 업로드 6회</li>
+                        <li data-i18n="plan_priority_f3">전담 매니저 & 월 1회 콜</li>
+                    </ul>
+                    <a class="btn" href="#contact" data-i18n="select">선택</a>
+                </div>
+            </div>
+            <p style="margin-top:8px;color:#666;font-size:14px" data-i18n="billing_note">
+                Billed monthly. Cancel anytime.
+            </p>
+        </section>
+        <section id="contact" class="contact">
+            <h2 data-i18n="contact_title">Contact Us</h2>
+            <form class="form" id="contact-form">
+                <div class="row">
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Client’s name"
+                        data-i18n-ph="form_name_ph"
+                        required
+                    >
+                </div>
+                <div class="row">
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email address for receiving replies"
+                        data-i18n-ph="form_email_ph"
+                        required
+                    >
+                </div>
+                <div class="row">
+                    <input
+                        type="tel"
+                        name="phone"
+                        placeholder="Contact Phone Number"
+                        data-i18n-ph="form_phone_ph"
+                    >
+                </div>
+                <div class="row">
+                    <textarea
+                        name="message"
+                        placeholder="A brief description of what you would like to request"
+                        data-i18n-ph="form_msg_ph"
+                        required
+                    ></textarea>
+                </div>
+                <label class="consent">
+                    <input type="checkbox" id="agree" required>
+                    <span data-i18n="consent_label">I agree to the collection/use of personal information (required)</span>
+                    <a id="view-policy" data-i18n="consent_view">View details</a>
+                </label>
+                <div class="send">
+                    <button type="submit" class="btn" data-i18n="send">Send</button>
+                </div>
+            </form>
+            <!-- 소셜 아이콘 -->
+            <div class="socials" aria-label="Contact via social">
+                <a
+                    class="social-btn"
+                    href="https://t.me/your_handle"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Telegram"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M22 3.24c.2-.86-.53-1.58-1.38-1.28L2.47 8.19c-1.1.39-1.08 1.93.04 2.27l5.46 1.7 2.11 6.51c.26.81 1.28.95 1.8.26l2.88-3.78 5.06 3.7c.83.61 2.03.16 2.26-.84L22 3.24ZM8.73 12.28l8.9-5.46c.22-.14.45.16.26.34l-7.17 6.69c-.13.12-.21.3-.22.49l-.13 2.66c-.01.23-.34.26-.41.04l-1.23-4.43c-.05-.17.03-.36.2-.43Z"/>
+                    </svg>
+                </a>
+                <a
+                    class="social-btn"
+                    href="https://x.com/your_handle"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="X (Twitter)"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M18.244 2H22l-7.45 8.57L22 22h-4.96l-5.12-7.9L6.06 22H2l7.86-8.78L2 2h4.95l5.01 7.72L18.244 2Zm-1.07 18h1.71L7.91 4H6.2l10.974 16Z"/>
+                    </svg>
+                </a>
+                <!-- Instagram -->
+                <a
+                    class="social-btn"
+                    href="https://instagram.com/your_handle"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Instagram"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM18.75 5a1.25 1.25 0 1 1-1.5 1.5A1.25 1.25 0 0 1 18.75 5Z"/>
+                    </svg>
+                </a>
+                <!-- YouTube -->
+                <a
+                    class="social-btn"
+                    href="https://www.youtube.com/@your_handle"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="YouTube"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M23 7.5c0-1.2-.9-2.2-2-2.4C18.9 4.7 15 4.5 12 4.5s-6.9.2-9 .6C1.9 5.3 1 6.3 1 7.5 1 9 1 15 1 16.5c0 1.2.9 2.2 2 2.4 2.1.4 6 .6 9 .6s6.9-.2 9-.6c1.1-.2 2-1.2 2-2.4V7.5ZM10 9.3l5.7 3.2L10 15.7V9.3Z"/>
+                    </svg>
+                </a>
+                <!-- TikTok -->
+                <a
+                    class="social-btn"
+                    href="https://www.tiktok.com/@your_handle"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="TikTok"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14 3v9.2a3.7 3.7 0 1 1-3.7-3.7c.3 0 .6 0 .9.1V6.2A7.2 7.2 0 0 0 10.3 6 7.7 7.7 0 1 0 18 13.7V9.9c.9.9 2.3 1.8 4 2.1V9.2c-1.7-.4-3.3-1.6-4-3.2V3h-4Z"/>
+                    </svg>
+                </a>
+                <!-- Naver Blog -->
+                <a
+                    class="social-btn"
+                    href="https://blog.naver.com/your_handle"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Naver Blog"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        role="img"
+                    >
+                        <!-- 전면 'N' (현재 글자색을 따름) -->
+                        <path d="M7 7h3.1l6 8.6V7H18v10h-3.1l-6-8.6V17H7V7z"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="contact-info" aria-label="Customer Support">
+                <div class="pill">
+                    <!-- envelope -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5v11A2.5 2.5 0 0 1 19.5 20h-15A2.5 2.5 0 0 1 2 17.5v-11Zm2 .3v.1l8 5 8-5v-.1a.5.5 0 0 0-.5-.3h-15a.5.5 0 0 0-.5.3Zm16 2.9-6.9 4.3a2 2 0 0 1-2.2 0L4 9.7v7.8c0 .3.2.5.5.5h15c.3 0 .5-.2.5-.5V9.7Z"/>
+                    </svg>
+                    <strong>CS</strong>
+                    :
+                    <a href="mailto:LinkHash11235@proton.me">LinkHash11235@proton.me</a>
+                </div>
+            </div>
+        </section>
+        <!-- 개인정보처리방침 모달 -->
+        <div
+            class="modal-backdrop"
+            id="policy-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="policy-title"
+        >
+            <div class="modal">
+                <button class="close" id="policy-close" aria-label="Close">×</button>
+                <h3 id="policy-title" data-i18n="policy_title">Privacy Policy</h3>
+                <div class="content">
+                    <p class="bullet" data-i18n="policy_1_title">1. Purpose of collection/use</p>
+                    <p data-i18n="policy_1_body">We use your information only to respond to inquiries. We do not use it for any other purpose.</p>
+                    <p class="bullet" data-i18n="policy_2_title">2. Items we collect</p>
+                    <p data-i18n="policy_2_body">Name, contact info, inquiry details (service usage records, access logs)</p>
+                    <p class="bullet" data-i18n="policy_3_title">3. Retention period</p>
+                    <p data-i18n="policy_3_body">We retain your information for 5 years, or delete it immediately upon your request.</p>
+                    <p class="bullet" data-i18n="policy_note">We never use your data for purposes other than those stated above.</p>
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+            ©
+            <span data-i18n="brand" class="brand-green">LinkHash</span>
+        </footer>
+        <script>
+  const i18n = {
+    ko: {
+      brand: "LinkHash",
+      // 내비(한글)
+      nav_home: "홈",
+      nav_pricing: "가격",
+      nav_how: "작업 방식",
+      nav_rewards: "리워드 프로그램",
+      nav_contact: "문의",
+      nav_connect: "지갑 연결",
+      // 히어로
+      hero_title: "강력한 백링크로 검색 순위를 끌어올리세요",
+      hero_sub: "화이트햇 중심, 투명 리포트, 확실한 성과, 검색 엔진 최적화.",
+      cta_start: "시작하기",
+      cta_free: "무료 상담",
+      // 본문
+      how_title: "저희의 SEO 솔루션",
+      how_da: "권위 높은(제3자 지표 기준) 웹사이트에 백링크 구축",
+      how_pbn: "큐레이션된 파트너 네트워크(브랜드 보유·제휴 매체)에 콘텐츠 배포",
+      how_reward: "웹3.0 리워드 프로그램 (준비중)",
+      plans_title: "플랜",
+      plan_basic_name: "Basic Plan",
+      plan_basic_f1: "DR 약 20+",
+      plan_basic_f2: "오픈 커뮤니티, 게스트 포스트 (보조 배치 ≤ 2)",
+      plan_basic_f3: "월 리포트",
+      plan_growth_name: "Growth Plan",
+      plan_growth_f1: "DR 약 40+",
+      plan_growth_f2: "혼합: 오픈+에디토리얼 (보조 배치 ≤ 4)",
+      plan_growth_f3: "월 리포트, 앵커, 내부링크 전략 컨설팅",
+      plan_priority_name: "Priority Plan",
+      plan_priority_f1: "DR 약 60+ 프리미엄",
+      plan_priority_f2: "에디토리얼, 니치 우선 (보조 배치 ≤ 6)",
+      plan_priority_f3: "월 리포트, 앵커, 내부링크 전략 컨설팅, 전담 매니저, 24시간 내 이메일 응답",
+      metrics_note: "참고:DR(Ahrefs)는 다른 벤더 지표로, 숫자는 대략적 기준입니다. 실제 배치는 품질 검수·주제 적합성·유기 트래픽 등을 함께 고려해 결정됩니다.",
+      select: "선택",
+      most_popular: "Most Popular",
+      contact_title: "문의하기",
+      contact_email_label: "이메일",
+      // 리워드 섹션
+      rewards_title: "리워드 프로그램",
+      rewards_desc: "곧 공개됩니다: 백링크 캠페인 참여 및 추천으로 혜택을 받으세요.",
+      rewards_cta: "지갑을 연결하고 알림 받기",
+      per_month: "/월",
+      billing_note: "월 단위 과금, 언제든 해지 가능",
+      nav_about: "About",
+      about_title: "팀 소개",
+      about_sub: "링크 빌딩을 데이터로, 결과는 투명하게.",
+      about_c1_title: "자체 수집·라벨링 데이터",
+      about_c1_body: "내부 크롤링과 큐레이션으로 고 DR/권위 도메인 풀을 구축했습니다. 주제 적합성·유기 트래픽·스팸 시그널을 라벨링해 안전한 배치를 보장합니다.",
+      about_c2_title: "브랜드 블로그 & 큐레이션 파트너",
+      about_c2_body: "브랜드 보유 블로그와 신뢰할 수 있는 큐레이션 파트너 매체를 통해 게스트 포스트·리뷰·리소스 링크 등 자연스러운 포맷으로 노출합니다.",
+      about_c3_title: "화이트햇 리워드 생태계",
+      about_c3_body: "공정한 화이트햇 리워드 프로그램을 통해 누구나 공개적으로 캠페인에 자유롭게 참여할 수 있도록 투명한 조건과 가이드를 제공합니다. 보상은 웹3.0 기반으로 지갑 연동 후 USDT로 지급됩니다.",
+      about_badge_data: "도메인 데이터셋",
+      about_badge_quality: "품질 점검",
+      about_badge_brand: "브랜드 채널",
+      about_badge_editorial: "에디토리얼",
+      about_badge_web3: "Web3 · USDT",
+      about_badge_open: "오픈 참여",
+      nav_stake: "페퍼 스테이킹",
+      nav_events: "이벤트"
+    },
+    en: {
+      brand: "LinkHash",
+      // nav (영문)
+      nav_home: "Home",
+      nav_pricing: "Pricing",
+      nav_how: "How We Work",
+      nav_rewards: "Reward Program",
+      nav_contact: "Contact",
+      nav_connect: "Connect Wallet",
+      // hero
+      hero_title: "Get Powerful Backlinks To Boost Your Ranking",
+      hero_sub: "White-hat first. Transparent reports. Real results. SEO.",
+      cta_start: "Get Started",
+      cta_free: "Free Consultation",
+      // body
+      how_title: "How We Work",
+      how_da: "Build backlinks on authoritative websites (based on third-party metrics)",
+      how_pbn: "Distribute content across our curated partner network (brand-owned & partner sites)",
+      how_reward: "Web3.0 Reward program (coming soon)",
+      plans_title: "Plans",
+      plan_basic_name: "Basic Plan",
+      plan_basic_f1: "Roughly DR 20+",
+      plan_basic_f2: "Open communities and guest posts (support placements ≤ 2)",
+      plan_basic_f3: "Monthly report",
+      plan_growth_name: "Growth Plan",
+      plan_growth_f1: "Roughly DR 40+",
+      plan_growth_f2: "Mixed: open + editorial (support placements ≤ 4)",
+      plan_growth_f3: "Monthly report + Anchor + internal linking strategy",
+      plan_priority_name: "Priority Plan",
+      plan_priority_f1: "Roughly DR 60+",
+      plan_priority_f2: "Editorial and niche prioritized (support placements ≤ 6)",
+      plan_priority_f3: "Monthly report + Anchor + internal linking strategy + Dedicated manager with email reply within 24h",
+      metrics_note: "Note: DR (Ahrefs) is a different vendor metric. Numbers are approximate; final placements consider quality review, topical fit, and traffic.",
+      select: "Select",
+      most_popular: "Most Popular",
+      contact_title: "Contact Us",
+      contact_email_label: "Email",
+      // rewards
+      rewards_title: "Reward Program",
+      rewards_desc: "Coming soon: Earn perks by engaging with our backlink campaigns and referrals.",
+      rewards_cta: "Connect wallet to get notified",
+      per_month: "/month",
+      billing_note: "Billed monthly. Cancel anytime.",
+      nav_about: "About",
+      about_title: "About Us",
+      about_sub: "Data-driven link building with transparent results.",
+      about_c1_title: "In-house Data & Labeling",
+      about_c1_body: "We curate and label a pool of high-authority (high DR) domains. We score topical fit, organic traffic, and spam signals to ensure safe placements.",
+      about_c2_title: "Brand Blogs & Curation Partners",
+      about_c2_body: "We publish via brand-owned blogs and trusted curation partners using natural formats—guest posts, reviews, and resource links.",
+      about_c3_title: "White-hat Reward Ecosystem",
+      about_c3_body: "We run a fair, white-hat reward program that enables open, large-scale public participation with clear rules and guidance. Rewards are Web3-based and paid in USDT (stablecoin) after wallet connection.",
+      about_badge_data: "Domain dataset",
+      about_badge_quality: "Quality checks",
+      about_badge_brand: "Brand channels",
+      about_badge_editorial: "Editorial",
+      about_badge_web3: "Web3 · USDT",
+      about_badge_open: "Open participation",
+      nav_stake: "Stake Pepper",
+      nav_events: "Events",
+    }
+  };
+
+  i18n.ko = Object.assign(i18n.ko || {}, {
+    nav_home:"홈", nav_pricing:"가격", nav_how:"작업 방식", nav_rewards:"리워드 프로그램", nav_contact:"문의", nav_connect:"지갑 연결",
+    form_name_ph:"고객명",
+    form_email_ph:"회신받을 이메일 주소",
+    form_phone_ph:"연락처(선택)",
+    form_msg_ph:"요청하시는 내용을 간단히 적어주세요",
+    consent_label:"개인정보 수집/이용 동의(필수)",
+    consent_view:"자세히 보기",
+    send:"보내기",
+    policy_title:"개인정보처리방침",
+    policy_1_title:"1. 개인정보 수집 및 이용 목적",
+    policy_1_body:"문의사항에 대한 상담과 답변 제공 외 다른 용도에는 사용하지 않습니다.",
+    policy_2_title:"2. 수집하는 개인정보 항목",
+    policy_2_body:"성명, 연락처, 문의사항 (서비스 이용 기록, 접속 로그)",
+    policy_3_title:"3. 보유 및 이용 기간",
+    policy_3_body:"보유 기간은 5년이며, 삭제 요청 시 즉시 파기합니다.",
+    policy_note:"고객님의 정보는 이용 목적 외에 별도로 사용되지 않습니다.",
+    rewards_title:"리워드 프로그램",
+    rewards_desc:"곧 공개됩니다: 백링크 캠페인 참여와 추천으로 혜택을 받으세요.",
+    rewards_cta:"지갑을 연결하고 알림 받기",
+  });
+
+  i18n.en = Object.assign(i18n.en || {}, {
+    nav_home:"Home", nav_pricing:"Pricing", nav_how:"How We Work", nav_rewards:"Reward Program", nav_contact:"Contact", nav_connect:"Connect Wallet",
+    form_name_ph:"Client’s name",
+    form_email_ph:"Email address for receiving replies",
+    form_phone_ph:"Contact Phone Number (optional)",
+    form_msg_ph:"A brief description of what you would like to request",
+    consent_label:"I agree to the collection/use of personal information (required)",
+    consent_view:"View details",
+    send:"Send",
+    policy_title:"Privacy Policy",
+    policy_1_title:"1. Purpose of collection/use",
+    policy_1_body:"Used only to respond to inquiries. Not used for any other purpose.",
+    policy_2_title:"2. Items we collect",
+    policy_2_body:"Name, contact, inquiry details (service usage records, access logs)",
+    policy_3_title:"3. Retention period",
+    policy_3_body:"Kept for 5 years or deleted immediately upon request.",
+    policy_note:"We never use your data for purposes other than stated above.",
+    rewards_title:"Reward Program",
+    rewards_desc:"Coming soon: Earn perks by engaging with our backlink campaigns and referrals.",
+    rewards_cta:"Connect wallet to get notified",
+  });
+
+    const $ = (sel) => document.querySelectorAll(sel);
+
+    function applyLang(lang){
+      const dict = i18n[lang] || i18n.ko;
+      document.documentElement.lang = lang === "en" ? "en" : "ko";
+
+      // 텍스트 노드
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key] !== undefined) el.innerHTML = dict[key];
+      });
+
+      // placeholder
+      document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+        const key = el.getAttribute("data-i18n-ph");
+        if (dict[key] !== undefined) el.placeholder = dict[key];
+      });
+
+      // 버튼 활성화
+      document.getElementById("btn-ko").classList.toggle("active", lang === "ko");
+      document.getElementById("btn-en").classList.toggle("active", lang === "en");
+
+      try { localStorage.setItem("lang", lang); } catch(e){}
+    }
+
+
+    // 이벤트
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("btn-ko").addEventListener("click", () => applyLang("ko"));
+      document.getElementById("btn-en").addEventListener("click", () => applyLang("en"));
+
+      // 초기 언어: 저장된 값 → URL ?lang= → 브라우저 언어
+      const url = new URL(window.location.href);
+      const urlLang = url.searchParams.get("lang");
+      const pathIsKo = window.location.pathname.startsWith("/ko/");
+      const initial = urlLang || (pathIsKo ? "ko" : "en");   // ✅ 경로 기준 기본 언어
+      //const saved = localStorage.getItem("lang");
+      //const browserIsKo = (navigator.language || "").toLowerCase().startsWith("ko");
+      // const initial = urlLang || saved || (browserIsKo ? "ko" : "en");
+      //const initial = urlLang || "en";
+      applyLang(initial);
+
+
+      // --- 모달 열기/닫기 ---
+      const modal = document.getElementById("policy-modal");
+      document.getElementById("view-policy").addEventListener("click", (e)=>{ e.preventDefault(); modal.style.display="flex"; });
+      document.getElementById("policy-close").addEventListener("click", ()=> modal.style.display="none");
+      modal.addEventListener("click", (e)=>{ if(e.target===modal) modal.style.display="none"; });
+
+      // --- 폼 제출(데모) ---
+      document.getElementById("contact-form").addEventListener("submit", (e)=>{
+        e.preventDefault();
+        if(!document.getElementById("agree").checked){
+          alert(document.documentElement.lang==="ko" ? "개인정보 수집·이용에 동의해주세요." : "Please agree to the privacy policy.");
+          return;
+        }
+        // TODO: 실제 전송 로직(Email, Django view 등)
+        alert(document.documentElement.lang==="ko" ? "문의가 접수되었습니다!" : "Your message has been sent!");
+        e.target.reset();
+      });
+
+      // 햄버거 토글
+      const ham = document.getElementById("hamburger");
+      const drawer = document.getElementById("nav-drawer");
+      ham.addEventListener("click", () => {
+        const open = drawer.style.display === "flex";
+        drawer.style.display = open ? "none" : "flex";
+        ham.setAttribute("aria-expanded", String(!open));
+      });
+      // 드로어 외부 클릭 닫기
+      document.addEventListener("click", (e)=>{
+        if (drawer.style.display==="flex" && !drawer.contains(e.target) && e.target!==ham){
+          drawer.style.display="none"; ham.setAttribute("aria-expanded","false");
+        }
+      });
+    });
+        </script>
+        <script>
+    async function connectWallet() {
+      try {
+        if (!window.ethereum) {
+          alert("MetaMask not detected.");
+          return;
+        }
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const address = (accounts && accounts[0]) ? accounts[0] : null;
+        if (!address) { alert("No account."); return; }
+
+        // 1) Ask server for nonce
+        const r1 = await fetch(`/api/auth/nonce?address=${address}`);
+        const d1 = await r1.json();
+        if (!d1.ok) { alert("Failed to get nonce: " + (d1.error || "")); return; }
+
+        // 2) Compose message for signing
+        const message = [
+          "LinkHash Login",
+          `Address: ${address}`,
+          `Nonce: ${d1.nonce}`,
+          `URI: ${location.origin}`,
+          `Time: ${new Date().toISOString()}`
+        ].join("\n");
+
+        // 3) Sign with personal_sign
+        const signature = await window.ethereum.request({
+          method: "personal_sign",
+          params: [ message, address ],
+        });
+
+        // 4) Verify on server
+        const r2 = await fetch("/api/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address, message, signature })
+        });
+        const d2 = await r2.json();
+        if (!d2.ok) {
+          alert("Login failed: " + (d2.error || "unknown"));
+          return;
+        }
+        location.reload();
+      } catch (e) {
+        console.error(e);
+        alert("Wallet error: " + e.message);
+      }
+    }
+
+    async function logoutWallet() {
+      try {
+        await fetch("/api/auth/logout", { method: "POST" });
+        location.reload();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+        </script>
+    </body>
+</html>
