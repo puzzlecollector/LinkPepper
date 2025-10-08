@@ -1,0 +1,215 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ meta.title }}</title>
+        <link rel="canonical" href="{{ meta.canonical }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description }}">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title }}">
+        <meta property="og:description" content="{{ meta.og_description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <style>
+    :root{ --green:#16a34a; --line:#e5e7eb; --text:#111827; --muted:#6b7280; --card:#fff; --chip:#f9fafb; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:var(--text); }
+    a{ color:inherit; text-decoration:none; }
+    .container{ max-width:1100px; margin:0 auto; padding:20px; }
+    .nav{ display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid var(--line); }
+    .brand-green{ color:var(--green); font-weight:800; }
+    .nav-links{ display:flex; gap:16px; align-items:center; }
+    .btn{ padding:10px 14px; border-radius:10px; background:var(--green); color:#fff; display:inline-block; }
+    .btn-outline{ padding:10px 14px; border-radius:10px; border:1px solid var(--green); color:var(--green); display:inline-block; background:#fff; }
+    .lang{ display:flex; gap:8px; }
+    .lang a{ border:1px solid var(--line); padding:6px 10px; border-radius:8px; }
+
+    .page-title{ padding:40px 20px; text-align:center; }
+    .page-title h1{ margin:0 0 8px; font-size:34px; }
+    .muted{ color:var(--muted); }
+
+    .board{ display:grid; grid-template-columns:2fr 1fr; gap:18px; padding:24px 20px; }
+    .card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:0 8px 24px rgba(0,0,0,.06); }
+    .post{ display:flex; gap:16px; }
+    .thumb{ width:160px; height:160px; border-radius:12px; border:1px solid var(--line); background:#fff; overflow:hidden; flex:0 0 160px; }
+    .thumb img{ width:100%; height:100%; object-fit:contain; background:#fff; }
+    .title{ font-size:18px; font-weight:700; margin:0 0 6px; }
+    .tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .tag{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid var(--line); background:var(--chip); border-radius:999px; font-size:13px; }
+    .meta{ font-size:12px; color:var(--muted); margin-top:6px; }
+    @media (max-width:900px){ .board{ grid-template-columns:1fr; } .thumb{ width:120px; height:120px; flex-basis:120px; } .page-title h1{ font-size:26px; } }
+    .rule{
+      margin-top:10px; padding:10px 12px; border:1px solid var(--line);
+      background:var(--chip); border-radius:10px; color:#374151; font-size:13px;
+    }
+    .rule strong{ font-weight:700; }
+        </style>
+    </head>
+    <body>
+        <!-- 헤더 -->
+        <header class="nav">
+            {% if meta.lang == "ko" %}
+      {% url 'home_ko' as home_url %}
+      {% url 'events_ko' as events_url %}
+      {% url 'rewards_ko' as rewards_url %}
+    {% else %}
+      {% url 'home_en' as home_url %}
+      {% url 'events_en' as events_url %}
+      {% url 'rewards_en' as rewards_url %}
+    {% endif %}
+            <div class="brand-green">LinkHash</div>
+            <nav class="nav-links">
+                <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                <a href="{{ events_url }}" style="font-weight:700;color:var(--green)">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                <a class="btn" href="#wallet">{% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}</a>
+                <a class="btn-outline" href="#stake">{% if meta.lang == 'ko' %}스테이킹{% else %}Stake{% endif %}</a>
+            </nav>
+            <div class="lang">
+                {% if meta.lang == "ko" %}
+                <a href="{% url 'events_en' %}">🇺🇸 English</a>
+                <a href="{% url 'events_ko' %}" style="border-color:var(--green);color:var(--green)">🇰🇷 한국어</a>
+                {% else %}
+                <a href="{% url 'events_en' %}" style="border-color:var(--green);color:var(--green)">🇺🇸 English</a>
+                <a href="{% url 'events_ko' %}">🇰🇷 한국어</a>
+                {% endif %}
+            </div>
+        </header>
+        <!-- 타이틀 -->
+        <section class="page-title">
+            <h1>{% if meta.lang == 'ko' %}이벤트 & 공지{% else %}Events & Announcements{% endif %}</h1>
+            <p class="muted">
+                {% if meta.lang == 'ko' %}최신 이벤트와 공지사항을 확인하세요.{% else %}Check out our latest announcements and community events.{% endif %}
+            </p>
+        </section>
+        <!-- 게시판 -->
+        <main class="container board">
+            <!-- 목록 -->
+            <section class="card">
+                <!-- 포스트 #1 : PEPE -->
+                <article class="post">
+                    <div class="thumb">
+                        <img src="{% static 'img/events/pepe_pepper.png' %}" alt="PEPE Airdrop">
+                    </div>
+                    <div class="content">
+                        <h3 class="title">
+                            {% if meta.lang == 'ko' %}
+              링크 공유 과제에 참여하는
+                            <strong>첫 100명</strong>에게 1인당
+                            <strong>PEPE 1,000,000</strong>
+                            에어드랍!
+            {% else %}
+              First
+                            <strong>100 participants</strong> in the Link Sharing Task get
+                            <strong>1,000,000 PEPE</strong>
+                            each!
+            {% endif %}
+                        </h3>
+                        <p class="meta">{% if meta.lang == 'ko' %}공지 날짜{% else %}Posted on{% endif %}: 2025-09-13</p>
+                        <div class="tags">
+                            {% if meta.lang == 'ko' %}
+                            <span class="tag">#밈코인&nbsp;이벤트</span>
+                            <span class="tag">#에어드랍</span>
+                            <span class="tag">#PEPE</span>
+                            <span class="tag">#알트시즌</span>
+                            {% else %}
+                            <span class="tag">#meme&nbsp;coin&nbsp;event</span>
+                            <span class="tag">#airdrop</span>
+                            <span class="tag">#PEPE</span>
+                            <span class="tag">#Altseason</span>
+                            {% endif %}
+                        </div>
+                        <!-- 지급 규정: Ethereum 전용 -->
+                        <div class="rule">
+                            {% if meta.lang == 'ko' %}
+                            <strong>지급 안내:</strong>
+                            <u>이더리움 지갑 주소(0x…)</u>로 참여한 경우에만
+                            <strong>PEPE(ERC-20)</strong>
+                            으로 지급됩니다.
+            {% else %}
+                            <strong>Payout:</strong>
+                            <u>Only for Ethereum wallet addresses (0x…)</u>, rewards are paid in
+                            <strong>PEPE (ERC-20)</strong>
+                            .
+            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                <!-- 포스트 #2 : BONK -->
+                <article class="post" style="margin-top:16px">
+                    <div class="thumb">
+                        <!-- bonk 썸네일(없으면 임시로 pepe 이미지를 사용해도 됨) -->
+                        <img src="{% static 'img/events/bonk_pepper.png' %}" alt="BONK Airdrop">
+                    </div>
+                    <div class="content">
+                        <h3 class="title">
+                            {% if meta.lang == 'ko' %}
+              솔라나 지갑 사용자 보너스!
+                            <strong>첫 100명</strong>에게 1인당
+                            <strong>BONK 500,000</strong>
+                            에어드랍
+            {% else %}
+              Bonus for Solana wallets!
+                            <strong>First 100</strong> get
+                            <strong>500,000 BONK</strong>
+                            each
+            {% endif %}
+                        </h3>
+                        <p class="meta">{% if meta.lang == 'ko' %}공지 날짜{% else %}Posted on{% endif %}: 2025-09-13</p>
+                        <div class="tags">
+                            {% if meta.lang == 'ko' %}
+                            <span class="tag">#봉크</span>
+                            <span class="tag">#솔라나</span>
+                            <span class="tag">#에어드랍</span>
+                            {% else %}
+                            <span class="tag">#BONK</span>
+                            <span class="tag">#Solana</span>
+                            <span class="tag">#airdrop</span>
+                            {% endif %}
+                        </div>
+                        <!-- 지급 규정: Solana 전용 -->
+                        <div class="rule">
+                            {% if meta.lang == 'ko' %}
+                            <strong>지급 안내:</strong>
+                            <u>솔라나 지갑 주소(Base58)</u>로 참여한 경우에만
+                            <strong>BONK(SPL)</strong>
+                            으로 지급됩니다.
+            {% else %}
+                            <strong>Payout:</strong>
+                            <u>Only for Solana wallet addresses (base58)</u>, rewards are paid in
+                            <strong>BONK (SPL)</strong>
+                            .
+            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            </section>
+            <!-- 사이드(공지/설명) -->
+            <aside class="card">
+                <h3 style="margin:0 0 10px">{% if meta.lang == 'ko' %}안내{% else %}Notes{% endif %}</h3>
+                <p class="muted" style="margin:0">
+                    {% if meta.lang == 'ko' %}
+          에어드랍은 과제 검수 후 순차 지급됩니다. 봇/중복 참여는 제외될 수 있습니다.
+        {% else %}
+          Airdrops are distributed after review. Bot/duplicate entries may be excluded.
+        {% endif %}
+                </p>
+                <div style="margin-top:12px">
+                    <a class="btn" href="{% url 'rewards_en' %}">
+                        {% if meta.lang == 'ko' %}리워드 프로그램 바로가기{% else %}Go to Rewards Program{% endif %}
+                    </a>
+                </div>
+            </aside>
+        </main>
+        <footer class="container" style="text-align:center; color:#6b7280; padding-bottom:30px">
+            ©
+            <span class="brand-green">LinkHash</span>
+        </footer>
+    </body>
+</html>

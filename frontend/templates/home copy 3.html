@@ -54,7 +54,7 @@
       --line:#1a212d;
       --text:#e6f1ee;
       --muted:#9fb0aa;
-      --green:#16a34a;          /* LinkHash green (Matrix-ish) */
+      --green:#16a34a;          /* LinkHash green (Matrix‑ish) */
       --green-2:#23d16a;
       --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
       --radius:16px;
@@ -174,10 +174,8 @@
     .swiper{padding:8px}
     .swiper-slide{width:auto}
 
-    /* Section headings with "View more" link */
-    .section-head{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:8px;}
-    .more-link{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-weight:700; border:1px solid rgba(255,255,255,.08); background:rgba(14,18,25,.6); color:#d9f6e6}
-    .more-link:hover{border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18)}
+    /* ===== FOOTER ===== */
+    .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10;}
 
     /* (desktop only, as requested) */
     @media (max-width:1140px){ .container{width:1000px} }
@@ -203,7 +201,6 @@
                     <a href="#explain">How it works</a>
                     <a href="{{ rewards_url }}">Reward Program</a>
                     <a href="{{ events_url }}">Events</a>
-                    <a href="/leaderboard/">Leaderboard</a>
                     <a class="btn-outline" href="#projects">Campaigns</a>
                     {% if wallet_user %}
                     <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
@@ -221,10 +218,10 @@
                     <div class="badge">Web3 · SEO · Rewards</div>
                     <h1>
                         Boost rankings with
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">transparent, white-hat</span>
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">transparent, white‑hat</span>
                         campaigns that pay your community.
                     </h1>
-                    <p>Advertisers fund pools in USDT. Users complete visit & link-share tasks. Everyone sees the numbers.</p>
+                    <p>Advertisers fund pools in USDT. Users complete visit & link‑share tasks. Everyone sees the numbers.</p>
                     <div class="cta">
                         <a class="btn" href="#projects">Explore Campaigns</a>
                         <a class="btn-outline" href="{{ rewards_url }}">How rewards work</a>
@@ -264,13 +261,13 @@
         <section id="explain" class="section">
             <div class="container">
                 <h2>Built for two sides — one transparent system</h2>
-                <p class="lead">Data-driven placements, visible progress, and playful UX so people actually enjoy participating.</p>
+                <p class="lead">Data‑driven placements, visible progress, and playful UX so people actually enjoy participating.</p>
                 <div class="cards">
                     <div class="card">
                         <h3>For Advertisers</h3>
-                        <p>Launch safe link-building with curated placements, live progress & detailed reports.</p>
+                        <p>Launch safe link‑building with curated placements, live progress & detailed reports.</p>
                         <div class="chips">
-                            <span class="chip">White-hat</span>
+                            <span class="chip">White‑hat</span>
                             <span class="chip">Topical fit</span>
                             <span class="chip">Transparent</span>
                         </div>
@@ -286,7 +283,7 @@
                     </div>
                     <div class="card">
                         <h3>Safety by design</h3>
-                        <p>Anti-spam heuristics, manual review where needed, and clear consequences for abuse.</p>
+                        <p>Anti‑spam heuristics, manual review where needed, and clear consequences for abuse.</p>
                         <div class="chips">
                             <span class="chip">Spam guard</span>
                             <span class="chip">Appeals</span>
@@ -296,16 +293,10 @@
                 </div>
             </div>
         </section>
-        <!-- ===== PROJECTS: LIVE (2-row Swiper grid) ===== -->
+        <!-- ===== PROJECTS: CAROUSEL ===== -->
         <section id="projects" class="projects">
             <div class="container">
-                <div class="section-head">
-                    <h2>Live Campaigns</h2>
-                    <a class="more-link" href="https://link-hash.com/rewards/">
-                        View more
-                        <span aria-hidden="true">→</span>
-                    </a>
-                </div>
+                <h2>Live Campaigns</h2>
                 <p class="sub">Browse tasks like a shop — pick a mission, complete it, claim rewards.</p>
                 <div class="swiper" id="campaign-swiper">
                     <div class="swiper-wrapper">
@@ -352,7 +343,7 @@
                         </div>
                         {% endfor %}
           {% else %}
-                        <!-- Live Campaigns (6 examples to fill 2 rows nicely) -->
+                        <!-- Placeholders (local images if you downloaded them; otherwise uses Unsplash URLs) -->
                         <div class="swiper-slide">
                             <article class="project-card">
                                 <div class="thumb">
@@ -456,333 +447,7 @@
                                 </div>
                             </article>
                         </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Analytics dashboard">
-                                    <div class="task-badges">
-                                        <span class="task-badge link">LINK</span>
-                                        <span class="task-badge visit">VISIT</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>SEO Suite: Case study tour</h3>
-                                    <p>Visit 3 pages, collect codes, and share a short review post.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 3,200&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 516
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="52"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>52% claimed</span>
-                                        <span>2025-10-01 → 2025-11-30</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">View details</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.pexels.com/photos/29831433/pexels-photo-29831433.jpeg?cs=srgb&dl=pexels-tugaykocaturk-29831433.jpg&fm=jpg" alt="Crypto wallet">
-                                    <div class="task-badges">
-                                        <span class="task-badge visit">VISIT</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>Wallet onboarding quest</h3>
-                                    <p>Create a demo wallet, browse settings, and submit the code from the FAQ.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 1,000&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 190
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="28"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>28% claimed</span>
-                                        <span>2025-11-01 → 2025-12-10</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">View details</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" alt="Laptop coding">
-                                    <div class="task-badges">
-                                        <span class="task-badge link">LINK</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>DevTools beta feedback</h3>
-                                    <p>Share a thoughtful beta review on your blog with a contextual backlink.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 2,750&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 304
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="71"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>71% claimed</span>
-                                        <span>2025-10-15 → 2025-12-05</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">View details</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- ===== PAST CAMPAIGNS (2-row Swiper grid) ===== -->
-        <section id="past-projects" class="projects">
-            <div class="container">
-                <div class="section-head">
-                    <h2>Past Campaigns</h2>
-                    <a class="more-link" href="https://link-hash.com/rewards/">
-                        Browse all
-                        <span aria-hidden="true">→</span>
-                    </a>
-                </div>
-                <p class="sub">Closed pools with public metrics — see what a good campaign looks like.</p>
-                <div class="swiper" id="past-swiper">
-                    <div class="swiper-wrapper">
-                        <!-- Past examples (6 distinct) -->
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/MobileHCI2008_Audience.jpg" alt="Tech conference">
-                                    <div class="task-badges">
-                                        <span class="task-badge link">LINK</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>Creator Tools launch week</h3>
-                                    <p>Publish a how-to article with screenshots and a dofollow resource link.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 3,400&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 528
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="100"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>100% claimed</span>
-                                        <span>2025-08-01 → 2025-09-01</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">See summary</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.pexels.com/photos/374147/pexels-photo-374147.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Desk with plant">
-                                    <div class="task-badges">
-                                        <span class="task-badge visit">VISIT</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>Landing page QA hunt</h3>
-                                    <p>Find 3 minor UX issues and submit the on-page code at the footer.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 900&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 167
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="100"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>100% claimed</span>
-                                        <span>2025-07-12 → 2025-08-10</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">See summary</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Team discussion">
-                                    <div class="task-badges">
-                                        <span class="task-badge link">LINK</span>
-                                        <span class="task-badge visit">VISIT</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>Community spotlight series</h3>
-                                    <p>Interview a power user, publish highlights, and verify the unique code.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 1,800&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 294
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="100"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>100% claimed</span>
-                                        <span>2025-06-05 → 2025-07-05</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">See summary</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop" alt="Hackathon group">
-                                    <div class="task-badges">
-                                        <span class="task-badge link">LINK</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>Hackathon wrap-up posts</h3>
-                                    <p>Publish your team’s recap with links to demo and docs.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 2,200&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 351
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="100"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>100% claimed</span>
-                                        <span>2025-05-10 → 2025-06-10</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">See summary</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=1200&auto=format&fit=crop" alt="Analytics screen">
-                                    <div class="task-badges">
-                                        <span class="task-badge visit">VISIT</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>Docs deep-dive quest</h3>
-                                    <p>Walk through 5 docs pages and submit the breadcrumb code.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 1,200&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 205
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="100"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>100% claimed</span>
-                                        <span>2025-04-15 → 2025-05-20</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">See summary</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="swiper-slide">
-                            <article class="project-card">
-                                <div class="thumb">
-                                    <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=1200&auto=format&fit=crop" alt="Notebook planning">
-                                    <div class="task-badges">
-                                        <span class="task-badge link">LINK</span>
-                                    </div>
-                                </div>
-                                <div class="body">
-                                    <h3>Feature spotlight blogs</h3>
-                                    <p>Publish a feature teardown with a contextual dofollow citation.</p>
-                                    <div class="meta">
-                                        <div class="pill">
-                                            <strong>Pool</strong>
-                                            &nbsp; 1,950&nbsp;USDT
-                                        </div>
-                                        <div class="pill">
-                                            <strong>People</strong>
-                                            &nbsp; 277
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="bar" data-pct="100"></div>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                                        <span>100% claimed</span>
-                                        <span>2025-03-01 → 2025-04-01</span>
-                                    </div>
-                                    <div class="foot">
-                                        <a class="btn" href="/rewards/">See summary</a>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -794,7 +459,7 @@
                     ©
                     <strong>LinkHash</strong>
                 </div>
-                <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+                <div style="opacity:.7">White‑hat backlinks · Transparent rewards</div>
             </div>
         </footer>
         <!-- ===== LIBS ===== -->
@@ -912,31 +577,13 @@
               scrollTrigger:{ trigger: ".stage .pin-wrap", start: `${20 + i*25}% top`, end: `${32 + i*25}% top`, scrub: true }});
           });
 
-          // ---- Swiper (ESM) : 2-row grids ----
-          const liveSwiper = new Swiper('#campaign-swiper', {
+          // ---- Swiper (ESM) ----
+          const swiper = new Swiper('#campaign-swiper', {
+            slidesPerView: "auto",
             spaceBetween: 18,
-            grid: { rows: 2, fill: 'row' },
-            slidesPerView: 3,
+            freeMode: true,
             mousewheel: true,
-            grabCursor: true,
-            breakpoints: {
-              0:   { slidesPerView: 1 },
-              900: { slidesPerView: 2 },
-              1200:{ slidesPerView: 3 }
-            }
-          });
-
-          const pastSwiper = new Swiper('#past-swiper', {
-            spaceBetween: 18,
-            grid: { rows: 2, fill: 'row' },
-            slidesPerView: 3,
-            mousewheel: true,
-            grabCursor: true,
-            breakpoints: {
-              0:   { slidesPerView: 1 },
-              900: { slidesPerView: 2 },
-              1200:{ slidesPerView: 3 }
-            }
+            grabCursor: true
           });
 
           // Progress bars

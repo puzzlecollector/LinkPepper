@@ -1,0 +1,5 @@
+Django==5.2.6
+gunicorn==21.2.0
+eth-account==0.10.0
+psycopg2-binary==2.9.9    # keep if you're on Postgres; remove if you're NOT
+python-dotenv==1.0.1      # harmless helper if you use .env files

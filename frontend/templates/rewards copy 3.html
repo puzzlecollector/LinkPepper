@@ -283,7 +283,7 @@
                                     {% if meta.lang == 'ko' %}개별 보상 큼{% else %}Biggest payout{% endif %}
                                 </li>
                                 <li role="option" data-value="pool">
-                                    {% if meta.lang == 'ko' %}리워드 풀 큼{% else %}Largest pool{% endif %}
+                                    {% if meta.lang == 'ко' %}리워드 풀 큼{% else %}Largest pool{% endif %}
                                 </li>
                                 <li role="option" data-value="popular">
                                     {% if meta.lang == 'ko' %}인기 캠페인{% else %}Most popular{% endif %}
@@ -325,10 +325,12 @@
                             <p>{{ c.summary }}</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; {{ c.pool_usdt }} USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; {{ c.participants }}
+                                    <strong>People</strong>
+                                    &nbsp; {{ c.participants }}
                                 </div>
                             </div>
                             <div class="progress">
@@ -339,10 +341,7 @@
                                 <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
                             </div>
                             <div class="foot">
-                                <!-- link to detail page -->
-                                <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/" aria-label="View details for {{ c.title }}">
-                                    {{ c.cta|default:"View details" }}
-                                </a>
+                                <a class="btn" href="/rewards/">{{ c.cta|default:"View details" }}</a>
                             </div>
                         </div>
                     </article>
@@ -369,10 +368,12 @@
                             <p>Visit 3 pages, collect codes, then post a short review with insights.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 3,200 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 3,200 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 516
+                                    <strong>People</strong>
+                                    &nbsp; 516
                                 </div>
                             </div>
                             <div class="progress">
@@ -383,7 +384,7 @@
                                 <span>2025-10-01 → 2025-11-30</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/seo-suite-case-study-tour-1/" aria-label="View details for SEO Suite: Case study tour">View details</a>
+                                <a class="btn" href="/rewards/">View details</a>
                             </div>
                         </div>
                     </article>
@@ -406,10 +407,12 @@
                             <p>Create a demo wallet, browse settings, submit the hidden FAQ code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,000 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,000 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 190
+                                    <strong>People</strong>
+                                    &nbsp; 190
                                 </div>
                             </div>
                             <div class="progress">
@@ -420,7 +423,7 @@
                                 <span>2025-11-01 → 2025-12-10</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/wallet-onboarding-quest-2/" aria-label="View details for Wallet onboarding quest">View details</a>
+                                <a class="btn" href="/rewards/">View details</a>
                             </div>
                         </div>
                     </article>
@@ -443,10 +446,12 @@
                             <p>Write a genuine Naver Blog review with a contextual dofollow link.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 5,000 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 5,000 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 412
+                                    <strong>People</strong>
+                                    &nbsp; 412
                                 </div>
                             </div>
                             <div class="progress">
@@ -457,7 +462,7 @@
                                 <span>2025-10-05 → 2025-11-15</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/naver-review-sprint-3/" aria-label="View details for Naver review sprint">View details</a>
+                                <a class="btn" href="/rewards/">View details</a>
                             </div>
                         </div>
                     </article>
@@ -480,10 +485,12 @@
                             <p>Scroll & interact; find the verification code at the bottom.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,500 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,500 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 230
+                                    <strong>People</strong>
+                                    &nbsp; 230
                                 </div>
                             </div>
                             <div class="progress">
@@ -494,7 +501,7 @@
                                 <span>2025-10-10 → 2025-12-01</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/product-page-engagement-4/" aria-label="View details for Product page engagement">View details</a>
+                                <a class="btn" href="/rewards/">View details</a>
                             </div>
                         </div>
                     </article>
@@ -517,10 +524,12 @@
                             <p>Publish a thoughtful beta review on your blog with a citation link.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 2,750 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 2,750 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 304
+                                    <strong>People</strong>
+                                    &nbsp; 304
                                 </div>
                             </div>
                             <div class="progress">
@@ -531,7 +540,7 @@
                                 <span>2025-10-15 → 2025-12-05</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/devtools-beta-feedback-5/" aria-label="View details for DevTools beta feedback">View details</a>
+                                <a class="btn" href="/rewards/">View details</a>
                             </div>
                         </div>
                     </article>
@@ -555,10 +564,12 @@
                             <p>Read the post, find the hidden code, submit & earn.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 2,000 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 2,000 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 842
+                                    <strong>People</strong>
+                                    &nbsp; 842
                                 </div>
                             </div>
                             <div class="progress">
@@ -569,7 +580,7 @@
                                 <span>2025-09-01 → 2025-10-31</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/simplequant-blog-launch-6/" aria-label="View details for SimpleQuant: Blog launch">View details</a>
+                                <a class="btn" href="/rewards/">View details</a>
                             </div>
                         </div>
                     </article>
@@ -599,10 +610,12 @@
                             <p>Publish a how-to article with screenshots and a dofollow citation.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 3,400 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 3,400 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 528
+                                    <strong>People</strong>
+                                    &nbsp; 528
                                 </div>
                             </div>
                             <div class="progress">
@@ -613,7 +626,7 @@
                                 <span>2025-08-01 → 2025-09-01</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/creator-tools-launch-week-101/" aria-label="See summary for Creator Tools launch week">See summary</a>
+                                <a class="btn" href="/rewards/">See summary</a>
                             </div>
                         </div>
                     </article>
@@ -636,10 +649,12 @@
                             <p>Find 3 minor UX issues and submit the footer code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 900 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 900 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 167
+                                    <strong>People</strong>
+                                    &nbsp; 167
                                 </div>
                             </div>
                             <div class="progress">
@@ -650,7 +665,7 @@
                                 <span>2025-07-12 → 2025-08-10</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/landing-page-qa-hunt-102/" aria-label="See summary for Landing page QA hunt">See summary</a>
+                                <a class="btn" href="/rewards/">See summary</a>
                             </div>
                         </div>
                     </article>
@@ -674,10 +689,12 @@
                             <p>Interview a power user, publish highlights, verify unique code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,800 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,800 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 294
+                                    <strong>People</strong>
+                                    &nbsp; 294
                                 </div>
                             </div>
                             <div class="progress">
@@ -688,7 +705,7 @@
                                 <span>2025-06-05 → 2025-07-05</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/community-spotlight-series-103/" aria-label="See summary for Community spotlight series">See summary</a>
+                                <a class="btn" href="/rewards/">See summary</a>
                             </div>
                         </div>
                     </article>
@@ -711,10 +728,12 @@
                             <p>Publish your team’s recap with links to demo and docs.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 2,200 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 2,200 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 351
+                                    <strong>People</strong>
+                                    &nbsp; 351
                                 </div>
                             </div>
                             <div class="progress">
@@ -725,7 +744,7 @@
                                 <span>2025-05-10 → 2025-06-10</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/hackathon-wrap-up-posts-104/" aria-label="See summary for Hackathon wrap-up posts">See summary</a>
+                                <a class="btn" href="/rewards/">See summary</a>
                             </div>
                         </div>
                     </article>
@@ -748,10 +767,12 @@
                             <p>Walk through 5 docs pages and submit the breadcrumb code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,200 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,200 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 205
+                                    <strong>People</strong>
+                                    &nbsp; 205
                                 </div>
                             </div>
                             <div class="progress">
@@ -762,7 +783,7 @@
                                 <span>2025-04-15 → 2025-05-20</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/docs-deep-dive-quest-105/" aria-label="See summary for Docs deep-dive quest">See summary</a>
+                                <a class="btn" href="/rewards/">See summary</a>
                             </div>
                         </div>
                     </article>
@@ -785,10 +806,12 @@
                             <p>Publish a feature teardown with a contextual dofollow citation.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,950 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,950 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 277
+                                    <strong>People</strong>
+                                    &nbsp; 277
                                 </div>
                             </div>
                             <div class="progress">
@@ -799,7 +822,7 @@
                                 <span>2025-03-01 → 2025-04-01</span>
                             </div>
                             <div class="foot">
-                                <a class="btn" href="/rewards/feature-spotlight-blogs-106/" aria-label="See summary for Feature spotlight blogs">See summary</a>
+                                <a class="btn" href="/rewards/">See summary</a>
                             </div>
                         </div>
                     </article>
@@ -809,7 +832,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
@@ -865,6 +889,7 @@
         const open = dd.classList.toggle('open');
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         if(open){
+          // focus first selected option
           const current = menu.querySelector('[aria-selected="true"]');
           (current || menu.firstElementChild).focus?.();
         }
