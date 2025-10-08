@@ -24,4 +24,14 @@ urlpatterns = [
     # reward submission endpoints
     path("rewards/submit/link/<slug:slug>/", v.submit_link, name="submit_link"),
     path("rewards/submit/visit/<slug:slug>/", v.submit_visit, name="submit_visit"),
+
+    # Campaign detail (pretty URL like: /rewards/simplequant-blog-launch-5/)
+    path("rewards/<slug:slug>-<int:pk>/", v.rewards_detail, name="rewards_detail"),
+
+        # leaderboard
+    path("leaderboard/", v.leaderboard_en, name="leaderboard_en"),
+    path("ko/leaderboard/", v.leaderboard_ko, name="leaderboard_ko"),
+
+
+
 ]
