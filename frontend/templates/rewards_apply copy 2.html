@@ -88,28 +88,17 @@
       .card .head{display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.06)}
       .card .body{padding:18px}
       .hint{color:var(--muted); font-size:13px}
-
-      /* spacing tweaks: more vertical space between fields */
-      .row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+      .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
       .row.three{grid-template-columns:1fr 1fr 1fr}
       .row.full{grid-template-columns:1fr}
-      .row:last-child{margin-bottom:0}
-
-      label{display:block; font-weight:700; margin:2px 0 10px;}
+      label{display:block; font-weight:700; margin:2px 0 8px;}
       .opt{color:var(--muted); font-weight:600; font-size:12px; margin-left:6px}
-
-      input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], textarea, select{
+      input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], input[type="date"], textarea, select{
         width:100%; padding:12px 14px; border:1px solid #2a333f; border-radius:12px; background:#0b1117; color:#e6f1ee; outline:none;
-        transition:border-color .15s ease, box-shadow .15s ease; margin-bottom:6px;
+        transition:border-color .15s ease, box-shadow .15s ease;
       }
       textarea{min-height:110px}
       input:focus, textarea:focus, select:focus{ border-color:#1ad36a; box-shadow:0 0 0 4px rgba(35,209,106,.15) }
-
-      /* remove number spinners */
-      input[type="number"]::-webkit-outer-spin-button,
-      input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-      input[type="number"]{ -moz-appearance:textfield; appearance:textfield; }
-
       .chips{display:flex; gap:8px; flex-wrap:wrap}
       .chip{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#0b1218; border:1px solid #1d2836; color:#cde6da; font-weight:700; cursor:pointer}
       .chip input{accent-color:#19b357}
@@ -122,17 +111,6 @@
       .note{padding:14px; border:1px dashed #243040; border-radius:14px; background:#0a1117; color:#b9c9c3}
       .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px}
       .stack{display:flex; flex-wrap:wrap; gap:8px}
-
-      /* custom file input */
-      .file-wrap{display:flex; align-items:center; gap:10px;}
-      .file-hidden{position:absolute; left:-9999px; width:0; height:0; overflow:hidden;}
-      .file-label{display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background:#0b1117; color:#e6f1ee; font-weight:700; cursor:pointer;}
-      .file-name{color:#9fb0aa; font-size:13px;}
-
-      /* date selects row */
-      .date-row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
-      .date-group{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
-      .date-group select{min-width:0;}
 
       /* Footer */
       .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; margin-top:40px;}
@@ -187,7 +165,6 @@
         {% endif %}
       </nav>
 
-
       </div>
     </header>
 
@@ -223,19 +200,19 @@
           </div>
 
           {% url 'rewards_apply_submit' as apply_submit_url %}
-          <form class="body" method="post" action="{{ apply_submit_url|default:'#' }}" enctype="multipart/form-data" id="applyForm">
+          <form class="body" method="post" action="{{ apply_submit_url|default:'#' }}" enctype="multipart/form-data">
             {% csrf_token %}
 
             <!-- Contact -->
             <div class="row">
               <div>
                 <label for="email">Email *</label>
-                <input id="email" name="email" type="email" required placeholder="name@example.com" autocomplete="email">
+                <input id="email" name="email" type="email" required placeholder="name@example.com">
                 <div class="hint">{% if meta.lang == 'ko' %}필수{% else %}Required{% endif %}</div>
               </div>
               <div>
                 <label for="phone">{% if meta.lang == 'ko' %}전화번호{% else %}Phone{% endif %} *</label>
-                <input id="phone" name="phone" type="tel" required placeholder="+82 10 1234 1234" inputmode="tel" autocomplete="tel">
+                <input id="phone" name="phone" type="tel" required placeholder="+82 10 1234 1234">
                 <div class="hint">{% if meta.lang == 'ko' %}국가코드 포함{% else %}Include country code{% endif %}</div>
               </div>
             </div>
@@ -255,21 +232,11 @@
             <div class="row">
               <div>
                 <label for="site_url">{% if meta.lang == 'ko' %}웹사이트 URL{% else %}Website URL{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
-                <input id="site_url" name="website_url" type="url" placeholder="https://example.com" inputmode="url" autocomplete="url">
+                <input id="site_url" name="website_url" type="url" placeholder="https://example.com">
               </div>
               <div>
-                <label for="thumbInput">{% if meta.lang == 'ko' %}썸네일 이미지{% else %}Thumbnail Image{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
-
-                <!-- custom file control -->
-                <div class="file-wrap">
-                  <input id="thumbInput" class="file-hidden" name="thumbnail" type="file" accept="image/*">
-                  <label class="file-label" for="thumbInput">
-                    {% if meta.lang == 'ko' %}이미지 선택{% else %}Choose image{% endif %}
-                  </label>
-                  <span class="file-name" id="thumbName">
-                    {% if meta.lang == 'ko' %}선택된 파일 없음{% else %}No file selected{% endif %}
-                  </span>
-                </div>
+                <label for="thumb">{% if meta.lang == 'ko' %}썸네일 이미지{% else %}Thumbnail Image{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="thumb" name="thumbnail" type="file" accept="image/*">
               </div>
             </div>
 
@@ -316,7 +283,7 @@
               </div>
             </div>
 
-            <!-- LINK settings (conditional but visible by default for SEO inputs) -->
+            <!-- LINK settings (conditional) -->
             <div id="linkBlock" class="row">
               <div>
                 <label for="expected_keywords">
@@ -334,39 +301,26 @@
               </div>
             </div>
 
-            <!-- Rewards -->
+            <!-- Rewards & Window -->
             <div class="row">
               <div>
                 <label for="pool">{% if meta.lang == 'ko' %}총 리워드 풀 (USDT){% else %}Total Reward Pool (USDT){% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
-                <input id="pool" name="reward_pool_usdt" type="number" min="1" step="1" placeholder="e.g. 2500" inputmode="numeric" pattern="[0-9]*">
+                <input id="pool" name="reward_pool_usdt" type="number" min="1" step="1" placeholder="e.g. 2500">
               </div>
               <div>
                 <label for="payout">{% if meta.lang == 'ko' %}건당 예상 보상 (USDT){% else %}Expected Payout per Task (USDT){% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
-                <input id="payout" name="payout_per_task_usdt" type="number" min="0" step="0.01" placeholder="e.g. 3.50" inputmode="decimal">
+                <input id="payout" name="payout_per_task_usdt" type="number" min="0" step="0.01" placeholder="e.g. 3.50">
               </div>
             </div>
 
-            <!-- Dates (safe selects -> hidden ISO date fields) -->
-            <div class="date-row">
+            <div class="row">
               <div>
-                <label>{% if meta.lang == 'ko' %}캠페인 시작일{% else %}Start Date{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
-                <div class="date-group" data-name="start_date">
-                  <select id="start_y" aria-label="Start year"></select>
-                  <select id="start_m" aria-label="Start month"></select>
-                  <select id="start_d" aria-label="Start day"></select>
-                </div>
-                <input type="hidden" id="start" name="start_date" value="">
-                <div class="hint">{% if meta.lang == 'ko' %}연/월/일 선택 시 자동으로 YYYY-MM-DD 형식으로 저장됩니다.{% else %}Picking year/month/day saves as YYYY-MM-DD automatically.{% endif %}</div>
+                <label for="start">{% if meta.lang == 'ko' %}캠페인 시작일{% else %}Start Date{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="start" name="start_date" type="date">
               </div>
               <div>
-                <label>{% if meta.lang == 'ko' %}캠페인 종료일{% else %}End Date{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
-                <div class="date-group" data-name="end_date">
-                  <select id="end_y" aria-label="End year"></select>
-                  <select id="end_m" aria-label="End month"></select>
-                  <select id="end_d" aria-label="End day"></select>
-                </div>
-                <input type="hidden" id="end" name="end_date" value="">
-                <div class="hint">{% if meta.lang == 'ko' %}직접 입력 대신 선택만 가능하여 오타를 방지합니다.{% else %}Using selects prevents typos like “222220-02-04”.{% endif %}</div>
+                <label for="end">{% if meta.lang == 'ko' %}캠페인 종료일{% else %}End Date{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="end" name="end_date" type="date">
               </div>
             </div>
 
@@ -383,11 +337,11 @@
                   <div class="row three">
                     <div>
                       <label for="airdrop_first_n">{% if meta.lang == 'ko' %}선착순 인원 (N){% else %}First N People{% endif %}</label>
-                      <input id="airdrop_first_n" name="airdrop_first_n" type="number" min="1" step="1" placeholder="e.g. 100" inputmode="numeric" pattern="[0-9]*">
+                      <input id="airdrop_first_n" name="airdrop_first_n" type="number" min="1" step="1" placeholder="e.g. 100">
                     </div>
                     <div>
                       <label for="airdrop_amount">{% if meta.lang == 'ko' %}1인당 지급 (M){% else %}Amount per Person (M){% endif %}</label>
-                      <input id="airdrop_amount" name="airdrop_amount_per_user" type="number" min="0" step="0.0001" placeholder="e.g. 25" inputmode="decimal">
+                      <input id="airdrop_amount" name="airdrop_amount_per_user" type="number" min="0" step="0.0001" placeholder="e.g. 25">
                     </div>
                     <div>
                       <label for="airdrop_symbol">{% if meta.lang == 'ko' %}코인/토큰 심볼{% else %}Token Symbol{% endif %}</label>
@@ -480,8 +434,8 @@
 
       function updateBlocks(){
         visitBlk.style.display = visitCb?.checked ? 'block' : 'none';
-        // keep SEO inputs visible by default
-        linkBlk.style.display  = 'grid';
+        // LINK block primarily helpful for link tasks, but we keep visible by default for optional SEO fields.
+        linkBlk.style.display  = linkCb?.checked ? 'grid' : 'grid'; // keep shown to allow optional SEO inputs
       }
       function updateAirdrop(){ airBlk.style.display = airTgl?.checked ? 'block' : 'none'; }
 
@@ -489,78 +443,7 @@
       linkCb?.addEventListener('change', updateBlocks);
       airTgl?.addEventListener('change', updateAirdrop);
 
-      // Custom file input: show name
-      const thumbInput = document.getElementById('thumbInput');
-      const thumbName  = document.getElementById('thumbName');
-      thumbInput?.addEventListener('change', ()=>{
-        const n = thumbInput.files?.[0]?.name || (thumbInput.value?.split('\\').pop()) || '';
-        thumbName.textContent = n || (document.documentElement.lang === 'ko' ? '선택된 파일 없음' : 'No file selected');
-      });
-
-      // ===== Safe Date Selects =====
-      function pad(n){ return String(n).padStart(2,'0'); }
-      function daysIn(y,m){ return new Date(y, m, 0).getDate(); } // m: 1..12
-      function fillYears(sel, start, end){
-        sel.options.length = 0;
-        const opt0 = new Option(document.documentElement.lang === 'ko' ? '연도' : 'Year', '');
-        sel.add(opt0);
-        for(let y=start; y<=end; y++) sel.add(new Option(String(y), y));
-      }
-      function fillMonths(sel){
-        sel.options.length = 0;
-        const opt0 = new Option(document.documentElement.lang === 'ko' ? '월' : 'Month', '');
-        sel.add(opt0);
-        for(let m=1; m<=12; m++) sel.add(new Option(pad(m), m));
-      }
-      function fillDays(sel, y, m){
-        sel.options.length = 0;
-        const opt0 = new Option(document.documentElement.lang === 'ko' ? '일' : 'Day', '');
-        sel.add(opt0);
-        const lim = (y && m) ? daysIn(Number(y), Number(m)) : 31;
-        for(let d=1; d<=lim; d++) sel.add(new Option(pad(d), d));
-      }
-      function hookDateGroup(prefix){
-        const y = document.getElementById(prefix + '_y');
-        const m = document.getElementById(prefix + '_m');
-        const d = document.getElementById(prefix + '_d');
-        const hidden = document.getElementById(prefix === 'start' ? 'start' : 'end');
-
-        // year range: current .. +2 (and -1 for safety)
-        const now = new Date();
-        fillYears(y, now.getFullYear() - 1, now.getFullYear() + 2);
-        fillMonths(m);
-        fillDays(d, '', '');
-
-        function updateHidden(){
-          const yy = y.value, mm = m.value, dd = d.value;
-          if(yy && mm && dd){
-            hidden.value = `${yy}-${pad(mm)}-${pad(dd)}`;
-          }else{
-            hidden.value = '';
-          }
-        }
-        y.addEventListener('change', ()=>{ fillDays(d, y.value, m.value); updateHidden(); });
-        m.addEventListener('change', ()=>{ fillDays(d, y.value, m.value); updateHidden(); });
-        d.addEventListener('change', updateHidden);
-
-        // initialize
-        updateHidden();
-      }
-      hookDateGroup('start');
-      hookDateGroup('end');
-
-      // Prevent accidental non-numeric characters in purely numeric fields (soft guard)
-      document.querySelectorAll('input[type="number"][inputmode="numeric"]').forEach(inp=>{
-        inp.addEventListener('input', ()=>{ inp.value = inp.value.replace(/[^\d]/g,''); });
-      });
-
-      // On submit, ensures dates are already in hidden fields; nothing else to do
-      const form = document.getElementById('applyForm');
-      form?.addEventListener('submit', (e)=>{
-        // no-op, hidden fields already set by change events
-      });
-
-      // Initialize on load
+      // Initialize on load (default: show LINK block for optional fields; hide VISIT specifics)
       updateBlocks();
       updateAirdrop();
     </script>
