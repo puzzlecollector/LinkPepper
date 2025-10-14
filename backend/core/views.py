@@ -14,7 +14,7 @@ from eth_account.messages import encode_defunct
 from eth_account import Account
 
 # NOTE: adjust this import if your models live elsewhere
-from .models import WalletUser, Campaign, Submission
+from .models import WalletUser, Campaign, Submission, Event
 
 
 def _base_url(request):
@@ -177,38 +177,45 @@ def rewards_apply_ko(request):
 
 
 def _meta_for_events(lang, request):
+    base = _base_url(request)
     m = _meta_for(lang, request).copy()
-    if lang == "ko":
-        m.update({
-            "title": "LinkHash | 이벤트 · 공지",
-            "og_title": "LinkHash | 이벤트 · 공지",
-            "canonical": f"{_base_url(request)}/ko/events/",
-            "url": f"{_base_url(request)}/ko/events/",
-        })
-    else:
-        m.update({
-            "title": "LinkHash | Events & Announcements",
-            "og_title": "LinkHash | Events & Announcements",
-            "canonical": f"{_base_url(request)}/events/",
-            "url": f"{_base_url(request)}/events/",
-        })
+    titles = {
+        "en": ("LinkHash | Events & Announcements", "LinkHash | Events & Announcements", f"{base}/events/"),
+        "ko": ("LinkHash | 이벤트 · 공지",           "LinkHash | 이벤트 · 공지",           f"{base}/ko/events/"),
+        "ja": ("LinkHash | イベント・お知らせ",     "LinkHash | イベント・お知らせ",     f"{base}/ja/events/"),
+        "zh": ("LinkHash | 活动与公告",            "LinkHash | 活动与公告",            f"{base}/zh/events/"),
+    }
+    title, og_title, canon = titles.get(lang, titles["en"])
+    m.update({
+        "title": title,
+        "og_title": og_title,
+        "canonical": canon,
+        "url": canon,
+    })
     return m
 
 
-def events_en(request):
-    return render(
-        request,
-        "events.html",
-        {"meta": _meta_for_events("en", request), "wallet_user": get_wallet_user(request)},
-    )
 
+def _events_context(request, lang):
+    qs = Event.objects.filter(is_published=True, lang=lang).order_by("-posted_at", "-id")
+    return {
+        "meta": _meta_for_events(lang, request),
+        "wallet_user": get_wallet_user(request),
+        "events": qs,
+    }
+
+def events_en(request):
+    return render(request, "events.html", _events_context(request, "en"))
 
 def events_ko(request):
-    return render(
-        request,
-        "events.html",
-        {"meta": _meta_for_events("ko", request), "wallet_user": get_wallet_user(request)},
-    )
+    return render(request, "events.html", _events_context(request, "ko"))
+
+def events_ja(request):
+    return render(request, "events.html", _events_context(request, "ja"))
+
+def events_zh(request):
+    return render(request, "events.html", _events_context(request, "zh"))
+
 
 
 # ================== WALLET AUTH API (EVM) ==================

@@ -163,3 +163,31 @@ class Payout(models.Model):
 
     def __str__(self):
         return f"Payout #{self.pk} for submission {self.submission_id}"
+
+
+class Event(models.Model):
+    class Lang(models.TextChoices):
+        EN = "en", "English"
+        KO = "ko", "Korean"
+        JA = "ja", "Japanese"
+        ZH = "zh", "Chinese"
+
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    summary = models.TextField(blank=True, null=True)
+    body = models.TextField(blank=True, null=True)  # Markdown or HTML—your call
+    # Accepts http(s) or data:image/*;base64,... so admins can paste either.
+    thumb_src = models.TextField(blank=True, null=True)
+
+    lang = models.CharField(max_length=2, choices=Lang.choices, default=Lang.EN)
+    is_published = models.BooleanField(default=True)
+    posted_at = models.DateTimeField(default=timezone.now)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-posted_at", "-id"]
+        indexes = [models.Index(fields=["is_published", "lang", "posted_at"])]
+
+    def __str__(self):
+        return self.title

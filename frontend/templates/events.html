@@ -1,24 +1,24 @@
 <!doctype html>
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=1280, initial-scale=1">
-        <title>{{ meta.title }}</title>
-        <link rel="canonical" href="{{ meta.canonical }}">
-        <meta name="robots" content="index,follow">
-        <meta name="author" content="LinkHash">
-        <meta name="description" content="{{ meta.description }}">
-        <!-- OG -->
-        <meta property="og:type" content="website">
-        <meta property="og:site_name" content="LinkHash">
-        <meta property="og:title" content="{{ meta.og_title }}">
-        <meta property="og:description" content="{{ meta.og_description }}">
-        <meta property="og:url" content="{{ meta.url }}">
-        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
-        <!-- Favicons -->
-        <link rel="icon" href="{% static 'img/favicon.ico' %}">
-        <style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1280, initial-scale=1">
+    <title>{{ meta.title }}</title>
+    <link rel="canonical" href="{{ meta.canonical }}">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="LinkHash">
+    <meta name="description" content="{{ meta.description }}">
+    <!-- OG -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LinkHash">
+    <meta property="og:title" content="{{ meta.og_title }}">
+    <meta property="og:description" content="{{ meta.og_description }}">
+    <meta property="og:url" content="{{ meta.url }}">
+    <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+    <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+    <style>
       /* ===== THEME (match rewards pages) ===== */
       :root{
         --bg:#0a0b0d;
@@ -163,191 +163,125 @@
         .post{grid-template-columns:1fr}
         .thumb{height:180px}
       }
-        </style>
-    </head>
-    <body>
-        <!-- ===== NAV ===== -->
-        <header class="nav">
-            <div class="container row">
-                <div class="brand">
-                    <span class="dot"></span>
-                    <span>LinkHash</span>
-                </div>
-                <nav class="links">
-                    {% if meta.lang == "ko" %}
+    </style>
+  </head>
+  <body>
+    <!-- ===== NAV ===== -->
+    <header class="nav">
+      <div class="container row">
+        <div class="brand">
+          <span class="dot"></span>
+          <span>LinkHash</span>
+        </div>
+        <nav class="links">
+          {% if meta.lang == "ko" %}
             {% url 'home_ko' as home_url %}{% url 'events_ko' as events_url %}{% url 'rewards_ko' as rewards_url %}
+          {% elif meta.lang == "ja" %}
+            {% url 'home_en' as home_url %}{% url 'events_ja' as events_url %}{% url 'rewards_en' as rewards_url %}
+          {% elif meta.lang == "zh" %}
+            {% url 'home_en' as home_url %}{% url 'events_zh' as events_url %}{% url 'rewards_en' as rewards_url %}
           {% else %}
             {% url 'home_en' as home_url %}{% url 'events_en' as events_url %}{% url 'rewards_en' as rewards_url %}
           {% endif %}
-                    <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
-                    <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
-                    <a href="{{ events_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
-                    <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
-                    {% if wallet_user %}
-                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-                    <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">{% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}</a>
-                    {% else %}
-                    <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">{% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}</a>
-                    {% endif %}
-                </nav>
-                <div class="lang">
-                    {% if meta.lang == "ko" %}
-                    <a href="{% url 'events_en' %}">🇺🇸 English</a>
-                    <a class="active" href="{% url 'events_ko' %}">🇰🇷 한국어</a>
-                    {% else %}
-                    <a class="active" href="{% url 'events_en' %}">🇺🇸 English</a>
-                    <a href="{% url 'events_ko' %}">🇰🇷 한국어</a>
-                    {% endif %}
-                </div>
-            </div>
-        </header>
-        <!-- ===== PAGE HEADER ===== -->
-        <section class="page-head">
-            <div class="container">
-                <h1>{% if meta.lang == 'ko' %}이벤트 & 공지{% else %}Events & Announcements{% endif %}</h1>
-                <p class="sub">
-                    {% if meta.lang == 'ko' %}최신 이벤트와 공지사항을 확인하세요.{% else %}Check out our latest announcements and community events.{% endif %}
+          <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}首页{% else %}Home{% endif %}</a>
+          <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}</a>
+          <a href="{{ events_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}</a>
+          <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}</a>
+          {% if wallet_user %}
+            <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+            <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">{% if meta.lang == 'ko' %}대시보드{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Dashboard{% endif %}</a>
+          {% else %}
+            <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">{% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}</a>
+          {% endif %}
+        </nav>
+        <div class="lang">
+          <a {% if meta.lang == "en" %}class="active"{% endif %} href="{% url 'events_en' %}">🇺🇸 English</a>
+          <a {% if meta.lang == "ko" %}class="active"{% endif %} href="{% url 'events_ko' %}">🇰🇷 한국어</a>
+          <a {% if meta.lang == "ja" %}class="active"{% endif %} href="{% url 'events_ja' %}">🇯🇵 日本語</a>
+          <a {% if meta.lang == "zh" %}class="active"{% endif %} href="{% url 'events_zh' %}">🇨🇳 中文</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== PAGE HEADER ===== -->
+    <section class="page-head">
+      <div class="container">
+        <h1>
+          {% if meta.lang == 'ko' %}이벤트 & 공지{% elif meta.lang == 'ja' %}イベント & お知らせ{% elif meta.lang == 'zh' %}活动与公告{% else %}Events & Announcements{% endif %}
+        </h1>
+        <p class="sub">
+          {% if meta.lang == 'ko' %}최신 이벤트와 공지사항을 확인하세요.{% elif meta.lang == 'ja' %}最新のイベントとお知らせをチェックしましょう。{% elif meta.lang == 'zh' %}查看最新活动与公告。{% else %}Check out our latest announcements and community events.{% endif %}
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== BOARD ===== -->
+    <main class="container board">
+      <!-- LEFT: Posts list -->
+      <section class="card">
+        {% if events and events|length > 0 %}
+          {% for ev in events %}
+            <article class="post" {% if not forloop.first %}style="margin-top:16px"{% endif %}>
+              <div class="thumb">
+                {% if ev.thumb_src %}
+                  <img src="{{ ev.thumb_src }}" alt="{{ ev.title|escape }}">
+                {% else %}
+                  <img src="{% static 'img/og-cover.png' %}" alt="{{ ev.title|escape }}">
+                {% endif %}
+              </div>
+              <div class="content">
+                <h3 class="title">{{ ev.title }}</h3>
+                <p class="meta">
+                  {% if meta.lang == 'ko' %}공지 날짜{% elif meta.lang == 'ja' %}掲載日{% elif meta.lang == 'zh' %}发布时间{% else %}Posted on{% endif %}:
+                  {{ ev.posted_at|date:"Y-m-d" }}
                 </p>
-            </div>
-        </section>
-        <!-- ===== BOARD ===== -->
-        <main class="container board">
-            <!-- LEFT: Posts list -->
-            <section class="card">
-                <!-- Post #1: PEPE -->
-                <article class="post">
-                    <div class="thumb">
-                        <img src="{% static 'img/events/pepe_pepper.png' %}" alt="PEPE Airdrop">
-                    </div>
-                    <div class="content">
-                        <h3 class="title">
-                            {% if meta.lang == 'ko' %}
-                링크 공유 과제에 참여하는
-                            <strong>첫 100명</strong>
-                            에게 1인당
-                            <strong>PEPE 1,000,000</strong>
-                            에어드랍!
-              {% else %}
-                First
-                            <strong>100 participants</strong>
-                            in the Link Sharing Task get
-                            <strong>1,000,000 PEPE</strong>
-                            each!
-              {% endif %}
-                        </h3>
-                        <p class="meta">{% if meta.lang == 'ko' %}공지 날짜{% else %}Posted on{% endif %}: 2025-09-13</p>
-                        <div class="tags">
-                            {% if meta.lang == 'ko' %}
-                            <span class="tag">#밈코인&nbsp;이벤트</span>
-                            <span class="tag">#에어드랍</span>
-                            <span class="tag">#PEPE</span>
-                            <span class="tag">#알트시즌</span>
-                            {% else %}
-                            <span class="tag">#meme&nbsp;coin&nbsp;event</span>
-                            <span class="tag">#airdrop</span>
-                            <span class="tag">#PEPE</span>
-                            <span class="tag">#Altseason</span>
-                            {% endif %}
-                        </div>
-                        <!-- Rule: Ethereum only -->
-                        <div class="rule">
-                            {% if meta.lang == 'ko' %}
-                            <strong>지급 안내:</strong>
-                            <u>이더리움 지갑 주소(0x…)</u>
-                            로 참여한 경우에만
-                            <strong>PEPE(ERC-20)</strong>
-                            으로 지급됩니다.
-              {% else %}
-                            <strong>Payout:</strong>
-                            <u>Only for Ethereum wallet addresses (0x…)</u>
-                            , rewards are paid in
-                            <strong>PEPE (ERC-20)</strong>
-                            .
-              {% endif %}
-                        </div>
-                    </div>
-                </article>
-                <!-- Post #2: BONK -->
-                <article class="post" style="margin-top:16px">
-                    <div class="thumb">
-                        <img src="{% static 'img/events/bonk_pepper.png' %}" alt="BONK Airdrop">
-                    </div>
-                    <div class="content">
-                        <h3 class="title">
-                            {% if meta.lang == 'ko' %}
-                솔라나 지갑 사용자 보너스!
-                            <strong>첫 100명</strong>
-                            에게 1인당
-                            <strong>BONK 500,000</strong>
-                            에어드랍
-              {% else %}
-                Bonus for Solana wallets!
-                            <strong>First 100</strong>
-                            get
-                            <strong>500,000 BONK</strong>
-                            each
-              {% endif %}
-                        </h3>
-                        <p class="meta">{% if meta.lang == 'ko' %}공지 날짜{% else %}Posted on{% endif %}: 2025-09-13</p>
-                        <div class="tags">
-                            {% if meta.lang == 'ko' %}
-                            <span class="tag">#봉크</span>
-                            <span class="tag">#솔라나</span>
-                            <span class="tag">#에어드랍</span>
-                            {% else %}
-                            <span class="tag">#BONK</span>
-                            <span class="tag">#Solana</span>
-                            <span class="tag">#airdrop</span>
-                            {% endif %}
-                        </div>
-                        <!-- Rule: Solana only -->
-                        <div class="rule">
-                            {% if meta.lang == 'ko' %}
-                            <strong>지급 안내:</strong>
-                            <u>솔라나 지갑 주소(Base58)</u>
-                            로 참여한 경우에만
-                            <strong>BONK(SPL)</strong>
-                            으로 지급됩니다.
-              {% else %}
-                            <strong>Payout:</strong>
-                            <u>Only for Solana wallet addresses (base58)</u>
-                            , rewards are paid in
-                            <strong>BONK (SPL)</strong>
-                            .
-              {% endif %}
-                        </div>
-                    </div>
-                </article>
-            </section>
-            <!-- RIGHT: Notes -->
-            <aside class="card aside">
-                <h3>{% if meta.lang == 'ko' %}안내{% else %}Notes{% endif %}</h3>
-                <p class="muted">
-                    {% if meta.lang == 'ko' %}
+                {% if ev.summary %}
+                  <p>{{ ev.summary|linebreaksbr }}</p>
+                {% endif %}
+                {% if ev.body %}
+                  <div class="rule">{{ ev.body|safe }}</div>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          <p class="muted" style="margin:0">
+            {% if meta.lang == 'ko' %}아직 등록된 이벤트가 없습니다.{% elif meta.lang == 'ja' %}イベントはまだありません。{% elif meta.lang == 'zh' %}目前还没有活动。{% else %}No events yet.{% endif %}
+          </p>
+        {% endif %}
+      </section>
+
+      <!-- RIGHT: Notes -->
+      <aside class="card aside">
+        <h3>{% if meta.lang == 'ko' %}안내{% elif meta.lang == 'ja' %}ご案内{% elif meta.lang == 'zh' %}说明{% else %}Notes{% endif %}</h3>
+        <p class="muted">
+          {% if meta.lang == 'ko' %}
             에어드랍은 과제 검수 후 순차 지급됩니다. 봇/중복 참여는 제외될 수 있습니다.
+          {% elif meta.lang == 'ja' %}
+            エアドロップは審査後に順次配布されます。不正や重複は無効となる場合があります。
+          {% elif meta.lang == 'zh' %}
+            空投将在审核后陆续发放。机器人/重复参与可能会被剔除。
           {% else %}
             Airdrops are distributed after review. Bot/duplicate entries may be excluded.
           {% endif %}
-                </p>
-                <div style="margin-top:14px; display:flex; gap:10px;">
-                    <a class="btn" href="{% url 'rewards_en' %}">
-                        {% if meta.lang == 'ko' %}리워드 프로그램 바로가기{% else %}Go to Rewards Program{% endif %}
-                    </a>
-                    <a class="btn-outline" href="/rewards/apply/">
-                        {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for a Campaign{% endif %}
-                    </a>
-                </div>
-            </aside>
-        </main>
-        <!-- ===== FOOTER ===== -->
-        <footer class="footer">
-            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-                <div>
-                    ©
-                    <strong>LinkHash</strong>
-                </div>
-                <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
-            </div>
-        </footer>
-    </body>
+        </p>
+        <div style="margin-top:14px; display:flex; gap:10px;">
+          <a class="btn" href="{% url 'rewards_en' %}">
+            {% if meta.lang == 'ko' %}리워드 프로그램 바로가기{% elif meta.lang == 'ja' %}リワードを見る{% elif meta.lang == 'zh' %}前往奖励计划{% else %}Go to Rewards Program{% endif %}
+          </a>
+          <a class="btn-outline" href="/rewards/apply/">
+            {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请活动{% else %}Apply for a Campaign{% endif %}
+          </a>
+        </div>
+      </aside>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+        <div>© <strong>LinkHash</strong></div>
+        <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+      </div>
+    </footer>
+  </body>
 </html>
