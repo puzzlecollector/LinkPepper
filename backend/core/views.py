@@ -16,6 +16,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
 from eth_account.messages import encode_defunct
 from eth_account import Account
+from django.template.loader import select_template
 
 # IMPORTANT: import models from the rewards app
 from .models import (
@@ -34,6 +35,66 @@ from .models import (
 # ---------- helpers ----------
 def _base_url(request):
     return f"{request.scheme}://{request.get_host()}"
+
+def _is_mobile_host(request) -> bool:
+    host = (request.get_host() or "").lower()
+    # treat m.link-hash.com as mobile
+    return host.startswith("m.")
+
+# ---------- helpers ----------
+def _is_mobile_host(request) -> bool:
+    host = (request.get_host() or "").lower()
+    return host.startswith("m.")
+
+def _ua_is_mobile(request) -> bool:
+    """
+    Extremely light UA sniffing — enough to catch iOS/Android phones.
+    We don't force mobile if a tablet/desktop; subdomain or query override wins.
+    """
+    ua = (request.META.get("HTTP_USER_AGENT") or "").lower()
+    # Common mobile indicators; avoid 'ipad' to keep iPad as desktop-like
+    mobile_hits = ("iphone", "ipod", "android", "mobile", "windows phone")
+    return any(k in ua for k in mobile_hits)
+
+def _query_overrides_mobile(request) -> bool | None:
+    """
+    Returns True/False when URL explicitly requests a view, else None.
+    Supported:
+      - ?view=mobile / ?view=desktop
+      - ?m=1 / ?m=0
+    """
+    q = request.GET
+    view = (q.get("view") or "").strip().lower()
+    if view in ("mobile", "m"): return True
+    if view in ("desktop", "d"): return False
+    mflag = q.get("m")
+    if mflag == "1": return True
+    if mflag == "0": return False
+    return None
+
+def _should_use_mobile(request) -> bool:
+    """
+    Priority: explicit URL override > m. host > mobile UA.
+    """
+    override = _query_overrides_mobile(request)
+    if override is not None:
+        return override
+    if _is_mobile_host(request):
+        return True
+    return _ua_is_mobile(request)
+
+def render_mobile_first(request, base_template_name: str, context: dict):
+    """
+    Try {base}_mobile.html first when mobile is preferred, then fallback.
+    Example: render_mobile_first(request, "rewards", ctx)
+    """
+    template_candidates = []
+    if _should_use_mobile(request):
+        template_candidates.append(f"{base_template_name}_mobile.html")
+    template_candidates.append(f"{base_template_name}.html")
+    t = select_template(template_candidates)
+    return render(request, t.template.name, context)
+
 
 def _normalize_evm_address(addr: str | None) -> str | None:
     """
@@ -247,7 +308,7 @@ def home_en(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "home.html", ctx)
+    return render_mobile_first(request, "home", ctx)
 
 @ensure_csrf_cookie
 def home_ko(request):
@@ -257,7 +318,7 @@ def home_ko(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "home.html", ctx)
+    return render_mobile_first(request, "home", ctx)
 
 @ensure_csrf_cookie
 def home_ja(request):
@@ -267,7 +328,7 @@ def home_ja(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "home.html", ctx)
+    return render_mobile_first(request, "home", ctx)
 
 @ensure_csrf_cookie
 def home_zh(request):
@@ -277,7 +338,7 @@ def home_zh(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "home.html", ctx)
+    return render_mobile_first(request, "home", ctx)
 
 
 # ---- Rewards listing (now sends real campaigns to template) ----
@@ -332,7 +393,7 @@ def rewards_en(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "rewards.html", ctx)
+    return render_mobile_first(request, "rewards", ctx)
 
 def rewards_ko(request):
     ctx = {
@@ -342,7 +403,7 @@ def rewards_ko(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "rewards.html", ctx)
+    return render_mobile_first(request, "rewards", ctx)
 
 def rewards_ja(request):
     ctx = {
@@ -352,7 +413,7 @@ def rewards_ja(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "rewards.html", ctx)
+    return render_mobile_first(request, "rewards", ctx)
 
 def rewards_zh(request):
     ctx = {
@@ -362,7 +423,7 @@ def rewards_zh(request):
         "projects": _live_campaigns(),
         "past_projects": _past_campaigns(),
     }
-    return render(request, "rewards.html", ctx)
+    return render_mobile_first(request, "rewards", ctx)
 
 # ---- Rewards apply (landing) ----
 def rewards_apply_en(request):
@@ -408,7 +469,9 @@ def rewards_apply_en(request):
             "canonical": f"{base}/rewards/apply/",
             "url": f"{base}/rewards/apply/",
         }
-    return render(request, "rewards_apply.html", {"meta": meta, "wallet_user": get_wallet_user(request)})
+    ctx = {"meta": meta, "wallet_user": get_wallet_user(request)}
+    return render_mobile_first(request, "rewards_apply", ctx)
+
 
 def rewards_apply_ko(request):
     base = _base_url(request)
@@ -522,7 +585,7 @@ def events_en(request):
         "lang": lang,
         "events": events,
     }
-    return render(request, "events.html", ctx)
+    return render_mobile_first(request, "events", ctx)
 
 def events_ko(request):
     lang = "ko"
@@ -810,7 +873,7 @@ def rewards_detail(request, slug, pk):
         "submitted": submitted, "quota_total": quota_total, "claimed_percent": claimed_percent,
         "using_sample": using_sample,
     }
-    return render(request, "rewards_details.html", ctx)
+    return render_mobile_first(request, "rewards_details", ctx)
 
 
 # ======== LEADERBOARD ========
@@ -906,7 +969,7 @@ def leaderboard_en(request):
         "rows": rows, "range_label": label, "range_code": code,
         "using_sample": not Submission.objects.filter(created_at__gte=since).exists(),
     }
-    return render(request, "leaderboard.html", ctx)
+    return render_mobile_first(request, "leaderboard", ctx)
 
 def leaderboard_ko(request):
     since, label, code = _leaderboard_range(request)
@@ -917,7 +980,7 @@ def leaderboard_ko(request):
         "rows": rows, "range_label": label, "range_code": code,
         "using_sample": not Submission.objects.filter(created_at__gte=since).exists(),
     }
-    return render(request, "leaderboard.html", ctx)
+    return render_mobile_first(request, "leaderboard", ctx)
 
 def leaderboard_ja(request):
     since, label, code = _leaderboard_range(request)
@@ -928,7 +991,7 @@ def leaderboard_ja(request):
         "rows": rows, "range_label": label, "range_code": code,
         "using_sample": not Submission.objects.filter(created_at__gte=since).exists(),
     }
-    return render(request, "leaderboard.html", ctx)
+    return render_mobile_first(request, "leaderboard", ctx)
 
 def leaderboard_zh(request):
     since, label, code = _leaderboard_range(request)
@@ -939,4 +1002,4 @@ def leaderboard_zh(request):
         "rows": rows, "range_label": label, "range_code": code,
         "using_sample": not Submission.objects.filter(created_at__gte=since).exists(),
     }
-    return render(request, "leaderboard.html", ctx)
+    return render_mobile_first(request, "leaderboard", ctx)

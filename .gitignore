@@ -1,1 +1,52 @@
+# ---- Python / Django basics ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+.build/
+dist/
+pip-wheel-metadata/
+*.log
+
+# Virtual envs
+venv/
+.env/
+.env.*/
+.venv/
+.python-version
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Django: local settings & secrets
+*.env
+*.local
+*.ini
+*.cfg
+
+# SQLite DB (local only)
 db.sqlite3
+db.sqlite3-*
+*.sqlite3
+
+# Static & media (generated / uploaded)
+staticfiles/
+static/
+media/
+mediafiles/
+
+# Node / frontend (if present)
+frontend/node_modules/
+frontend/.cache/
+*.lock
+*.map
+
+# Django migrations (keep only package marker)
+**/migrations/*
+!**/migrations/__init__.py
