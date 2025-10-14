@@ -15,6 +15,8 @@ urlpatterns = [
     path("rewards/apply/ko/", v.rewards_apply_ko, name="rewards_apply_ko"),
     path("events/", v.events_en, name="events_en"),
     path("ko/events/", v.events_ko, name="events_ko"),
+    path("ja/events/", v.events_ja, name="events_ja"),
+    path("zh/events/", v.events_zh, name="events_zh"),
 
     # wallet auth API
     path("api/auth/nonce", v.api_nonce, name="api_nonce"),
