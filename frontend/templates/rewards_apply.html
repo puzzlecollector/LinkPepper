@@ -1,182 +1,917 @@
 <!doctype html>
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ meta.title }}</title>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1280, initial-scale=1">
+    <title>{{ meta.title|default:"LinkHash | Launch a Campaign" }}</title>
+    <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="LinkHash">
+    <meta name="description" content="{{ meta.description|default:'Request a new LinkHash reward campaign.' }}">
+    <!-- OG/Twitter -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LinkHash">
+    <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+    <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+    <meta property="og:url" content="{{ meta.url }}">
+    <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+    <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+    <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+    <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
 
-  <link rel="canonical" href="{{ meta.canonical }}">
-  <meta name="robots" content="index,follow">
-  <meta name="author" content="LinkHash">
-  <meta name="description" content="{{ meta.description }}">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LinkHash">
-  <meta property="og:title" content="{{ meta.og_title }}">
-  <meta property="og:description" content="{{ meta.og_description }}">
-  <meta property="og:url" content="{{ meta.url }}">
-  <meta property="og:image" content="{% static 'img/og-cover.png' %}">
-  <link rel="icon" href="{% static 'img/favicon.ico' %}">
-  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+    <style>
+      :root{
+        --bg:#0a0b0d; --bg-elev:#0f1115; --panel:#11141a; --panel-2:#0e1318; --grid:#0b0f13; --line:#1a212d;
+        --text:#e6f1ee; --muted:#9fb0aa; --green:#16a34a; --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px; --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 16px 40px rgba(0,0,0,.45);
+        --noise:transparent url('data:image/svg+xml;utf8,\
+          <svg xmlns="http://www.w3.org/2000/svg" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\
+          <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+          <rect width=\"120\" height=\"120\" filter=\"url(%23n)\" opacity=\".04\"/></svg>') repeat;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                     "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", Arial, sans-serif;
+        letter-spacing:.2px; background-attachment:fixed;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:1200px; margin:0 auto; padding:0 20px;}
 
-  <style>
-    :root{ --green:#16a34a; --line:#e5e7eb; --text:#111827; --muted:#6b7280; --bg:#fff; --card:#fff; --chip:#f9fafb; --shadow:0 8px 24px rgba(0,0,0,.06); }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--text);background:var(--bg)}
-    a{color:inherit;text-decoration:none}
-    .container{max-width:1000px;margin:0 auto;padding:20px}
-    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
-    .brand-green{color:var(--green);font-weight:800}
-    .nav-links{display:flex;gap:16px;align-items:center}
-    .btn{padding:10px 14px;border-radius:10px;background:var(--green);color:#fff;display:inline-block}
-    .btn-outline{padding:10px 14px;border-radius:10px;border:1px solid var(--green);color:var(--green);display:inline-block;background:#fff}
-    .lang{display:flex;gap:8px}
-    .lang a{border:1px solid var(--line);padding:6px 10px;border-radius:8px}
+      /* NAV */
+      .nav{position:sticky; top:0; z-index:60; backdrop-filter: blur(10px);
+        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+        border-bottom:1px solid rgba(255,255,255,.06);}
+      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+      .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; color:#d8ffe7; text-shadow:0 0 18px rgba(35,209,106,.24);}
+      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+      .nav .links{display:flex; gap:24px; align-items:center;}
+      .nav .links a{color:#cfe7dd; opacity:.9}
+      .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
 
-    .page-title{padding:40px 20px;text-align:center}
-    .page-title h1{margin:0 0 6px;font-size:34px}
-    .muted{color:var(--muted)}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
-    .form{max-width:780px;margin:0 auto}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .row.full{grid-template-columns:1fr}
-    label{font-size:14px;color:#374151;margin-bottom:6px;display:block}
-    input, select, textarea{
-      width:100%;padding:12px 14px;border:1px solid #cfd4da;border-radius:10px;font-size:15px;outline:none;
-      transition:border-color .12s ease, box-shadow .12s ease;
-    }
-    input:focus,select:focus,textarea:focus{ border-color:#16a34a; box-shadow:0 0 0 4px rgba(22,163,74,.12); }
-    .help{font-size:12px;color:var(--muted);margin-top:6px}
-    .fee{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--chip);padding:6px 10px;border-radius:999px;font-size:13px}
-    .submit-row{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
-    .notice{margin-top:12px;color:var(--muted);font-size:14px}
-    @media (max-width:900px){ .row{grid-template-columns:1fr} .page-title h1{font-size:26px} }
-    .footer {text-align:center; padding:20px; border-top:1px solid #eee; color:#666; margin-top:40px;}
-  </style>
-</head>
-<body>
+      /* Language dropdown */
+      .lang{position:relative}
+      .lang-btn{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px;
+        border:1px solid #2a333f; background:#0b1117; color:#cfe7dd; cursor:pointer; font-weight:700}
+      .lang .chev{opacity:.8}
+      .lang-menu{position:absolute; right:0; top:calc(100% + 8px); min-width:180px; padding:8px; margin:0;
+        background:#0b1117; border:1px solid #2a333f; border-radius:12px; list-style:none; display:none; z-index:100}
+      .lang-menu.open{display:block}
+      .lang-item{padding:8px 10px; border-radius:8px; cursor:pointer; white-space:nowrap}
+      .lang-item:hover, .lang-item[aria-selected="true"]{background:#0f141a; color:#e6f1ee}
 
-  <!-- 헤더 -->
-  <header class="nav">
+      /* HEADER */
+      .page-head{
+        padding:50px 0 16px;
+        background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)), var(--noise);
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .page-head h1{margin:0 0 10px; font-size:36px; letter-spacing:.3px;}
+      .page-head .sub{color:var(--muted); margin:0}
 
-    {% if meta.lang == "ko" %}
-      {% url 'home_ko' as home_url %}
-      {% url 'events_ko' as events_url %}
-      {% url 'rewards_ko' as rewards_url %}
-    {% else %}
-      {% url 'home_en' as home_url %}
-      {% url 'events_en' as events_url %}
-      {% url 'rewards_en' as rewards_url %}
-    {% endif %}
+      /* FORM LAYOUT */
+      .grid{display:grid; grid-template-columns:2fr 1fr; gap:18px; padding:22px 0;}
+      .card{background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-lg);}
+      .card .head{display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.06)}
+      .card .body{padding:18px}
+      .hint{color:var(--muted); font-size:13px}
+      .row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+      .row.three{grid-template-columns:1fr 1fr 1fr}
+      .row.full{grid-template-columns:1fr}
+      .row:last-child{margin-bottom:0}
+      label{display:block; font-weight:700; margin:2px 0 10px;}
+      .opt{color:var(--muted); font-weight:600; font-size:12px; margin-left:6px}
+      input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], textarea, select{
+        width:100%; padding:12px 14px; border:1px solid #2a333f; border-radius:12px; background:#0b1117; color:#e6f1ee; outline:none;
+        transition:border-color .15s ease, box-shadow .15s ease; margin-bottom:6px;}
+      textarea{min-height:110px}
+      input:focus, textarea:focus, select:focus{ border-color:#1ad36a; box-shadow:0 0 0 4px rgba(35,209,106,.15) }
+      input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+      input[type="number"]{ -moz-appearance:textfield; appearance:textfield; }
 
-    <div class="brand-green">LinkHash</div>
-    <nav class="nav-links">
-      <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
-      <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
-      <a class="btn" href="#wallet">{% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}</a>
-      <a class="btn-outline" href="#stake">{% if meta.lang == 'ko' %}스테이킹{% else %}Stake{% endif %}</a>
-    </nav>
-    <div class="lang">
-      {% if meta.lang == "ko" %}
-        <a href="{% url 'rewards_apply_en' %}">🇺🇸 English</a>
-        <a href="{% url 'rewards_apply_ko' %}" style="border-color:var(--green);color:var(--green)">🇰🇷 한국어</a>
-      {% else %}
-        <a href="{% url 'rewards_apply_en' %}" style="border-color:var(--green);color:var(--green)">🇺🇸 English</a>
-        <a href="{% url 'rewards_apply_ko' %}">🇰🇷 한국어</a>
-      {% endif %}
-    </div>
-  </header>
+      .chips{display:flex; gap:8px; flex-wrap:wrap}
+      .chip{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#0b1218; border:1px solid #1d2836; color:#cde6da; font-weight:700; cursor:pointer}
+      .chip input{accent-color:#19b357}
 
-  <!-- 타이틀 -->
-  <section class="page-title">
-    <h1>{% if meta.lang == 'ko' %}리워드 프로그램 신청{% else %}Apply for Reward Program{% endif %}</h1>
-    <p class="muted">
-      {% if meta.lang == 'ko' %}
-        간단한 정보만 남겨 주세요. <strong>24시간 내로 회신</strong>드립니다.
-      {% else %}
-        Leave a few details. We’ll <strong>reply within 24 hours</strong>.
-      {% endif %}
-    </p>
-  </section>
+      .foot-actions{display:flex; justify-content:flex-end; gap:10px; padding:16px 18px; border-top:1px solid rgba(255,255,255,.06)}
+      .divider{height:1px; background:#1d2836; margin:14px 0}
 
-  <!-- 폼 카드 -->
-  <main class="container">
-    <div class="card">
-      <form class="form" method="post" action="#">
-        {% csrf_token %}
+      .side{display:flex; flex-direction:column; gap:12px}
+      .note{padding:14px; border:1px dashed #243040; border-radius:14px; background:#0a1117; color:#b9c9c3}
+      .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px}
+      .stack{display:flex; flex-wrap:wrap; gap:8px}
 
-        <div class="row">
-          <!-- 전화번호 (선택) -->
-          <div>
-            <label for="phone">{% if meta.lang == 'ko' %}전화번호 (선택){% else %}Phone (optional){% endif %}</label>
-            <input id="phone" name="phone" type="tel" placeholder="+82 10 1234 1234">
-            <div class="help">
-              {% if meta.lang == 'ko' %}예시 형식: +82 10 1234 1234{% else %}Example: +82 10 1234 1234{% endif %}
+      .file-wrap{display:flex; align-items:center; gap:10px;}
+      .file-hidden{position:absolute; left:-9999px; width:0; height:0; overflow:hidden;}
+      .file-label{display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background:#0b1117; color:#e6f1ee; font-weight:700; cursor:pointer;}
+      .file-name{color:#9fb0aa; font-size:13px;}
+
+      .ico-preview{ width:32px; height:32px; border-radius:6px; border:1px solid #2a333f; background:#0b1117; display:none; overflow:hidden;}
+      .ico-preview img{ width:100%; height:100%; object-fit:contain; display:block; }
+
+      .date-row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+      .date-group{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+      .date-group select{min-width:0;}
+
+      .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; margin-top:40px;}
+
+      .alert{padding:12px 14px; border-radius:12px; margin:8px 0 0; font-size:14px}
+      .alert.err{background:#1a1113; border:1px solid #3f1a22; color:#ffd4de}
+      .alert.ok{background:#0e1713; border:1px solid #1e3a2f; color:#c9ffe7}
+
+      @media (max-width:1140px){ .container{width:1000px} }
+      @media (max-width:1000px){ .container{width:920px} .grid{grid-template-columns:1fr} }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="container row">
+        <div class="brand"><span class="dot"></span><span>LinkHash</span></div>
+
+        <nav class="links">
+          <!-- Left: same 4 links + Apply -->
+          <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+            {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
+          </a>
+          <a href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
+            {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
+          </a>
+          <a href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
+            {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
+          </a>
+          <a href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
+            {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+          </a>
+
+          <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}" style="font-weight:700;color:#d8ffe7">
+            {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
+          </a>
+
+          {% if wallet_user %}
+            <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+            <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+              {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Logout{% endif %}
+            </a>
+          {% else %}
+            <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+              {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
+            </a>
+          {% endif %}
+
+          <!-- Language dropdown -->
+          <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+            <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="flag-emoji" aria-hidden="true"></span>
+              <span class="label">
+                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+              </span>
+              <svg class="chev" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+                <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
+              <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
+              <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
+              <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
+              <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PAGE HEADER -->
+    <section class="page-head">
+      <div class="container">
+        <h1>
+          {% if meta.lang == 'ko' %}캠페인 런칭 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Request a New Campaign{% endif %}
+        </h1>
+        <p class="sub">
+          {% if meta.lang == 'ko' %}
+            이메일과 전화번호만 있으면 접수가 가능합니다. 나머지 정보는 선택 사항이며, 담당자가 후속 안내를 드립니다.
+          {% elif meta.lang == 'ja' %}
+            まずはメールと電話番号のみで申請できます。詳細は後ほど担当者がご案内します。
+          {% elif meta.lang == 'zh' %}
+            只需提供邮箱和电话即可开始。其他信息为可选，我们会后续联络确认细节。
+          {% else %}
+            Only email and phone are required to get started. Everything else is optional—we’ll follow up for details.
+          {% endif %}
+        </p>
+      </div>
+    </section>
+
+    <!-- FORM -->
+    <main class="container" id="apply" style="padding-bottom:20px">
+      <div class="grid">
+        <!-- Left: Application form -->
+        <section class="card" aria-labelledby="formTitle">
+          <div class="head">
+            <h2 id="formTitle" style="margin:0">
+              {% if meta.lang == 'ko' %}신청 정보{% elif meta.lang == 'ja' %}申請内容{% elif meta.lang == 'zh' %}申请信息{% else %}Application Details{% endif %}
+            </h2>
+            <div class="stack">
+              <span class="pill">Web3 · SEO · Rewards</span>
+              <span class="pill">{% if meta.lang == 'ko' %}화이트햇{% elif meta.lang == 'ja' %}ホワイトハット{% elif meta.lang == 'zh' %}白帽{% else %}White-hat{% endif %}</span>
             </div>
           </div>
 
-          <!-- 이메일 -->
-          <div>
-            <label for="email">{% if meta.lang == 'ko' %}이메일{% else %}Email{% endif %}</label>
-            <input id="email" name="email" type="email" required placeholder="name@example.com">
+          <!-- SUBMIT STATE / ERROR SLOT -->
+          <div id="submitAlert" class="alert" style="display:none"></div>
+
+          <form class="body" method="post" action="#" enctype="multipart/form-data" id="applyForm" novalidate>
+            {% csrf_token %}
+
+            <!-- Contact -->
+            <div class="row">
+              <div>
+                <label for="email">Email *</label>
+                <input id="email" name="email" type="email" required placeholder="name@example.com" autocomplete="email">
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}필수{% elif meta.lang == 'ja' %}必須{% elif meta.lang == 'zh' %}必填{% else %}Required{% endif %}
+                </div>
+              </div>
+              <div>
+                <label for="phone">
+                  {% if meta.lang == 'ko' %}전화번호{% elif meta.lang == 'ja' %}電話番号{% elif meta.lang == 'zh' %}电话{% else %}Phone{% endif %} *
+                </label>
+                <input id="phone" name="phone" type="tel" required placeholder="+82 10 1234 1234" inputmode="tel" autocomplete="tel">
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}국가코드 포함{% elif meta.lang == 'ja' %}国番号を含めてください{% elif meta.lang == 'zh' %}请包含国家区号{% else %}Include country code{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="country">
+                  {% if meta.lang == 'ko' %}국가{% elif meta.lang == 'ja' %}国{% elif meta.lang == 'zh' %}国家{% else %}Country{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <input id="country" name="country" type="text" placeholder="{% if meta.lang == 'ko' %}예: 대한민국{% elif meta.lang == 'ja' %}例: 日本{% elif meta.lang == 'zh' %}示例：中国{% else %}e.g. South Korea{% endif %}">
+              </div>
+              <div>
+                <label for="title">
+                  {% if meta.lang == 'ko' %}캠페인 제목{% elif meta.lang == 'ja' %}キャンペーン名{% elif meta.lang == 'zh' %}活动标题{% else %}Campaign Title{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <input id="title" name="campaign_title" type="text" placeholder="{% if meta.lang == 'ko' %}예: SimpleQuant 블로그 런칭{% elif meta.lang == 'ja' %}例: SimpleQuant ブログローンチ{% elif meta.lang == 'zh' %}示例：SimpleQuant 博客上线{% else %}e.g. SimpleQuant Blog Launch{% endif %}">
+              </div>
+            </div>
+
+            <!-- Website -->
+            <div class="row">
+              <div>
+                <label for="site_url">
+                  {% if meta.lang == 'ko' %}웹사이트 URL{% elif meta.lang == 'ja' %}WebサイトURL{% elif meta.lang == 'zh' %}网站链接{% else %}Website URL{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <input id="site_url" name="website_url" type="url" placeholder="https://example.com" inputmode="url" autocomplete="url">
+              </div>
+              <div>
+                <label for="thumbInput">
+                  {% if meta.lang == 'ko' %}썸네일 이미지{% elif meta.lang == 'ja' %}サムネイル画像{% elif meta.lang == 'zh' %}缩略图{% else %}Thumbnail Image{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <div class="file-wrap">
+                  <input id="thumbInput" class="file-hidden" name="thumbnail" type="file" accept="image/*">
+                  <label class="file-label" for="thumbInput">
+                    {% if meta.lang == 'ko' %}이미지 선택{% elif meta.lang == 'ja' %}画像を選択{% elif meta.lang == 'zh' %}选择图片{% else %}Choose image{% endif %}
+                  </label>
+                  <span class="file-name" id="thumbName">
+                    {% if meta.lang == 'ko' %}선택된 파일 없음{% elif meta.lang == 'ja' %}ファイル未選択{% elif meta.lang == 'zh' %}未选择文件{% else %}No file selected{% endif %}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Favicon upload -->
+            <div class="row">
+              <div>
+                <label for="faviInput">
+                  {% if meta.lang == 'ko' %}파비콘 이미지{% elif meta.lang == 'ja' %}ファビコン画像{% elif meta.lang == 'zh' %}网站图标（Favicon）{% else %}Favicon Image{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택 · 권장 32×32 PNG/ICO{% elif meta.lang == 'ja' %}任意・推奨 32×32 PNG/ICO{% elif meta.lang == 'zh' %}可选 · 推荐 32×32 PNG/ICO{% else %}optional · 32×32 PNG/ICO recommended{% endif %})</span>
+                </label>
+                <div class="file-wrap">
+                  <input id="faviInput" class="file-hidden" name="favicon" type="file" accept=".png,.ico,image/png,image/x-icon">
+                  <label class="file-label" for="faviInput">
+                    {% if meta.lang == 'ko' %}파비콘 선택{% elif meta.lang == 'ja' %}ファビコンを選択{% elif meta.lang == 'zh' %}选择图标{% else %}Choose favicon{% endif %}
+                  </label>
+                  <span class="file-name" id="faviName">
+                    {% if meta.lang == 'ko' %}선택된 파일 없음{% elif meta.lang == 'ja' %}ファイル未選択{% elif meta.lang == 'zh' %}未选择文件{% else %}No file selected{% endif %}
+                  </span>
+                  <span class="ico-preview" id="faviPrev" aria-hidden="true"><img alt=""></span>
+                </div>
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}구글 검색 과제에서 식별 아이콘으로 사용됩니다.{% elif meta.lang == 'ja' %}Google検索タスクの識別アイコンとして使用します。{% elif meta.lang == 'zh' %}用于 Google 搜索任务中的识别图标。{% else %}Used as the identifying icon for Google-search tasks.{% endif %}
+                </div>
+              </div>
+              <div></div>
+            </div>
+
+            <div class="row full">
+              <div>
+                <label for="site_desc">
+                  {% if meta.lang == 'ko' %}웹사이트 설명{% elif meta.lang == 'ja' %}Webサイトの説明{% elif meta.lang == 'zh' %}网站描述{% else %}Website Description{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <textarea id="site_desc" name="website_description" placeholder="{% if meta.lang == 'ko' %}예: 퀀트 투자 튜토리얼과 도구 제공{% elif meta.lang == 'ja' %}例: クオンツ投資のチュートリアルとツール{% elif meta.lang == 'zh' %}示例：量化投资教程与工具{% else %}e.g. Tutorials and tools for quantitative investing{% endif %}"></textarea>
+              </div>
+            </div>
+
+            <!-- Task Types -->
+            <div class="row full">
+              <div>
+                <label>
+                  {% if meta.lang == 'ko' %}과제 유형 선택{% elif meta.lang == 'ja' %}タスク種類を選択{% elif meta.lang == 'zh' %}选择任务类型{% else %}Select Task Type(s){% endif %}
+                </label>
+                <div class="chips" role="group" aria-label="Task types">
+                  <label class="chip">
+                    <input type="checkbox" name="task_types" value="VISIT" id="t_visit"> VISIT
+                  </label>
+                  <label class="chip">
+                    <input type="checkbox" name="task_types" value="LINK" id="t_link" checked> LINK
+                  </label>
+                </div>
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}
+                    VISIT: 사이트에서 코드 찾기 · LINK: SNS·블로그에 리뷰+백링크
+                  {% elif meta.lang == 'ja' %}
+                    VISIT: サイト上でコードを見つける／LINK: ブログ等にレビュー＋被リンク
+                  {% elif meta.lang == 'zh' %}
+                    VISIT：在站内找到验证码 · LINK：在博客/社媒发布评测并添加外链
+                  {% else %}
+                    VISIT: find a code on your site · LINK: publish a review with a backlink
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- VISIT settings -->
+            <div id="visitBlock" class="row full" style="display:none">
+              <div>
+                <label for="visit_code">
+                  {% if meta.lang == 'ko' %}검증 코드 (VISIT){% elif meta.lang == 'ja' %}検証コード（VISIT）{% elif meta.lang == 'zh' %}验证代码（VISIT）{% else %}Verification Code (VISIT){% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}참여자가 페이지에서 찾을 코드{% elif meta.lang == 'ja' %}参加者がページで見つけるコード{% elif meta.lang == 'zh' %}参与者需在页面上找到的代码{% else %}code participants must find on your page{% endif %})</span>
+                </label>
+                <input id="visit_code" name="visit_code" type="text" placeholder="e.g. CODE: X6K9Q2">
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}예: 푸터에 ‘코드: X6K9Q2’ 표시{% elif meta.lang == 'ja' %}例: フッターに「Code: X6K9Q2」{% elif meta.lang == 'zh' %}示例：在页脚显示“Code: X6K9Q2”{% else %}Example: show “Code: X6K9Q2” in your footer{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- LINK settings (SEO inputs) -->
+            <div id="linkBlock" class="row">
+              <div>
+                <label for="expected_keywords">
+                  {% if meta.lang == 'ko' %}리뷰 예상 키워드 (LINK){% elif meta.lang == 'ja' %}レビュー想定キーワード（LINK）{% elif meta.lang == 'zh' %}评测关键词（LINK）{% else %}Expected Review Keywords (LINK){% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}쉼표로 구분{% elif meta.lang == 'ja' %}カンマ区切り{% elif meta.lang == 'zh' %}逗号分隔{% else %}comma-separated{% endif %})</span>
+                </label>
+                <input id="expected_keywords" name="expected_review_keywords" type="text" placeholder="e.g. quant, backtesting, crypto tools">
+              </div>
+              <div>
+                <label for="seo_keywords">
+                  {% if meta.lang == 'ko' %}현재 SEO 키워드 (사이트){% elif meta.lang == 'ja' %}現在のサイトSEOキーワード{% elif meta.lang == 'zh' %}站点现有SEO关键词{% else %}Current Site SEO Keywords{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <input id="seo_keywords" name="current_seo_keywords" type="text" placeholder="e.g. algorithmic trading, strategy builder">
+              </div>
+            </div>
+
+            <!-- Rewards -->
+            <div class="row">
+              <div>
+                <label for="pool">
+                  {% if meta.lang == 'ko' %}총 리워드 풀 (USDT){% elif meta.lang == 'ja' %}総リワードプール (USDT){% elif meta.lang == 'zh' %}总奖励池 (USDT){% else %}Total Reward Pool (USDT){% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <input id="pool" name="reward_pool_usdt" type="number" min="1" step="1" placeholder="e.g. 2500" inputmode="numeric" pattern="[0-9]*">
+              </div>
+              <div>
+                <label for="payout">
+                  {% if meta.lang == 'ko' %}건당 예상 보상 (USDT){% elif meta.lang == 'ja' %}タスク当たりの想定報酬 (USDT){% elif meta.lang == 'zh' %}单次任务奖励 (USDT){% else %}Expected Payout per Task (USDT){% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <input id="payout" name="payout_per_task_usdt" type="number" min="0" step="0.01" placeholder="e.g. 3.50" inputmode="decimal">
+              </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="date-row">
+              <div>
+                <label>
+                  {% if meta.lang == 'ko' %}캠페인 시작일{% elif meta.lang == 'ja' %}開始日{% elif meta.lang == 'zh' %}开始日期{% else %}Start Date{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <div class="date-group" data-name="start_date">
+                  <select id="start_y" aria-label="Start year"></select>
+                  <select id="start_m" aria-label="Start month"></select>
+                  <select id="start_d" aria-label="Start day"></select>
+                </div>
+                <input type="hidden" id="start" name="start_date" value="">
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}연/월/일 선택 시 자동으로 YYYY-MM-DD 형식으로 저장됩니다.{% elif meta.lang == 'ja' %}年・月・日を選ぶと YYYY-MM-DD 形式で自動入力されます。{% elif meta.lang == 'zh' %}选择年/月/日后会自动保存为 YYYY-MM-DD。{% else %}Picking year/month/day saves as YYYY-MM-DD automatically.{% endif %}
+                </div>
+              </div>
+              <div>
+                <label>
+                  {% if meta.lang == 'ko' %}캠페인 종료일{% elif meta.lang == 'ja' %}終了日{% elif meta.lang == 'zh' %}结束日期{% else %}End Date{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                </label>
+                <div class="date-group" data-name="end_date">
+                  <select id="end_y" aria-label="End year"></select>
+                  <select id="end_m" aria-label="End month"></select>
+                  <select id="end_d" aria-label="End day"></select>
+                </div>
+                <input type="hidden" id="end" name="end_date" value="">
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}직접 입력 대신 선택만 가능하여 오타를 방지합니다.{% elif meta.lang == 'ja' %}直接入力ではなく選択式で、入力ミスを防ぎます。{% elif meta.lang == 'zh' %}通过选择而非手填，可避免格式错误。{% else %}Using selects prevents typos like “222220-02-04”.{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Airdrop -->
+            <div class="row full">
+              <div>
+                <label for="airdrop_toggle">
+                  {% if meta.lang == 'ko' %}에어드롭 이벤트{% elif meta.lang == 'ja' %}エアドロップイベント{% elif meta.lang == 'zh' %}空投活动{% else %}Airdrop Event{% endif %}
+                </label>
+                <div class="chips">
+                  <label class="chip">
+                    <input id="airdrop_toggle" type="checkbox" name="airdrop_enabled" value="true">
+                    {% if meta.lang == 'ko' %}에어드롭 진행{% elif meta.lang == 'ja' %}有効化{% elif meta.lang == 'zh' %}启用空投{% else %}Enable Airdrop{% endif %}
+                  </label>
+                </div>
+                <div id="airdropBlock" style="display:none; margin-top:12px">
+                  <div class="row three">
+                    <div>
+                      <label for="airdrop_first_n">
+                        {% if meta.lang == 'ko' %}선착순 인원 (N){% elif meta.lang == 'ja' %}先着人数 (N){% elif meta.lang == 'zh' %}前N名{% else %}First N People{% endif %}
+                      </label>
+                      <input id="airdrop_first_n" name="airdrop_first_n" type="number" min="1" step="1" placeholder="e.g. 100" inputmode="numeric" pattern="[0-9]*">
+                    </div>
+                    <div>
+                      <label for="airdrop_amount">
+                        {% if meta.lang == 'ko' %}1인당 지급 (M){% elif meta.lang == 'ja' %}一人あたり (M){% elif meta.lang == 'zh' %}每人发放 (M){% else %}Amount per Person (M){% endif %}
+                      </label>
+                      <input id="airdrop_amount" name="airdrop_amount_per_user" type="number" min="0" step="0.0001" placeholder="e.g. 25" inputmode="decimal">
+                    </div>
+                    <div>
+                      <label for="airdrop_symbol">
+                        {% if meta.lang == 'ko' %}코인/토큰 심볼{% elif meta.lang == 'ja' %}トークンシンボル{% elif meta.lang == 'zh' %}代币符号{% else %}Token Symbol{% endif %}
+                      </label>
+                      <input id="airdrop_symbol" name="airdrop_token_symbol" type="text" placeholder="e.g. LKH">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div>
+                      <label for="airdrop_chain">
+                        {% if meta.lang == 'ko' %}체인/네트워크{% elif meta.lang == 'ja' %}チェーン/ネットワーク{% elif meta.lang == 'zh' %}链/网络{% else %}Chain / Network{% endif %}
+                      </label>
+                      <input id="airdrop_chain" name="airdrop_network" type="text" placeholder="e.g. Ethereum, Polygon">
+                    </div>
+                    <div>
+                      <label for="airdrop_note">
+                        {% if meta.lang == 'ko' %}추가 조건{% elif meta.lang == 'ja' %}追加条件{% elif meta.lang == 'zh' %}附加条件{% else %}Additional Conditions{% endif %}
+                        <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                      </label>
+                      <input id="airdrop_note" name="airdrop_note" type="text" placeholder="{% if meta.lang == 'ko' %}예: KYC 필요 없음{% elif meta.lang == 'ja' %}例: KYC不要{% elif meta.lang == 'zh' %}示例：无需KYC{% else %}e.g. no KYC required{% endif %}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hidden fields that we programmatically set before submit -->
+            <input type="hidden" name="wants_visit" id="wants_visit" value="">
+            <input type="hidden" name="wants_link" id="wants_link" value="true">
+            <input type="hidden" name="thumbnail_url" id="thumbnail_url" value="">
+            <input type="hidden" name="favicon_url" id="favicon_url" value="">
+
+            <div class="divider"></div>
+
+            <!-- Submit -->
+            <div class="foot-actions">
+              <button class="btn-outline" type="reset" id="resetBtn">
+                {% if meta.lang == 'ko' %}초기화{% elif meta.lang == 'ja' %}リセット{% elif meta.lang == 'zh' %}重置{% else %}Reset{% endif %}
+              </button>
+              <button class="btn" type="submit" id="submitBtn">
+                {% if meta.lang == 'ko' %}신청 보내기{% elif meta.lang == 'ja' %}申請を送信{% elif meta.lang == 'zh' %}提交申请{% else %}Submit Application{% endif %}
+              </button>
+            </div>
+          </form>
+
+          <!-- Success screen (hidden initially) -->
+          <div id="successBlock" class="body" style="display:none">
+            <div class="alert ok" id="okMsg" style="margin-top:0">
+              {% if meta.lang == 'ko' %}신청이 접수되었습니다. 24시간 내 연락드리겠습니다.{% elif meta.lang == 'ja' %}申請を受け付けました。24時間以内にご連絡します。{% elif meta.lang == 'zh' %}申请已收到，我们会在24小时内联系你。{% else %}Your application is in. We’ll reach out within 24 hours.{% endif %}
+            </div>
+            <p style="color:#cfe7dd; margin-top:12px">
+              <strong>ID:</strong> <span id="appId">—</span>
+            </p>
+            <div class="stack">
+              <a class="btn-outline" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">← {% if meta.lang == 'ko' %}리워드 목록으로{% elif meta.lang == 'ja' %}リワード一覧へ{% elif meta.lang == 'zh' %}返回奖励页{% else %}Back to Rewards{% endif %}</a>
+            </div>
           </div>
+        </section>
+
+        <!-- Right: Tips / Summary -->
+        <aside class="side">
+          <section class="card">
+            <div class="head"><h3 style="margin:0">{% if meta.lang == 'ko' %}가이드{% elif meta.lang == 'ja' %}ガイド{% elif meta.lang == 'zh' %}指南{% else %}Guide{% endif %}</h3></div>
+            <div class="body">
+              <div class="note">
+                {% if meta.lang == 'ko' %}
+                  기본 연락처(이메일·전화)가 확인되면 담당자가 24시간 내로 연락드립니다. 규칙·예산·기간은 이후 확정 가능합니다.
+                {% elif meta.lang == 'ja' %}
+                  連絡先（メール・電話）確認後、24時間以内に担当よりご連絡します。ルール・予算・期間は後から確定できます。
+                {% elif meta.lang == 'zh' %}
+                  确认联系方式（邮箱/电话）后，我们会在24小时内联系您。规则、预算和周期可后续敲定。
+                {% else %}
+                  Once we have your email and phone, our team will contact you within 24 hours. Rules, budget, and dates can be finalized later.
+                {% endif %}
+              </div>
+              <div style="height:8px"></div>
+              <div class="stack">
+                <span class="pill">{% if meta.lang == 'ko' %}화이트햇{% elif meta.lang == 'ja' %}ホワイトハット{% elif meta.lang == 'zh' %}白帽{% else %}White-hat{% endif %}</span>
+                <span class="pill">{% if meta.lang == 'ko' %}투명성{% elif meta.lang == 'ja' %}透明性{% elif meta.lang == 'zh' %}透明{% else %}Transparent{% endif %}</span>
+                <span class="pill">{% if meta.lang == 'ko' %}즉시 보상{% elif meta.lang == 'ja' %}即時リワード{% elif meta.lang == 'zh' %}即时奖励{% else %}Instant Rewards{% endif %}</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="head"><h3 style="margin:0">{% if meta.lang == 'ko' %}작동 방식{% elif meta.lang == 'ja' %}進め方{% elif meta.lang == 'zh' %}运作方式{% else %}How It Works{% endif %}</h3></div>
+            <div class="body">
+              <ol style="margin:0 0 10px 18px; color:#cde6da; line-height:1.5">
+                <li>{% if meta.lang == 'ko' %}보상 풀과 기간 설정{% elif meta.lang == 'ja' %}プールと期間を設定{% elif meta.lang == 'zh' %}设定奖励池与周期{% else %}Set pool & window{% endif %}</li>
+                <li>{% if meta.lang == 'ko' %}규칙 공개 (VISIT/LINK){% elif meta.lang == 'ja' %}ルール公開（VISIT/LINK）{% elif meta.lang == 'zh' %}发布任务规则（VISIT/LINK）{% else %}Publish task rules (VISIT/LINK){% endif %}</li>
+                <li>{% if meta.lang == 'ko' %}제출 검증 & 즉시 보상{% elif meta.lang == 'ja' %}提出を検証して即時支払い{% elif meta.lang == 'zh' %}验证提交并即时发放奖励{% else %}Verify submissions & pay instantly{% endif %}</li>
+              </ol>
+              <div class="note">
+                {% if meta.lang == 'ko' %}
+                  에어드롭을 활성화하면 선착순 N명에게 M개의 토큰을 자동 분배하는 보너스 이벤트를 추가할 수 있습니다.
+                {% elif meta.lang == 'ja' %}
+                  エアドロップを有効にすると、先着N名にMトークンを自動配布するボーナスを追加できます。
+                {% elif meta.lang == 'zh' %}
+                  启用空投后，可为前N名参与者自动发放每人M枚代币作为加分活动。
+                {% else %}
+                  With airdrops enabled, the first N participants can automatically receive M tokens as a bonus event.
+                {% endif %}
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+        <div>© <strong>LinkHash</strong></div>
+        <div style="opacity:.7">
+          {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
         </div>
+      </div>
+    </footer>
 
-        <div class="row">
-          <!-- 타입 선택 -->
-          <div>
-            <label for="task_type">{% if meta.lang == 'ko' %}캠페인 유형{% else %}Campaign Type{% endif %}</label>
-            <select id="task_type" name="task_type" required>
-              <option value="link">{% if meta.lang == 'ko' %}링크 공유 리워드{% else %}Link Sharing Reward{% endif %}</option>
-              <option value="visit">{% if meta.lang == 'ko' %}방문 리워드{% else %}Visit Reward{% endif %}</option>
-            </select>
-          </div>
+    <!-- LIGHT INTERACTIONS -->
+    <script type="module">
+      // ---------- Language dropdown ----------
+      (function(){
+        const root = document.getElementById('langSwitcher');
+        if(!root) return;
+        const btn  = root.querySelector('.lang-btn');
+        const menu = root.querySelector('.lang-menu');
+        const items= Array.from(root.querySelectorAll('.lang-item'));
+        const current = root.dataset.current || 'en';
 
-          <!-- 보상 풀 -->
-          <div>
-            <label for="pool">{% if meta.lang == 'ko' %}보상 풀 (USDT){% else %}Reward Pool (USDT){% endif %}</label>
-            <input id="pool" name="pool" type="number" min="1" step="1" required placeholder="e.g. 2500">
-          </div>
-        </div>
+        // mark current
+        items.forEach(li=>{
+          if(li.dataset.lang === current){ li.setAttribute('aria-selected','true'); }
+        });
 
-        <!-- 캠페인 설명 -->
-        <div class="row full">
-          <div>
-            <label for="desc">{% if meta.lang == 'ko' %}간단한 캠페인 설명 (선택){% else %}Brief Campaign Description (optional){% endif %}</label>
-            <textarea id="desc" name="desc" rows="4" placeholder="{% if meta.lang == 'ko' %}예: simplequant.net 방문 후 '퀀트' 키워드 포함 포스트 작성{% else %}Ex: Write post incl. 'quant' keyword after visiting simplequant.net{% endif %}"></textarea>
-          </div>
-        </div>
+        function applyFlag(){
+          const sel = items.find(x=>x.dataset.lang === current);
+          const flagEl = root.querySelector('.flag-emoji');
+          if(sel && flagEl){ flagEl.textContent = sel.dataset.flag || ''; }
+        }
+        applyFlag();
 
-        <!-- 수수료/응답 안내 -->
-        <div class="fee">
-          <span class="pill">
-            <!-- coins icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 4.69 2 8v8c0 3.31 4.48 6 10 6s10-2.69 10-6V8c0-3.31-4.48-6-10-6Zm0 2c4.41 0 8 .9 8 4s-3.59 4-8 4-8-.9-8-4 3.59-4 8-4Z"/></svg>
-            {% if meta.lang == 'ko' %}서비스 수수료: <strong>30&nbsp;USDT</strong>{% else %}Service fee: <strong>30&nbsp;USDT</strong>{% endif %}
-          </span>
-          <span class="pill">
-            <!-- clock icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm1 10.41V7a1 1 0 1 0-2 0v6a1 1 0 0 0 .55.89l4 2a1 1 0 1 0 .9-1.78L13 12.41Z"/></svg>
-            {% if meta.lang == 'ko' %}<strong>24시간 내 답변</strong> 드립니다.{% else %}We <strong>reply within 24h</strong>.{% endif %}
-          </span>
-        </div>
+        function openMenu(){ menu.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+        function closeMenu(){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
 
-        <div class="submit-row">
-          <button class="btn" type="submit">{% if meta.lang == 'ko' %}신청 보내기{% else %}Submit Application{% endif %}</button>
-          <button class="btn-outline" type="reset">{% if meta.lang == 'ko' %}초기화{% else %}Reset{% endif %}</button>
-        </div>
+        btn?.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          menu.classList.contains('open') ? closeMenu() : openMenu();
+          menu.focus();
+        });
+        document.addEventListener('click', (e)=>{ if(!root.contains(e.target)) closeMenu(); });
+        menu.addEventListener('keydown', (e)=>{
+          if(e.key==='Escape'){ closeMenu(); btn.focus(); }
+        });
 
-        <p class="notice">
-          {% if meta.lang == 'ko' %}
-            제출 후 담당자가 내용을 검토해 이메일로 후속 안내를 드립니다.
-          {% else %}
-            After submission, our team will review and follow up via email.
-          {% endif %}
-        </p>
-      </form>
-    </div>
-    <footer class="footer">© <span data-i18n="brand" class="brand-green">LinkHash</span></footer>
-  </main>
-</body>
+        // Navigate to language route for THIS page
+        function destFor(lang){
+          if(lang==='ko') return '/rewards/apply/ko/';
+          if(lang==='ja') return '/rewards/apply/ja/';
+          if(lang==='zh') return '/rewards/apply/zh/';
+          return '/rewards/apply/';
+        }
+        items.forEach(li=>{
+          li.addEventListener('click', ()=>{
+            const lang = li.dataset.lang;
+            window.location.href = destFor(lang);
+          });
+        });
+      })();
+
+      // ---------- Dynamic blocks ----------
+      const visitCb = document.getElementById('t_visit');
+      const linkCb  = document.getElementById('t_link');
+      const visitBlk= document.getElementById('visitBlock');
+      const linkBlk = document.getElementById('linkBlock');
+      const airTgl  = document.getElementById('airdrop_toggle');
+      const airBlk  = document.getElementById('airdropBlock');
+
+      function updateBlocks(){
+        visitBlk.style.display = visitCb?.checked ? 'block' : 'none';
+        linkBlk.style.display  = 'grid'; // keep SEO fields visible
+        document.getElementById('wants_visit').value = visitCb?.checked ? 'true' : '';
+        document.getElementById('wants_link').value  = linkCb?.checked ? 'true' : '';
+      }
+      function updateAirdrop(){ airBlk.style.display = airTgl?.checked ? 'block' : 'none'; }
+
+      visitCb?.addEventListener('change', updateBlocks);
+      linkCb?.addEventListener('change', updateBlocks);
+      airTgl?.addEventListener('change', updateAirdrop);
+
+      // File input labels + previews
+      const thumbInput = document.getElementById('thumbInput');
+      const thumbName  = document.getElementById('thumbName');
+      const faviInput  = document.getElementById('faviInput');
+      const faviName   = document.getElementById('faviName');
+      const faviPrev   = document.getElementById('faviPrev');
+      const faviImg    = faviPrev?.querySelector('img');
+
+      function noFileText(){
+        const lang = document.documentElement.lang || 'en';
+        if(lang==='ko') return '선택된 파일 없음';
+        if(lang==='ja') return 'ファイル未選択';
+        if(lang==='zh') return '未选择文件';
+        return 'No file selected';
+      }
+
+      function readAsDataURL(file){ return new Promise((res, rej)=>{ const fr = new FileReader(); fr.onerror=rej; fr.onload=()=>res(fr.result); fr.readAsDataURL(file); }); }
+
+      thumbInput?.addEventListener('change', async ()=>{
+        const file = thumbInput.files?.[0];
+        thumbName.textContent = file?.name || noFileText();
+        if(file){
+          const dataUrl = await readAsDataURL(file);
+          document.getElementById('thumbnail_url').value = String(dataUrl||'');
+        }else{
+          document.getElementById('thumbnail_url').value = '';
+        }
+      });
+
+      let faviObjectUrl;
+      faviInput?.addEventListener('change', async ()=>{
+        const file = faviInput.files?.[0];
+        faviName.textContent = file?.name || noFileText();
+
+        if(faviObjectUrl){ URL.revokeObjectURL(faviObjectUrl); faviObjectUrl = null; }
+        if(file){
+          faviObjectUrl = URL.createObjectURL(file);
+          if(faviImg){ faviImg.src = faviObjectUrl; }
+          if(faviPrev){ faviPrev.style.display = 'inline-block'; }
+          const dataUrl = await readAsDataURL(file);
+          document.getElementById('favicon_url').value = String(dataUrl||'');
+        }else{
+          if(faviPrev){ faviPrev.style.display = 'none'; }
+          document.getElementById('favicon_url').value = '';
+        }
+      });
+
+      // Date selects
+      function pad(n){ return String(n).padStart(2,'0'); }
+      function daysIn(y,m){ return new Date(y, m, 0).getDate(); } // m:1..12
+      function labelFor(kind){
+        const lang = document.documentElement.lang || 'en';
+        if(kind==='y') return lang==='ko'?'연도':(lang==='ja'?'年':(lang==='zh'?'年':'Year'));
+        if(kind==='m') return lang==='ko'?'월':(lang==='ja'?'月':(lang==='zh'?'月':'Month'));
+        return lang==='ko'?'일':(lang==='ja'?'日':(lang==='zh'?'日':'Day'));
+      }
+      function fillYears(sel,start,end){
+        sel.options.length=0;
+        sel.add(new Option(labelFor('y'), ''));
+        for(let y=start;y<=end;y++) sel.add(new Option(String(y), y));
+      }
+      function fillMonths(sel){
+        sel.options.length=0;
+        sel.add(new Option(labelFor('m'), ''));
+        for(let m=1;m<=12;m++) sel.add(new Option(pad(m), m));
+      }
+      function fillDays(sel,y,m){
+        sel.options.length=0;
+        sel.add(new Option(labelFor('d'), ''));
+        const lim=(y&&m)?daysIn(Number(y),Number(m)):31;
+        for(let d=1;d<=lim;d++) sel.add(new Option(pad(d), d));
+      }
+      function hookDate(prefix){
+        const y=document.getElementById(prefix+'_y');
+        const m=document.getElementById(prefix+'_m');
+        const d=document.getElementById(prefix+'_d');
+        const hidden=document.getElementById(prefix==='start'?'start':'end');
+        const now=new Date();
+        fillYears(y, now.getFullYear()-1, now.getFullYear()+2);
+        fillMonths(m); fillDays(d,'','');
+        function sync(){
+          const yy=y.value, mm=m.value, dd=d.value;
+          hidden.value = (yy && mm && dd) ? `${yy}-${pad(mm)}-${pad(dd)}` : '';
+        }
+        y.addEventListener('change', ()=>{ fillDays(d, y.value, m.value); sync(); });
+        m.addEventListener('change', ()=>{ fillDays(d, y.value, m.value); sync(); });
+        d.addEventListener('change', sync);
+        sync();
+      }
+      hookDate('start');
+      hookDate('end');
+
+      // Numeric cleanup for pure integer fields
+      document.querySelectorAll('input[type="number"][inputmode="numeric"]').forEach(inp=>{
+        inp.addEventListener('input', ()=>{ inp.value = inp.value.replace(/[^\d]/g,''); });
+      });
+
+      // ---------- Submit handler ----------
+      const form = document.getElementById('applyForm');
+      const alertBox = document.getElementById('submitAlert');
+      const submitBtn = document.getElementById('submitBtn');
+      const resetBtn  = document.getElementById('resetBtn');
+      const successBlock = document.getElementById('successBlock');
+      const appIdSpan = document.getElementById('appId');
+
+      function showError(msg){
+        alertBox.textContent = msg || 'Submission failed.';
+        alertBox.className = 'alert err';
+        alertBox.style.display = 'block';
+        successBlock.style.display = 'none';
+      }
+      function showOk(id){
+        alertBox.style.display = 'none';
+        appIdSpan.textContent = id || '—';
+        form.style.display = 'none';
+        successBlock.style.display = 'block';
+      }
+
+      form?.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+
+        // Basic required fields check (email, phone)
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        if(!email || !phone){
+          showError(
+            document.documentElement.lang==='ko' ? '이메일과 전화번호를 입력해주세요.' :
+            (document.documentElement.lang==='ja' ? 'メールと電話番号を入力してください。' :
+            (document.documentElement.lang==='zh' ? '请填写邮箱和电话。' : 'Please enter email and phone.'))
+          );
+          return;
+        }
+
+        // Ensure wants_* reflect current checkboxes
+        updateBlocks();
+
+        // Build FormData
+        const fd = new FormData(form);
+
+        // Map task_types -> wants_visit / wants_link if not present (defensive)
+        const types = Array.from(document.querySelectorAll('input[name="task_types"]:checked')).map(i=>i.value);
+        if(!fd.get('wants_visit')) fd.set('wants_visit', types.includes('VISIT') ? 'true' : '');
+        if(!fd.get('wants_link'))  fd.set('wants_link',  types.includes('LINK')  ? 'true' : '');
+
+        // Endpoint
+        const url = '/api/rewards/apply';
+
+        // Disable while sending
+        submitBtn.disabled = true; submitBtn.textContent = '…';
+
+        try{
+          const r = await fetch(url, { method:'POST', body: fd, credentials: 'same-origin' });
+          const t = await r.text();
+          let json;
+          try{ json = JSON.parse(t); }catch{ json = { ok:false, error:t||'bad response' }; }
+          if(!r.ok || !json.ok){
+            showError(json.error || ('HTTP '+r.status));
+          }else{
+            showOk(json.application_id || '');
+          }
+        }catch(err){
+          showError(err && err.message ? err.message : String(err));
+        }finally{
+          submitBtn.disabled = false;
+          submitBtn.textContent =
+            document.documentElement.lang==='ko' ? '신청 보내기' :
+            (document.documentElement.lang==='ja' ? '申請を送信' :
+            (document.documentElement.lang==='zh' ? '提交申请' : 'Submit Application'));
+        }
+      });
+
+      // Keep initial state accurate
+      updateBlocks();
+      updateAirdrop();
+    </script>
+
+    <!-- Wallet auth helpers (unchanged) -->
+    <script>
+      function getCookie(name){
+        const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
+        return m ? decodeURIComponent(m[2]) : null;
+      }
+      async function apiGet(url){
+        const r = await fetch(url, { credentials: 'same-origin' });
+        if(!r.ok) throw new Error((await r.text()) || ('GET ' + url + ' failed'));
+        return r.json();
+      }
+      async function apiPost(url, json){
+        const r = await fetch(url, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken') || ''
+          },
+          body: JSON.stringify(json || {})
+        });
+        if(!r.ok){
+          let msg;
+          try{ msg = (await r.json()).error }catch(e){ msg = await r.text(); }
+          throw new Error(msg || ('POST ' + url + ' failed'));
+        }
+        return r.json();
+      }
+
+      async function connectWallet(){
+        try{
+          if(!window.ethereum){
+            alert('MetaMask not detected. Please install MetaMask.');
+            return;
+          }
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const address = (accounts && accounts[0]) ? accounts[0] : null;
+          if(!address){ alert('No account selected.'); return; }
+
+          const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
+          if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
+          const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
+
+          const signature = await window.ethereum.request({
+            method: 'personal_sign',
+            params: [ message, address ]
+          });
+
+          const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
+          if(verifyRes && verifyRes.ok){
+            window.location.reload();
+          }else{
+            alert('Login failed.');
+          }
+        }catch(err){
+          console.error(err);
+          alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+        }
+      }
+
+      async function logoutWallet(){
+        try{
+          await apiPost('/api/auth/logout', {});
+          window.location.reload();
+        }catch(err){
+          console.error(err);
+          alert('Logout failed: ' + (err && err.message ? err.message : err));
+        }
+      }
+
+      window.connectWallet = connectWallet;
+      window.logoutWallet  = logoutWallet;
+    </script>
+  </body>
 </html>

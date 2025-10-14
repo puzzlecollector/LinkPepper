@@ -1,0 +1,619 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=1280, initial-scale=1">
+        <title>{{ meta.title|default:"LinkHash | Campaign" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'White-hat campaign with transparent rewards.' }}">
+        <!-- OG/Twitter -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{% static 'img/favicon-32x32.png' %}"
+        >
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="{% static 'img/favicon-16x16.png' %}"
+        >
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+        <style>
+      /* ======= THEME (match home/rewards pages) ======= */
+      :root{
+        --bg:#0a0b0d;
+        --bg-elev:#0f1115;
+        --panel:#11141a;
+        --panel-2:#0e1318;
+        --grid:#0b0f13;
+        --line:#1a212d;
+        --text:#e6f1ee;
+        --muted:#9fb0aa;
+        --green:#16a34a;
+        --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px;
+        --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 16px 40px rgba(0,0,0,.45);
+        --noise:transparent url('data:image/svg+xml;utf8,\
+          <svg xmlns="http://www.w3.org/2000/svg" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\
+          <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+          <rect width=\"120\" height=\"120\" filter=\"url(%23n)\" opacity=\".04\"/></svg>') repeat;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+        letter-spacing:.2px;
+        background-attachment: fixed;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:1200px; margin:0 auto; padding:0 20px;}
+
+      /* ===== NAV (same as home) ===== */
+      .nav{
+        position:sticky; top:0; z-index:60;
+        backdrop-filter: blur(10px);
+        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+      .brand{
+        display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px;
+        color:#d8ffe7;
+        text-shadow:0 0 18px rgba(35,209,106,.24);
+      }
+      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+      .nav .links{display:flex; gap:24px; align-items:center;}
+      .nav .links a{color:#cfe7dd; opacity:.9}
+      .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+      /* ===== PAGE HEADER ===== */
+      .page-head{
+        padding:44px 0 16px;
+        background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)), var(--noise);
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .title-row{display:flex; align-items:flex-end; justify-content:space-between; gap:20px;}
+      .title h1{margin:0 0 8px; font-size:36px;}
+      .title .sub{margin:0; color:var(--muted)}
+      .facts{
+        display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      }
+      .fact{
+        display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border-radius:12px;
+        background:#0b1218; border:1px solid #1d2836; color:#cde6da; font-weight:700; font-size:13px;
+      }
+      .status-open{ color:#aef2c9; border-color:#2a6f47; }
+      .status-closed{ color:#ffbdbd; border-color:#5a2a2a; }
+
+      /* ===== LAYOUT ===== */
+      .main{
+        display:grid; grid-template-columns: 2fr 1fr; gap:18px; padding:22px 0;
+      }
+      .hero-card{
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; overflow:hidden; box-shadow:var(--shadow-lg);
+      }
+      .hero-img{height:340px; background:#0b1117; overflow:hidden;}
+      .hero-img img{width:100%; height:100%; object-fit:cover; display:block; opacity:.95; transform:scale(1.02)}
+      .hero-body{padding:18px;}
+      .hero-body p{margin:0; color:#b9c9c3}
+
+      .side{
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; padding:16px; box-shadow:var(--shadow-md);
+        display:flex; flex-direction:column; gap:10px;
+      }
+      .side .row{display:flex; justify-content:space-between; gap:8px; font-size:14px; color:#cde6da;}
+      .side .label{color:#9fb0aa}
+      .progress{height:10px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden}
+      .progress .bar{height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)}
+      .cta{display:flex; gap:10px; margin-top:6px; justify-content:flex-end}
+
+      /* ===== TABS ===== */
+      .section{margin-top:16px;}
+      .tabs{display:flex; gap:12px; margin:10px 0 14px;}
+      .tab{
+        padding:14px 20px; border-radius:999px; border:1px solid #2a333f;
+        background:linear-gradient(180deg, rgba(14,18,25,.85), rgba(14,18,25,.55));
+        color:#cfe7dd; font-weight:800; cursor:pointer; letter-spacing:.3px; font-size:15px;
+        transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      }
+      .tab:hover{ transform:translateY(-2px); border-color:rgba(35,209,106,.35); box-shadow:0 14px 30px rgba(22,163,74,.18) }
+      .tab.active{
+        border-color:#2fe07a; color:#05160c; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:var(--glow);
+        transform:translateY(-1px);
+      }
+      .panel{display:none;}
+      .panel.active{display:block;}
+
+      /* ===== PARTICIPATE FORMS ===== */
+      form .row{display:flex; gap:10px; flex-wrap:wrap}
+      input[type="text"],input[type="url"],textarea{
+        width:100%; padding:12px 14px; border:1px solid #2a333f; border-radius:12px; background:#0b1117; color:#e6f1ee;
+      }
+      textarea{min-height:100px}
+      .note{color:#9fb0aa; font-size:13px}
+
+      /* Examples scroller */
+      .scroller{max-height:240px; overflow:auto; padding-right:6px;}
+      .example{border:1px dashed #243040; border-radius:12px; padding:10px; margin-bottom:8px; background:#0a1117;}
+      .example .meta{display:flex; gap:8px; flex-wrap:wrap; font-size:12px; color:#8aa099;}
+
+      /* Footer */
+      .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; margin-top:40px;}
+      /* ===== Language dropdown (nav) ===== */
+        .lang{ position:relative; margin-left:8px; }
+        .lang-btn{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:10px 12px; font-weight:700; border-radius:12px;
+        border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6;
+        cursor:pointer;
+        }
+        .lang-btn:hover{ border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18) }
+        .lang .chev{ opacity:.8 }
+
+        .lang-menu{
+        position:absolute; top:110%; right:0; width:210px;
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.08);
+        border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45);
+        padding:6px; display:none; z-index:70;
+        }
+        .lang.open .lang-menu{ display:block; animation:menuIn .14s ease-out }
+        @keyframes menuIn{ from{ transform:translateY(-6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+
+        .lang-item{
+        display:flex; align-items:center; gap:10px; padding:10px 10px; border-radius:10px;
+        cursor:pointer; color:#cfe7dd; font-weight:700;
+        }
+        .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
+
+        .flag-emoji{
+        display:inline-flex; align-items:center; justify-content:center;
+        width:18px; height:18px; line-height:18px;
+        font-size:14px; border-radius:3px;
+        background:rgba(255,255,255,.06);
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+        }
+        /* keep existing .links row spacing happy */
+        .links{ display:flex; gap:24px; align-items:center; }
+
+      /* Responsive */
+      @media (max-width:1140px){ .container{width:1000px} }
+      @media (max-width:1000px){ .container{width:920px} .main{grid-template-columns:1fr} .hero-img{height:280px} }
+        </style>
+    </head>
+    <body>
+        <!-- ===== NAV ===== -->
+        <header class="nav">
+            <div class="container row">
+                <div class="brand">
+                    <span class="dot"></span>
+                    <span>LinkHash</span>
+                </div>
+                <nav class="links">
+                {% if meta.lang == "ko" %}
+                    {% url 'home_ko' as home_url %}
+                    {% url 'events_ko' as events_url %}
+                    {% url 'rewards_ko' as rewards_url %}
+                    {% url 'rewards_apply_ko' as apply_url %}
+                {% else %}
+                    {% url 'home_en' as home_url %}
+                    {% url 'events_en' as events_url %}
+                    {% url 'rewards_en' as rewards_url %}
+                    {% url 'rewards_apply_en' as apply_url %}
+                {% endif %}
+
+                <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                <a href="{{ rewards_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+
+                <!-- NEW: Apply for campaign (locale-aware) -->
+                <a class="btn-outline" href="{{ apply_url }}">
+                    {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+                </a>
+
+                {% if wallet_user %}
+                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                    <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+                    {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+                    </a>
+                {% else %}
+                    <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+                    {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+                    </a>
+                {% endif %}
+                <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+                    <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="flag-emoji" aria-hidden="true"></span>
+                        <span class="label">
+                        {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+                        </span>
+                        <svg class="chev" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+                        <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
+                        <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
+                        <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
+                        <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
+                        <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
+                    </ul>
+                    </div>
+
+                </nav>
+
+            </div>
+        </header>
+        <!-- ===== PAGE HEADER ===== -->
+        <section class="page-head">
+            <div class="container">
+                <div class="title-row">
+                    <div class="title">
+                        <h1>{{ campaign.title }}</h1>
+                        <p class="sub">{{ campaign.summary|default:"Transparent, white-hat tasks with instant rewards." }}</p>
+                    </div>
+                    <div class="facts">
+                        <span class="fact">
+                            <strong>Pool</strong>
+                            &nbsp; {{ campaign.pool_usdt|default:"0" }} USDT
+                        </span>
+                        <span class="fact">
+                            <strong>Payout</strong>
+                            &nbsp; {{ campaign.payout_usdt|default:"-" }} USDT
+                        </span>
+                        <span class="fact">
+                            <strong>Dates</strong>
+                            &nbsp; {{ campaign.start|date:"Y-m-d" }} → {{ campaign.end|date:"Y-m-d" }}
+                        </span>
+                        {% if campaign.is_open_now and campaign.is_open_now %} {# if method exists #}
+                        <span class="fact status-open">● Live</span>
+                        {% else %}
+                        <span class="fact status-closed">● Closed</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== MAIN ===== -->
+        <main class="container">
+            <div class="main">
+                <!-- Left: hero + tabs -->
+                <section class="hero-card">
+                    <div class="hero-img">
+                        <img src="{{ campaign.image_url|default:'https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&h=800' }}" alt="">
+                    </div>
+                    <div class="hero-body">
+                        <p>{% firstof campaign.long_description campaign.summary "" %}</p>
+                        <div class="section">
+                            <div class="tabs" role="tablist">
+                                <button
+                                    class="tab active"
+                                    data-target="#intro"
+                                    role="tab"
+                                    aria-selected="true"
+                                    id="tab-intro"
+                                >
+                                    {% if meta.lang == 'ko' %}소개{% else %}Introduction{% endif %}
+                                </button>
+                                <button
+                                    class="tab"
+                                    data-target="#participate"
+                                    role="tab"
+                                    aria-selected="false"
+                                    id="tab-participate"
+                                >
+                                    {% if meta.lang == 'ko' %}참여하기{% else %}Participate{% endif %}
+                                </button>
+                            </div>
+                            <!-- INTRO PANEL -->
+                            <div id="intro" class="panel active" aria-labelledby="tab-intro">
+                                <div style="display:grid; grid-template-columns:1fr; gap:12px">
+                                    <div class="note">
+                                        {% if meta.lang == 'ko' %}
+                      아래 가이드를 따라 과제를 수행하세요. 화이트햇 활동만 허용됩니다.
+                    {% else %}
+                      Follow the guide below. Only white-hat contributions are allowed.
+                    {% endif %}
+                                    </div>
+                                    {% if campaign.client_site_domain %}
+                                    <div class="note">
+                                        <strong>Site:</strong>
+                                        {{ campaign.client_site_domain }}
+                                    </div>
+                                    {% endif %}
+                  {% if campaign.rules %}
+                                    <div class="note">
+                                        <strong>{% if meta.lang == 'ko' %}규칙{% else %}Rules{% endif %}:</strong>
+                                        {{ campaign.rules }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <h3 style="margin:18px 0 8px;">{% if meta.lang == 'ko' %}최근 참여 예시{% else %}Recent Examples{% endif %}</h3>
+                                <div class="scroller">
+                                    {% for s in examples %}
+                                    <div class="example">
+                                        <div style="margin-bottom:6px;">
+                                            {% if s.post_url %}
+                                            <a
+                                                href="{{ s.post_url }}"
+                                                target="_blank"
+                                                rel="noopener"
+                                                style="text-decoration:underline; color:#d8ffe7"
+                                            >{{ s.post_url }}</a>
+                                            {% elif s.visited_url %}
+                                            <span style="color:#cfe7dd">{{ s.visited_url }}</span>
+                                            {% else %}
+                                            <span style="color:#cfe7dd">{{ s.comment|default:"(no comment)" }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="meta">
+                                            <span>👤 {% firstof s.user.display_name s.user.address s.user_address "Anon" %}</span>
+                                            <span>·</span>
+                                            <span>
+                                                {% if s.created_at %}{{ s.created_at|date:"Y-m-d H:i" }}{% else %}-{% endif %}
+                                            </span>
+                                            {% if s.proof_score %}
+                                            <span>·</span>
+                                            <span>Score {{ s.proof_score }}</span>
+                                            {% endif %}
+  {% if s.get_status_display or s.status %}
+                                            <span>·</span>
+                                            <span>Status: {% firstof s.get_status_display s.status "PENDING" %}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="note">{% if meta.lang == 'ko' %}아직 예시가 없습니다.{% else %}No examples yet.{% endif %}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <!-- PARTICIPATE PANEL -->
+                            <!-- PARTICIPATE PANEL -->
+                            <div id="participate" class="panel" aria-labelledby="tab-participate">
+                                {# Normalize task_type to a string for comparisons #}
+                            {% with t=campaign.task_type|stringformat:"s" %}
+
+                                {# If LINK or MIXED, show LINK form #}
+                                {% if t == "LINK" or t == "MIXED" %}
+                                <h3 style="margin:0 0 8px;">{% if meta.lang == 'ko' %}링크 공유 과제 제출{% else %}Submit Link Sharing Task{% endif %}</h3>
+                                <div class="note">
+                                    {% if meta.lang == 'ko' %}포스트 URL과 지갑 주소를 입력해 주세요.{% else %}Enter your post URL and wallet address.{% endif %}
+                                </div>
+                                <form method="post" action="{% if campaign.slug %}{% url 'submit_link' campaign.slug %}{% else %}#{% endif %}" style="margin-top:10px">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <input
+                                            type="url"
+                                            name="post_url"
+                                            placeholder="{% if meta.lang == 'ko' %}포스트 URL{% else %}Post URL{% endif %}"
+                                            required
+                                        >
+                                        <textarea name="comment" placeholder="{% if meta.lang == 'ko' %}추가 코멘트 (선택){% else %}Optional comment{% endif %}"></textarea>
+                                        <input
+                                            type="text"
+                                            name="wallet"
+                                            placeholder="{% if meta.lang == 'ko' %}월렛 주소 (예: 0x...){% else %}Wallet address (e.g., 0x...){% endif %}"
+                                            required
+                                        >
+                                    </div>
+                                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                                        <button class="btn" type="submit">{% if meta.lang == 'ko' %}제출{% else %}Submit{% endif %}</button>
+                                        <button class="btn-outline" type="reset">{% if meta.lang == 'ko' %}초기화{% else %}Reset{% endif %}</button>
+                                    </div>
+                                </form>
+                                <hr style="border:none; border-top:1px solid #1d2836; margin:16px 0;">
+                                {% endif %}
+
+                                {# If VISIT or SEARCH or MIXED, show VISIT/SEARCH form #}
+                                {% if t == "VISIT" or t == "SEARCH" or t == "MIXED" %}
+                                <h3 style="margin:0 0 8px;">{% if meta.lang == 'ko' %}방문/검색 과제 제출{% else %}Submit Visit/Search Task{% endif %}</h3>
+                                <div class="note">
+                                    {% if meta.lang == 'ko' %}
+                                    페이지 하단의 코드(예:
+                                    <strong>코드: xxxxxx</strong>
+                                    )를 찾아 입력하세요.
+                                    {% else %}
+                                    Find the code on the page (e.g.,
+                                    <strong>Code: xxxxxx</strong>
+                                    ) and submit it.
+                                    {% endif %}
+                                </div>
+                                <form method="post" action="{% if campaign.slug %}{% url 'submit_visit' campaign.slug %}{% else %}#{% endif %}" style="margin-top:10px">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <input
+                                            type="text"
+                                            name="code"
+                                            placeholder="{% if meta.lang == 'ko' %}코드 xxxxxx 입력{% else %}Enter code xxxxxx{% endif %}"
+                                            required
+                                        >
+                                        <input
+                                            type="text"
+                                            name="wallet2"
+                                            placeholder="{% if meta.lang == 'ko' %}월렛 주소 (예: 0x...){% else %}Wallet address (e.g., 0x...){% endif %}"
+                                            required
+                                        >
+                                    </div>
+                                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                                        <button class="btn" type="submit">{% if meta.lang == 'ko' %}제출{% else %}Submit{% endif %}</button>
+                                    </div>
+                                </form>
+                                {% endif %}
+
+                                {% if t != "LINK" and t != "MIXED" and t != "VISIT" and t != "SEARCH" %}
+                                <div class="note">
+                                    {% if meta.lang == 'ko' %}이 캠페인은 현재 참여 양식이 없습니다.{% else %}This campaign does not accept submissions right now.{% endif %}
+                                </div>
+                                {% endif %}
+
+                            {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Right: facts & progress -->
+                <aside class="side">
+                    <div class="row">
+                        <span class="label">Type</span>
+                        <span>{{ campaign.get_task_type_display|default:campaign.task_type }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Pool</span>
+                        <span>{{ campaign.pool_usdt|default:"0" }} USDT</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Payout</span>
+                        <span>{{ campaign.payout_usdt|default:"-" }} USDT</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Participants</span>
+                        <span>{{ campaign.participants|default:"-" }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Window</span>
+                        <span>{{ campaign.start|date:"Y-m-d" }} → {{ campaign.end|date:"Y-m-d" }}</span>
+                    </div>
+                    {% if quota_total %}
+                    <div class="row">
+                        <span class="label">Quota</span>
+                        <span>{{ submitted }}/{{ quota_total }}</span>
+                    </div>
+                    <div class="progress" style="margin-top:4px">
+                        <div class="bar" data-pct="{{ claimed_percent }}"></div>
+                    </div>
+                    {% endif %}
+                    <div class="cta">
+                        <a class="btn-outline" href="{{ meta.url }}">{% if meta.lang == 'ko' %}공유{% else %}Share{% endif %}</a>
+                    </div>
+                </aside>
+            </div>
+        </main>
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    ©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+            </div>
+        </footer>
+        <!-- ===== LIGHT INTERACTIONS ===== -->
+        <script type="module">
+      import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+
+      // Tabs
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.panel');
+      tabs.forEach(tab=>{
+        tab.addEventListener('click', ()=>{
+          tabs.forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+          panels.forEach(p=>p.classList.remove('active'));
+          tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+          const target = document.querySelector(tab.dataset.target);
+          if(target){ target.classList.add('active'); }
+          animateBars();
+        });
+      });
+
+      // Progress bar
+      function animateBars(){
+        document.querySelectorAll('.progress .bar').forEach(b=>{
+          const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
+          gsap.fromTo(b, { width: "0%" }, { width: target, duration: 1.2, ease: "power2.out" });
+        });
+      }
+      animateBars();
+        </script>
+        <script>
+            (function(){
+            const $wrap = document.getElementById('langSwitcher');
+            if(!$wrap) return;
+            const $btn  = $wrap.querySelector('.lang-btn');
+            const $menu = $wrap.querySelector('.lang-menu');
+            const current = ($wrap.dataset.current || 'en').toLowerCase();
+
+            const flagEl = $btn.querySelector('.flag-emoji');
+            const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
+            flagEl.textContent = flagMap[current] || '🇺🇸';
+
+            function open(){ $wrap.classList.add('open'); $btn.setAttribute('aria-expanded','true'); }
+            function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
+            $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
+            document.addEventListener('click', ()=> close());
+            document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
+
+            function pathFor(lang){
+                const loc = window.location;
+                const path = loc.pathname;
+                const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
+
+                const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
+
+                // /rewards/apply/ variants
+                const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
+                if(isApply){
+                if(lang === 'en') return '/rewards/apply/?lang=en';
+                return `/rewards/apply/${lang}/`;
+                }
+
+                if(baseMap[clean]){
+                if(lang === 'en'){
+                    const q = new URLSearchParams(loc.search);
+                    q.set('lang','en');
+                    return clean + (q.toString() ? `?${q.toString()}` : '');
+                }
+                return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
+                }
+
+                // Unknown/other page (e.g., /rewards/some-slug-5/) → keep path, toggle ?lang=xx
+                const params = new URLSearchParams(loc.search);
+                params.set('lang', lang);
+                return path + (params.toString() ? `?${params.toString()}` : '');
+            }
+
+            $menu.querySelectorAll('.lang-item').forEach(li=>{
+                li.addEventListener('click', ()=>{
+                const lang = li.getAttribute('data-lang');
+                const emoji = li.getAttribute('data-flag') || '';
+                flagEl.textContent = emoji;
+                $wrap.querySelector('.label').textContent =
+                    lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
+                close();
+                const target = pathFor(lang);
+                if(target) window.location.href = target;
+                });
+            });
+            })();
+            </script>
+
+    </body>
+</html>

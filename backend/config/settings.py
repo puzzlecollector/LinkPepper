@@ -53,9 +53,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # If you created a wallet middleware in core/middleware.py, keep this line enabled.
-    # Otherwise, you can remove or comment it out.
-    # "core.middleware.WalletAuthMiddleware",
+    "core.middleware.LanguageRoutingMiddleware",
+    "core.middleware.WalletAuthMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

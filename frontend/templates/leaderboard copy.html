@@ -1,0 +1,309 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=1280, initial-scale=1">
+        <title>{{ meta.title|default:"LinkHash | Leaderboard" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'Top contributors ranked by campaign participation.' }}">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <style>
+      :root{
+        --bg:#0a0b0d; --bg-elev:#0f1115; --panel:#11141a; --panel-2:#0e1318; --grid:#0b0f13;
+        --line:#1a212d; --text:#e6f1ee; --muted:#9fb0aa; --green:#16a34a; --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px; --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 16px 40px rgba(0,0,0,.45);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+        letter-spacing:.2px; background-attachment: fixed;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:1200px; margin:0 auto; padding:0 20px;}
+
+      /* NAV (match site) */
+      .nav{position:sticky; top:0; z-index:60; backdrop-filter: blur(10px);
+        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+        border-bottom:1px solid rgba(255,255,255,.06);}
+      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+      .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; color:#d8ffe7; text-shadow:0 0 18px rgba(35,209,106,.24);}
+      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+      .links{display:flex; gap:24px; align-items:center;}
+      .links a{color:#cfe7dd; opacity:.9}
+      .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+      /* HEADER */
+      .page-head{padding:50px 0 14px; background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)); border-bottom:1px solid rgba(255,255,255,.06);}
+      .page-head h1{margin:0 0 8px; font-size:36px;}
+      .page-head .sub{color:var(--muted); margin:0}
+      .range{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px;}
+      .chip{padding:8px 12px; border-radius:999px; border:1px solid #2a333f; background:#0b1117; color:#cfe7dd; font-weight:700; font-size:13px;}
+      .chip.active{border-color:#2fe07a; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow)}
+
+      /* TABLE */
+      .board{padding:22px 0 40px;}
+      .card{
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
+        overflow:hidden;
+      }
+      table{width:100%; border-collapse:separate; border-spacing:0;}
+
+      /* Make ONLY the first header row sticky to avoid overlap */
+      .table-head th{ /* main sticky row */
+        text-align:left; font-size:12px; color:#cfe7dd; font-weight:800; letter-spacing:.3px;
+        padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.06);
+        background:rgba(14,18,25,.65);
+        position:sticky; top:72px; z-index:10; backdrop-filter: blur(4px);
+      }
+      .table-subhead th{ /* second row labels – not sticky */
+        text-align:left; font-size:12px; color:#8fb0a5; font-weight:700; letter-spacing:.3px;
+        padding:6px 14px 10px; border-bottom:1px solid rgba(255,255,255,.06);
+        background:var(--panel);
+      }
+
+      tbody td{padding:14px; border-bottom:1px solid rgba(255,255,255,.06); font-size:14px; color:#dbe9e2;}
+      tbody tr{transition:background .15s ease}
+      tbody tr:hover{background:rgba(22,163,74,.06)}
+      .rank{width:70px; font-weight:800; color:#e6f1ee;}
+      .user{display:flex; align-items:center; gap:12px;}
+      .avatar{width:36px; height:36px; border-radius:999px; overflow:hidden; border:1px solid #1d2836; background:#0b1117; flex:0 0 36px;}
+      .handle{display:flex; flex-direction:column; gap:4px;}
+      .addr{font-weight:800;}
+      .muted{color:#9fb0aa; font-size:12px;}
+
+      .bar-split{
+        height:10px;
+        border:1px solid #1d2836;
+        background:
+          linear-gradient(
+            90deg,
+            #19b357 0,
+            #23d16a var(--links, 50%),
+            #1d6dd3 var(--links, 50%),
+            #5aa9ff 100%
+          );
+        border-radius:999px;
+        overflow:hidden;
+      }
+
+      .mind{white-space:nowrap;}
+      .stat{white-space:nowrap;}
+      .empty{padding:30px; text-align:center; color:#a8bab2;}
+
+      @media (max-width:1000px){
+        .container{width:920px}
+        .rank{width:54px}
+        .hide-md{display:none}
+      }
+      @media (max-width:680px){
+        .table-subhead .hide-sm, .hide-sm{display:none}
+        .addr{font-size:13px}
+      }
+        </style>
+    </head>
+    <body>
+        <!-- NAV -->
+        <header class="nav">
+            <div class="container row">
+                <div class="brand">
+                    <span class="dot"></span>
+                    <span>LinkHash</span>
+                </div>
+                <nav class="links">
+                {% if meta.lang == "ko" %}
+                {% url 'home_ko' as home_url %}
+                {% url 'events_ko' as events_url %}
+                {% url 'rewards_ko' as rewards_url %}
+                {% url 'rewards_apply_ko' as apply_url %}
+                {% else %}
+                {% url 'home_en' as home_url %}
+                {% url 'events_en' as events_url %}
+                {% url 'rewards_en' as rewards_url %}
+                {% url 'rewards_apply_en' as apply_url %}
+                {% endif %}
+
+                <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                <a href="/leaderboard/"   style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+
+                <!-- NEW: Apply for campaign (locale-aware) -->
+                <a class="btn-outline" href="{{ apply_url }}">
+                {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+                </a>
+
+                {% if wallet_user %}
+                <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+                    {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+                </a>
+                {% else %}
+                <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+                    {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+                </a>
+                {% endif %}
+            </nav>
+            </div>
+        </header>
+        <!-- HEADER -->
+        <section class="page-head">
+            <div class="container">
+                <h1>{% if meta.lang == 'ko' %}크리에이터 리더보드{% else %}Creator Leaderboard{% endif %}</h1>
+                <p class="sub">
+                    {% if meta.lang == 'ko' %}캠페인 기여도 기반 순위 (링크/방문/점수).{% else %}Ranked by campaign contributions (links, visits, score).{% endif %}
+          {% if using_sample %}
+                    <span class="muted"> · UI preview data</span>
+                    {% endif %}
+                </p>
+                <div class="range">
+                    <span class="muted">{% if meta.lang == 'ko' %}기간{% else %}Range{% endif %}:</span>
+                    <a class="chip {% if range_code == '7d' %}active{% endif %}" href="?range=7d">7D</a>
+                    <a class="chip {% if range_code == '30d' %}active{% endif %}" href="?range=30d">30D</a>
+                    <a class="chip {% if range_code == '3m' %}active{% endif %}" href="?range=3m">3M</a>
+                    <a class="chip {% if range_code == '6m' %}active{% endif %}" href="?range=6m">6M</a>
+                    <a class="chip {% if range_code == '12m' %}active{% endif %}" href="?range=12m">12M</a>
+                </div>
+            </div>
+        </section>
+        <!-- TABLE -->
+        <section class="container board">
+            <div class="card">
+                {% if rows %}
+                <table>
+                    <thead>
+                        <!-- Main header (sticky) -->
+                        <!-- <tr class="table-head">
+                            <th class="col-rank">#</th>
+                            <th class="col-name">{% if meta.lang == 'ko' %}지갑{% else %}Name{% endif %}</th>
+                            <th class="col-mind">{% if meta.lang == 'ko' %}마인드셰어{% else %}Mindshare{% endif %}</th>
+                            <th class="col-split">{% if meta.lang == 'ko' %}분할{% else %}Split{% endif %}</th>
+                            <th class="col-links">Links</th>
+                            <th class="col-visits">Visits</th>
+                            <th class="col-pts">Points</th>
+                        </tr> -->
+                        <!-- Metric labels (non-sticky) -->
+                        <tr class="table-subhead">
+                            <th></th>
+                            <th class="muted left">{% if meta.lang == 'ko' %}지갑{% else %}Wallet{% endif %}</th>
+                            <th class="muted left">{% if meta.lang == 'ko' %}마인드셰어{% else %}Mindshare{% endif %}</th>
+                            <th class="muted left">{% if meta.lang == 'ko' %}분할{% else %}Split{% endif %}</th>
+                            <th class="muted right">Links</th>
+                            <th class="muted right">Visits</th>
+                            <th class="muted right">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rows %}
+                        <tr>
+                            <td class="rank">{{ r.rank }}</td>
+                            <td>
+                                <div class="user">
+                                    <!-- inline SVG avatar (no network request, no 404) -->
+                                    <svg
+                                        class="avatar"
+                                        viewBox="0 0 40 40"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                    >
+                                        <defs>
+                                            <linearGradient
+                                                id="g{{ forloop.counter }}"
+                                                x1="0"
+                                                y1="0"
+                                                x2="1"
+                                                y2="1"
+                                            >
+                                                <stop offset="0" stop-color="#19b357"/>
+                                                <stop offset="1" stop-color="#23d16a"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <rect
+                                            x="0.5"
+                                            y="0.5"
+                                            width="39"
+                                            height="39"
+                                            rx="19.5"
+                                            fill="#0b1117"
+                                            stroke="#1d2836"
+                                        />
+                                        <circle
+                                            cx="20"
+                                            cy="15"
+                                            r="7"
+                                            fill="url(#g{{ forloop.counter }})"
+                                        />
+                                        <rect
+                                            x="10"
+                                            y="25"
+                                            width="20"
+                                            height="8"
+                                            rx="4"
+                                            fill="#1d2836"
+                                        />
+                                    </svg>
+                                    <div class="handle">
+                                        <span class="addr">{{ r.masked }}</span>
+                                        <span class="muted hide-sm">{% if meta.lang == 'ko' %}기여자{% else %}Contributor{% endif %}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mind hide-sm">{{ r.mindshare|floatformat:2 }}%</td>
+                            <td class="hide-md" style="min-width:220px;">
+                                <div class="bar-split" style="--links: {{ r.ratio_links|floatformat:'2' }}%;" aria-label="Links {{ r.links }}, Visits {{ r.visits }}"></div>
+                                <div class="muted" style="display:flex; justify-content:space-between; margin-top:4px;">
+                                    <span>{% if meta.lang == 'ko' %}링크{% else %}Links{% endif %} {{ r.links }}</span>
+                                    <span>{% if meta.lang == 'ko' %}방문{% else %}Visits{% endif %} {{ r.visits }}</span>
+                                </div>
+                            </td>
+                            <td class="stat hide-sm">{{ r.links }}</td>
+                            <td class="stat hide-sm">{{ r.visits }}</td>
+                            <td class="stat">
+                                <strong>{{ r.points }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty">
+                    {% if meta.lang == 'ko' %}
+            아직 데이터가 없습니다. 과제에 참여하면 순위가 표시됩니다.
+          {% else %}
+            No data yet. Participate in campaigns to appear here.
+          {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    ©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+            </div>
+        </footer>
+    </body>
+</html>

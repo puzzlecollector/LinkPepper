@@ -1,0 +1,980 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=1280, initial-scale=1">
+        <title>{{ meta.title|default:"LinkHash | Rewards" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'Earn USDT for white-hat contributions.' }}">
+        <!-- OG/Twitter -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{% static 'img/favicon-32x32.png' %}"
+        >
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="{% static 'img/favicon-16x16.png' %}"
+        >
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+        <style>
+      /* ======= THEME (match home.html) ======= */
+      :root{
+        --bg:#0a0b0d;
+        --bg-elev:#0f1115;
+        --panel:#11141a;
+        --panel-2:#0e1318;
+        --grid:#0b0f13;
+        --line:#1a212d;
+        --text:#e6f1ee;
+        --muted:#9fb0aa;
+        --green:#16a34a;
+        --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px;
+        --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 16px 40px rgba(0,0,0,.45);
+        --noise:transparent url('data:image/svg+xml;utf8,\
+          <svg xmlns="http://www.w3.org/2000/svg" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\
+          <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+          <rect width=\"120\" height=\"120\" filter=\"url(%23n)\" opacity=\".04\"/></svg>') repeat;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+        letter-spacing:.2px;
+        background-attachment: fixed;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:1200px; margin:0 auto; padding:0 20px;}
+
+      /* ===== NAV (same as home) ===== */
+      .nav{
+        position:sticky; top:0; z-index:60;
+        backdrop-filter: blur(10px);
+        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+      .brand{
+        display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px;
+        color:#d8ffe7;
+        text-shadow:0 0 18px rgba(35,209,106,.24);
+      }
+      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+      .nav .links{display:flex; gap:24px; align-items:center;}
+      .nav .links a{color:#cfe7dd; opacity:.9}
+      .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+      /* ===== PAGE HEADER ===== */
+      .page-head{
+        padding:50px 0 10px;
+        background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)), var(--noise);
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .page-head h1{margin:0 0 10px; font-size:36px; letter-spacing:.3px;}
+      .page-head .sub{color:var(--muted); margin:0}
+
+      /* ===== TABS & FILTERS ===== */
+      .controls{
+        display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 0 22px;
+      }
+      .tabs{display:flex; gap:12px;}
+      .tab{
+        padding:14px 20px; border-radius:999px; border:1px solid #2a333f;
+        background:linear-gradient(180deg, rgba(14,18,25,.85), rgba(14,18,25,.55));
+        color:#cfe7dd; font-weight:800; cursor:pointer; letter-spacing:.3px; font-size:15px;
+        transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      }
+      .tab:hover{ transform:translateY(-2px); border-color:rgba(35,209,106,.35); box-shadow:0 14px 30px rgba(22,163,74,.18) }
+      .tab.active{
+        border-color:#2fe07a; color:#05160c; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:var(--glow);
+        transform:translateY(-1px);
+      }
+
+      /* Custom dropdown */
+      .filters{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+      .dropdown{position:relative;}
+      .dropdown-toggle{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:12px 16px; border-radius:12px; border:1px solid #2a333f;
+        background:#0b1117; color:#d9f6e6; font-weight:700; cursor:pointer;
+        transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+      }
+      .dropdown-toggle:hover{ border-color:rgba(35,209,106,.35); box-shadow:0 10px 22px rgba(22,163,74,.15) }
+      .dropdown-toggle .caret{ font-size:12px; opacity:.8 }
+      .dropdown-menu{
+        position:absolute; top:110%; left:0; min-width:240px; padding:8px;
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.08); border-radius:14px; box-shadow:var(--shadow-md);
+        display:none; z-index:20;
+      }
+      .dropdown.open .dropdown-menu{ display:block; }
+      .dropdown-menu [role="option"]{
+        padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:600; color:#cfe7dd;
+      }
+      .dropdown-menu [role="option"]:hover{
+        background:rgba(22,163,74,.12); color:#eafff4;
+      }
+      .dropdown-menu [aria-selected="true"]{
+        background:rgba(22,163,74,.18); color:#eafff4; border:1px solid rgba(35,209,106,.35);
+      }
+
+      /* ===== GRID & CARDS ===== */
+      .grid{
+        display:grid; grid-template-columns:repeat(3, 1fr); gap:18px;
+      }
+      .project-card{
+        position:relative; width:100%; height:460px; display:flex; flex-direction:column; overflow:hidden;
+        background:linear-gradient(180deg, #0d1217, #0b0f14);
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
+        opacity:0; transform:translateY(8px); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      }
+      /* radiant hover */
+      .project-card::after{
+        content:""; position:absolute; inset:-20%; pointer-events:none; opacity:0;
+        background:radial-gradient(60% 60% at 50% 10%, rgba(35,209,106,.14), transparent 60%);
+        transition:opacity .2s ease;
+      }
+      .project-card:hover{
+        transform:translateY(-3px) scale(1.02);
+        border-color:rgba(35,209,106,.35);
+        box-shadow:0 40px 80px rgba(22,163,74,.18), var(--shadow-md);
+      }
+      .project-card:hover::after{ opacity:1; }
+
+      .project-card .thumb{position:relative; height:190px; background:#0b1117; overflow:hidden;}
+      .project-card .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.92; transform:scale(1.03)}
+      .task-badges{position:absolute; left:12px; bottom:12px; display:flex; gap:8px;}
+      .task-badge{padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(14,18,25,.8); border:1px solid rgba(255,255,255,.08);}
+      .task-badge.visit{color:#a0f2bd; border-color:#2a6f47}
+      .task-badge.link{color:#b2f5ff; border-color:#2a455e}
+      .project-card .body{flex:1; padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px;}
+      .project-card h3{font-size:18px; margin:0}
+      .project-card p{color:#b7c8c1; font-size:14px; margin:0 0 6px}
+      .meta{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
+      .meta .pill{background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:8px;}
+      .progress{height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:6px;}
+      .progress .bar{height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)}
+      .project-card .foot{display:flex; justify-content:flex-end; margin-top:auto;}
+      .project-card .foot .btn{padding:10px 12px;}
+
+      /* show/hide by tab */
+      .panel{display:none;}
+      .panel.active{display:block;}
+
+      /* footer */
+      .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; margin-top:60px;}
+
+      /* responsive (desktop-first per your setup) */
+      @media (max-width:1140px){ .container{width:1000px} }
+      @media (max-width:1000px){ .container{width:920px} .grid{grid-template-columns:repeat(2,1fr)} }
+      @media (max-width:680px){ .grid{grid-template-columns:1fr} .tab{padding:12px 16px} }
+        </style>
+    </head>
+    <body>
+        <!-- ===== NAV (identical to home.html) ===== -->
+        <header class="nav">
+            <div class="container row">
+                <div class="brand">
+                    <span class="dot"></span>
+                    <span>LinkHash</span>
+                </div>
+                <nav class="links">
+                {% if meta.lang == "ko" %}
+                    {% url 'home_ko' as home_url %}
+                    {% url 'events_ko' as events_url %}
+                    {% url 'rewards_ko' as rewards_url %}
+                    {% url 'rewards_apply_ko' as apply_url %}
+                {% else %}
+                    {% url 'home_en' as home_url %}
+                    {% url 'events_en' as events_url %}
+                    {% url 'rewards_en' as rewards_url %}
+                    {% url 'rewards_apply_en' as apply_url %}
+                {% endif %}
+
+                <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                <a href="{{ rewards_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+
+                <!-- NEW: Apply for campaign (locale-aware) -->
+                <a class="btn-outline" href="{{ apply_url }}">
+                    {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+                </a>
+
+                {% if wallet_user %}
+                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                    <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+                    {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+                    </a>
+                {% else %}
+                    <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+                    {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+                    </a>
+                {% endif %}
+                </nav>
+
+            </div>
+        </header>
+        <!-- ===== PAGE HEADER ===== -->
+        <section class="page-head">
+            <div class="container">
+                <h1>{% if meta.lang == 'ko' %}리워드 캠페인{% else %}Reward Campaigns{% endif %}</h1>
+                <p class="sub">
+                    {% if meta.lang == 'ko' %}
+            화이트햇 활동으로 USDT를 적립하세요. 실시간 진행률과 투명한 규칙.
+          {% else %}
+            Earn USDT for white-hat contributions. Live progress and transparent rules.
+          {% endif %}
+                </p>
+                <!-- Tabs + Custom Dropdown Filters -->
+                <div class="controls">
+                    <div class="tabs" role="tablist" aria-label="Campaign tabs">
+                        <button
+                            class="tab active"
+                            data-target="#live"
+                            role="tab"
+                            aria-selected="true"
+                            id="tab-live"
+                        >
+                            {% if meta.lang == 'ko' %}진행중{% else %}Live{% endif %}
+                        </button>
+                        <button
+                            class="tab"
+                            data-target="#past"
+                            role="tab"
+                            aria-selected="false"
+                            id="tab-past"
+                        >
+                            {% if meta.lang == 'ko' %}종료됨{% else %}Past{% endif %}
+                        </button>
+                    </div>
+                    <div class="filters">
+                        <!-- Custom dropdown -->
+                        <div class="dropdown" id="sortDropdown" data-value="ending">
+                            <button
+                                class="dropdown-toggle"
+                                type="button"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span class="dropdown-label">
+                                    {% if meta.lang == 'ko' %}마감 임박{% else %}Ending soon{% endif %}
+                                </span>
+                                <span class="caret">▾</span>
+                            </button>
+                            <ul class="dropdown-menu" role="listbox" aria-labelledby="sortDropdown">
+                                <li role="option" data-value="ending" aria-selected="true">
+                                    {% if meta.lang == 'ko' %}마감 임박{% else %}Ending soon{% endif %}
+                                </li>
+                                <li role="option" data-value="new">
+                                    {% if meta.lang == 'ko' %}최신 시작{% else %}Newly launched{% endif %}
+                                </li>
+                                <li role="option" data-value="payout">
+                                    {% if meta.lang == 'ko' %}개별 보상 큼{% else %}Biggest payout{% endif %}
+                                </li>
+                                <li role="option" data-value="pool">
+                                    {% if meta.lang == 'ko' %}리워드 풀 큼{% else %}Largest pool{% endif %}
+                                </li>
+                                <li role="option" data-value="popular">
+                                    {% if meta.lang == 'ko' %}인기 캠페인{% else %}Most popular{% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== PANELS ===== -->
+        <main class="container" style="padding:24px 0 0">
+            <!-- LIVE -->
+            <section id="live" class="panel active" aria-labelledby="tab-live">
+                <div class="grid" id="liveGrid">
+                    {% if projects %}
+            {% for c in projects %}
+                    <article
+                        class="project-card"
+                        data-start="{{ c.start|date:'Y-m-d' }}"
+                        data-end="{{ c.end|date:'Y-m-d' }}"
+                        data-pool="{{ c.pool_usdt|default:0 }}"
+                        data-payout="{{ c.payout_usdt|default:0 }}"
+                        data-pop="{{ c.participants|default:0 }}"
+                    >
+                        <div class="thumb">
+                            <img src="{{ c.image_url }}" alt="">
+                            <div class="task-badges">
+                                {% if c.has_visit %}
+                                <span class="task-badge visit">VISIT</span>
+                                {% endif %}
+                    {% if c.has_link %}
+                                <span class="task-badge link">LINK</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>{{ c.title }}</h3>
+                            <p>{{ c.summary }}</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; {{ c.pool_usdt }} USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; {{ c.participants }}
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>{{ c.claimed_percent }}% claimed</span>
+                                <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
+                            </div>
+                            <div class="foot">
+                                <!-- link to detail page -->
+                                <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/" aria-label="View details for {{ c.title }}">
+                                    {{ c.cta|default:"View details" }}
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+          {% else %}
+                    <!-- Sample LIVE cards (data-* drives sorting) -->
+                    <article
+                        class="project-card"
+                        data-start="2025-10-01"
+                        data-end="2025-11-30"
+                        data-pool="3200"
+                        data-payout="6"
+                        data-pop="516"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Analytics dashboard">
+                            <div class="task-badges">
+                                <span class="task-badge visit">VISIT</span>
+                                <span class="task-badge link">LINK</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>SEO Suite: Case study tour</h3>
+                            <p>Visit 3 pages, collect codes, then post a short review with insights.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 3,200 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 516
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="52"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>52% claimed</span>
+                                <span>2025-10-01 → 2025-11-30</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/seo-suite-case-study-tour-1/" aria-label="View details for SEO Suite: Case study tour">View details</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-11-01"
+                        data-end="2025-12-10"
+                        data-pool="1000"
+                        data-payout="2"
+                        data-pop="190"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.pexels.com/photos/29831433/pexels-photo-29831433.jpeg?cs=srgb&dl=pexels-tugaykocaturk-29831433.jpg&fm=jpg" alt="Crypto wallet on phone">
+                            <div class="task-badges">
+                                <span class="task-badge visit">VISIT</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Wallet onboarding quest</h3>
+                            <p>Create a demo wallet, browse settings, submit the hidden FAQ code.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 1,000 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 190
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="28"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>28% claimed</span>
+                                <span>2025-11-01 → 2025-12-10</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/wallet-onboarding-quest-2/" aria-label="View details for Wallet onboarding quest">View details</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-10-05"
+                        data-end="2025-11-15"
+                        data-pool="5000"
+                        data-payout="15"
+                        data-pop="412"
+                    >
+                        <div class="thumb">
+                            <img src="{% static 'img/cards/bitcoin-close.jpg' %}" alt="Bitcoin close up">
+                            <div class="task-badges">
+                                <span class="task-badge link">LINK</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Naver review sprint</h3>
+                            <p>Write a genuine Naver Blog review with a contextual dofollow link.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 5,000 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 412
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="40"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>40% claimed</span>
+                                <span>2025-10-05 → 2025-11-15</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/naver-review-sprint-3/" aria-label="View details for Naver review sprint">View details</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-10-10"
+                        data-end="2025-12-01"
+                        data-pool="1500"
+                        data-payout="3"
+                        data-pop="230"
+                    >
+                        <div class="thumb">
+                            <img src="{% static 'img/cards/green-office.jpg' %}" alt="Green office desk">
+                            <div class="task-badges">
+                                <span class="task-badge visit">VISIT</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Product page engagement</h3>
+                            <p>Scroll & interact; find the verification code at the bottom.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 1,500 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 230
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="15"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>15% claimed</span>
+                                <span>2025-10-10 → 2025-12-01</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/product-page-engagement-4/" aria-label="View details for Product page engagement">View details</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-10-15"
+                        data-end="2025-12-05"
+                        data-pool="2750"
+                        data-payout="8"
+                        data-pop="304"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" alt="Laptop coding">
+                            <div class="task-badges">
+                                <span class="task-badge link">LINK</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>DevTools beta feedback</h3>
+                            <p>Publish a thoughtful beta review on your blog with a citation link.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 2,750 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 304
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="71"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>71% claimed</span>
+                                <span>2025-10-15 → 2025-12-05</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/devtools-beta-feedback-5/" aria-label="View details for DevTools beta feedback">View details</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-09-01"
+                        data-end="2025-10-31"
+                        data-pool="2000"
+                        data-payout="4"
+                        data-pop="842"
+                    >
+                        <div class="thumb">
+                            <img src="{% static 'img/cards/neon-city.jpg' %}" alt="Neon city hero">
+                            <div class="task-badges">
+                                <span class="task-badge visit">VISIT</span>
+                                <span class="task-badge link">LINK</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>SimpleQuant: Blog launch</h3>
+                            <p>Read the post, find the hidden code, submit & earn.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 2,000 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 842
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="63"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>63% claimed</span>
+                                <span>2025-09-01 → 2025-10-31</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/simplequant-blog-launch-6/" aria-label="View details for SimpleQuant: Blog launch">View details</a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+                </div>
+            </section>
+            <!-- PAST -->
+            <section id="past" class="panel" aria-labelledby="tab-past">
+                <div class="grid" id="pastGrid">
+                    <!-- Sample PAST cards -->
+                    <article
+                        class="project-card"
+                        data-start="2025-08-01"
+                        data-end="2025-09-01"
+                        data-pool="3400"
+                        data-payout="10"
+                        data-pop="528"
+                    >
+                        <div class="thumb">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/MobileHCI2008_Audience.jpg" alt="Tech conference">
+                            <div class="task-badges">
+                                <span class="task-badge link">LINK</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Creator Tools launch week</h3>
+                            <p>Publish a how-to article with screenshots and a dofollow citation.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 3,400 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 528
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="100"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>100% claimed</span>
+                                <span>2025-08-01 → 2025-09-01</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/creator-tools-launch-week-101/" aria-label="See summary for Creator Tools launch week">See summary</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-07-12"
+                        data-end="2025-08-10"
+                        data-pool="900"
+                        data-payout="1"
+                        data-pop="167"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.pexels.com/photos/374147/pexels-photo-374147.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Desk with plant">
+                            <div class="task-badges">
+                                <span class="task-badge visit">VISIT</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Landing page QA hunt</h3>
+                            <p>Find 3 minor UX issues and submit the footer code.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 900 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 167
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="100"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>100% claimed</span>
+                                <span>2025-07-12 → 2025-08-10</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/landing-page-qa-hunt-102/" aria-label="See summary for Landing page QA hunt">See summary</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-06-05"
+                        data-end="2025-07-05"
+                        data-pool="1800"
+                        data-payout="3"
+                        data-pop="294"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Team discussion">
+                            <div class="task-badges">
+                                <span class="task-badge link">LINK</span>
+                                <span class="task-badge visit">VISIT</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Community spotlight series</h3>
+                            <p>Interview a power user, publish highlights, verify unique code.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 1,800 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 294
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="100"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>100% claimed</span>
+                                <span>2025-06-05 → 2025-07-05</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/community-spotlight-series-103/" aria-label="See summary for Community spotlight series">See summary</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-05-10"
+                        data-end="2025-06-10"
+                        data-pool="2200"
+                        data-payout="5"
+                        data-pop="351"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop" alt="Hackathon group">
+                            <div class="task-badges">
+                                <span class="task-badge link">LINK</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Hackathon wrap-up posts</h3>
+                            <p>Publish your team’s recap with links to demo and docs.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 2,200 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 351
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="100"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>100% claimed</span>
+                                <span>2025-05-10 → 2025-06-10</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/hackathon-wrap-up-posts-104/" aria-label="See summary for Hackathon wrap-up posts">See summary</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-04-15"
+                        data-end="2025-05-20"
+                        data-pool="1200"
+                        data-payout="2"
+                        data-pop="205"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=1200&auto=format&fit=crop" alt="Analytics screen">
+                            <div class="task-badges">
+                                <span class="task-badge visit">VISIT</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Docs deep-dive quest</h3>
+                            <p>Walk through 5 docs pages and submit the breadcrumb code.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 1,200 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 205
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="100"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>100% claimed</span>
+                                <span>2025-04-15 → 2025-05-20</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/docs-deep-dive-quest-105/" aria-label="See summary for Docs deep-dive quest">See summary</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article
+                        class="project-card"
+                        data-start="2025-03-01"
+                        data-end="2025-04-01"
+                        data-pool="1950"
+                        data-payout="4"
+                        data-pop="277"
+                    >
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=1200&auto=format&fit=crop" alt="Notebook planning">
+                            <div class="task-badges">
+                                <span class="task-badge link">LINK</span>
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>Feature spotlight blogs</h3>
+                            <p>Publish a feature teardown with a contextual dofollow citation.</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>Pool</strong>&nbsp; 1,950 USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>People</strong>&nbsp; 277
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="bar" data-pct="100"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>100% claimed</span>
+                                <span>2025-03-01 → 2025-04-01</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/feature-spotlight-blogs-106/" aria-label="See summary for Feature spotlight blogs">See summary</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+            </div>
+        </footer>
+        <!-- ===== LIGHT INTERACTIONS (no 3D) ===== -->
+        <script type="module">
+      import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+      import ScrollTrigger from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger.js';
+      import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Smooth scroll
+      const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.8, smoothWheel: true, normalizeWheel: true });
+      lenis.on('scroll', () => ScrollTrigger.update());
+      function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+
+      // Tabs
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.panel');
+      tabs.forEach(tab=>{
+        tab.addEventListener('click', ()=>{
+          tabs.forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+          panels.forEach(p=>p.classList.remove('active'));
+          tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+          const target = document.querySelector(tab.dataset.target);
+          if(target){ target.classList.add('active'); }
+          // re-trigger reveals
+          revealCards();
+          animateBars();
+        });
+      });
+
+      // ----- Custom dropdown (accessible-ish)
+      const dd = document.getElementById('sortDropdown');
+      const toggle = dd.querySelector('.dropdown-toggle');
+      const menu = dd.querySelector('.dropdown-menu');
+      const label = dd.querySelector('.dropdown-label');
+
+      function setDropdownValue(val, text){
+        dd.dataset.value = val;
+        label.textContent = text;
+        menu.querySelectorAll('[role="option"]').forEach(opt=>{
+          opt.setAttribute('aria-selected', String(opt.dataset.value === val));
+        });
+        applySort();
+        revealCards();
+      }
+
+      toggle.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const open = dd.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if(open){
+          const current = menu.querySelector('[aria-selected="true"]');
+          (current || menu.firstElementChild).focus?.();
+        }
+      });
+
+      menu.querySelectorAll('[role="option"]').forEach(opt=>{
+        opt.tabIndex = 0;
+        opt.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          setDropdownValue(opt.dataset.value, opt.textContent.trim());
+          dd.classList.remove('open');
+          toggle.setAttribute('aria-expanded','false');
+        });
+        opt.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            setDropdownValue(opt.dataset.value, opt.textContent.trim());
+            dd.classList.remove('open');
+            toggle.setAttribute('aria-expanded','false');
+            toggle.focus();
+          }
+          if(e.key === 'Escape'){
+            dd.classList.remove('open');
+            toggle.setAttribute('aria-expanded','false');
+            toggle.focus();
+          }
+        });
+      });
+
+      document.addEventListener('click', ()=>{
+        if(dd.classList.contains('open')){
+          dd.classList.remove('open');
+          toggle.setAttribute('aria-expanded','false');
+        }
+      });
+
+      // Sorting / Filters
+      function parseNum(el, attr){ return parseFloat(el.getAttribute(attr) || '0'); }
+      function parseDate(el, attr){
+        const v = el.getAttribute(attr);
+        return v ? new Date(v + 'T00:00:00Z') : new Date(0);
+      }
+      function sortGrid(gridEl, mode, isLive=true){
+        const cards = Array.from(gridEl.querySelectorAll('.project-card'));
+        let sorter;
+        if(mode === 'ending'){
+          sorter = (a,b)=> parseDate(a,'data-end') - parseDate(b,'data-end');
+          if(!isLive) sorter = (a,b)=> parseDate(b,'data-end') - parseDate(a,'data-end');
+        }else if(mode === 'new'){
+          sorter = (a,b)=> parseDate(b,'data-start') - parseDate(a,'data-start');
+        }else if(mode === 'payout'){
+          sorter = (a,b)=> parseNum(b,'data-payout') - parseNum(a,'data-payout');
+        }else if(mode === 'pool'){
+          sorter = (a,b)=> parseNum(b,'data-pool') - parseNum(a,'data-pool');
+        }else if(mode === 'popular'){
+          sorter = (a,b)=> parseNum(b,'data-pop') - parseNum(a,'data-pop');
+        }else{
+          sorter = ()=>0;
+        }
+        cards.sort(sorter).forEach(c=> gridEl.appendChild(c));
+      }
+
+      const liveGrid = document.getElementById('liveGrid');
+      const pastGrid = document.getElementById('pastGrid');
+      function applySort(){
+        const mode = dd.dataset.value || 'ending';
+        sortGrid(liveGrid, mode, true);
+        sortGrid(pastGrid, mode, false);
+      }
+
+      // Reveal animation for cards
+      function revealCards(){
+        gsap.utils.toArray('.panel.active .project-card').forEach((card, i)=>{
+          gsap.fromTo(card, {autoAlpha:0, y:8}, {autoAlpha:1, y:0, duration:.28, delay: i * 0.04, overwrite:true});
+        });
+      }
+
+      // Progress bars animate when in view
+      function animateBars(){
+        document.querySelectorAll('.panel.active .progress .bar').forEach(b=>{
+          const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
+          gsap.fromTo(b, { width: "0%" }, {
+            width: target, duration: 1.2, ease: "power2.out",
+            scrollTrigger: { trigger: b, start: "top 95%", once: true }
+          });
+        });
+      }
+
+      // Initial apply + animations
+      applySort();
+      revealCards();
+      animateBars();
+        </script>
+    </body>
+</html>

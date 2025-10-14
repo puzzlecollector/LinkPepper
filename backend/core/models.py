@@ -1,170 +1,383 @@
-# backend/core/models.py
+# apps/rewards/models.py
+from __future__ import annotations
+
+import uuid
+from decimal import Decimal
+
+from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.utils import timezone
 
 
+# ---------- Core choices ----------
+class TaskType(models.TextChoices):
+    VISIT = "VISIT", "Visit"
+    LINK = "LINK", "Link"
+    # Kept only so old rows (if any) don't blow up in templates.
+    # We normalize MIXED_LEGACY => VISIT in views/templates.
+    MIXED_LEGACY = "MIXED", "Mixed (legacy)"
+
+
+class Network(models.TextChoices):
+    ETH = "ETH", "Ethereum"
+    SOL = "SOL", "Solana"
+    BNB = "BNB", "BNB Chain"
+    POL = "POL", "Polygon"
+
+
+class SubmissionStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    APPROVED = "APPROVED", "Approved"
+    REJECTED = "REJECTED", "Rejected"
+    PAID = "PAID", "Paid"  # convenience terminal state; also see Payout
+
+
+# ---------- Wallet-based user (address-first identity) ----------
 class WalletUser(models.Model):
     """
-    Non-custodial wallet user (EVM). No passwords. Auth via message signature.
+    Lightweight user table for address-based login.
+    Users authenticate by signing a server-provided nonce with their wallet.
+    No password is stored here.
     """
-    address = models.CharField(max_length=42, unique=True)  # 0x… (lowercased)
-    display_name = models.CharField(max_length=120, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+    id = models.BigAutoField(primary_key=True)
 
-    # session helpers
-    last_login = models.DateTimeField(blank=True, null=True)
-    nonce = models.CharField(max_length=64, blank=True, null=True)  # fresh per login attempt
+    # EVM or other chain address. For EVM, store checksum/lowercase consistently on write.
+    address = models.CharField(max_length=128, unique=True, db_index=True)
 
-    # optional socials/wallets
-    wallet_solana = models.CharField(max_length=64, blank=True, null=True)
-    telegram = models.CharField(max_length=120, blank=True, null=True)
-    twitter_x = models.CharField(max_length=120, blank=True, null=True)
+    # Optional profile-ish fields
+    display_name = models.CharField(max_length=120, blank=True)
+    email = models.EmailField(blank=True)
 
-    is_admin = models.BooleanField(default=False)  # presentation-only flag
-    note = models.TextField(blank=True, null=True)
+    # Login helpers
+    nonce = models.CharField(max_length=180, blank=True, help_text="Random challenge for signature verification")
+    last_login = models.DateTimeField(null=True, blank=True)
+
+    # Admin toggle for your own use (not Django's is_staff/is_superuser)
+    is_admin = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]
-        verbose_name = "User"
-        verbose_name_plural = "Users"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.display_name or self.address
 
+    def set_new_nonce(self, token: str):
+        self.nonce = token
+        self.save(update_fields=["nonce"])
 
-class Campaign(models.Model):
-    class TaskType(models.TextChoices):
-        LINK = "LINK", "Link sharing"
-        VISIT = "VISIT", "Visit with footer code"
-        SEARCH = "SEARCH", "Google search + visit"
-        MAPS = "MAPS", "Google Maps task"
 
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
-    description = models.TextField(blank=True, null=True)
-    task_type = models.CharField(max_length=12, choices=TaskType.choices, default=TaskType.VISIT)
+# ---------- Client application (from /rewards/apply/) ----------
+class CampaignApplication(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    start_at = models.DateTimeField(blank=True, null=True)
-    end_at = models.DateTimeField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    # Minimal required
+    email = models.EmailField()
+    phone = models.CharField(max_length=64)
 
-    reward_currency = models.CharField(max_length=24, default="USDT")
-    reward_amount = models.DecimalField(max_digits=18, decimal_places=6, default=0)
-    quota_total = models.PositiveIntegerField(default=0, help_text="0 = unlimited")
+    # Optional meta (maps to rewards_apply.html)
+    country = models.CharField(max_length=64, blank=True)
+    campaign_title = models.CharField(max_length=180, blank=True)
+    website_url = models.URLField(blank=True)
+    website_description = models.TextField(blank=True)
 
-    client_site_domain = models.CharField(max_length=200, blank=True, null=True)
-    secret_code = models.CharField(
-        max_length=120, blank=True, null=True,
-        help_text="If all users read the same footer code, put it here."
+    # “Task types” requested by client (checkboxes). We store flags.
+    wants_visit = models.BooleanField(default=False)
+    wants_link = models.BooleanField(default=True)
+
+    # VISIT-specific
+    visit_code = models.CharField(
+        max_length=64, blank=True, help_text="Verification code users must find"
     )
-    code_case_sensitive = models.BooleanField(default=False)
-    extra = models.JSONField(blank=True, null=True)
+
+    # LINK-specific SEO fields
+    expected_review_keywords = models.CharField(max_length=400, blank=True)
+    current_seo_keywords = models.CharField(max_length=400, blank=True)
+
+    # Rewards (optional)
+    reward_pool_usdt = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(Decimal("0"))]
+    )
+    payout_per_task_usdt = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(Decimal("0"))]
+    )
+
+    # Dates (optional)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    # Airdrop optional
+    airdrop_enabled = models.BooleanField(default=False)
+    airdrop_first_n = models.PositiveIntegerField(null=True, blank=True)
+    airdrop_amount_per_user = models.DecimalField(
+        max_digits=18, decimal_places=8, null=True, blank=True,
+        validators=[MinValueValidator(Decimal("0"))]
+    )
+    airdrop_token_symbol = models.CharField(max_length=24, blank=True)
+    airdrop_network = models.CharField(max_length=48, blank=True)
+    airdrop_note = models.CharField(max_length=240, blank=True)
+
+    # Assets (store URLs your upload layer writes to; keeps models lean)
+    thumbnail_url = models.URLField(blank=True)
+    favicon_url = models.URLField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    handled = models.BooleanField(
+        default=False,
+        help_text="Mark true once an admin has responded/converted to a Campaign.",
+    )
 
     class Meta:
         ordering = ["-created_at"]
 
-    def __str__(self):
-        return self.title
-
-    @property
-    def submissions_count(self) -> int:
-        return self.submission_set.count()
-
-    @property
-    def quota_remaining(self):
-        if not self.quota_total:
-            return None
-        return max(0, self.quota_total - self.submissions_count)
-
-    def is_open_now(self) -> bool:
-        now = timezone.now()
-        if not self.is_active: return False
-        if self.start_at and now < self.start_at: return False
-        if self.end_at and now > self.end_at: return False
-        if self.quota_total and self.submissions_count >= self.quota_total: return False
-        return True
+    def __str__(self) -> str:
+        return f"Application {self.email} ({self.campaign_title or 'Untitled'})"
 
 
-class CampaignCode(models.Model):
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
-    code = models.CharField(max_length=120)
-    is_used = models.BooleanField(default=False)
-    claimed_by = models.ForeignKey(WalletUser, on_delete=models.SET_NULL, blank=True, null=True)
-    claimed_at = models.DateTimeField(blank=True, null=True)
+# ---------- Admin-created campaign (what powers Rewards pages) ----------
+class Campaign(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    slug = models.SlugField(max_length=220, unique=True, blank=True)
+
+    # Display
+    title = models.CharField(max_length=180)
+    summary = models.CharField(max_length=300, blank=True)
+    long_description = models.TextField(blank=True)
+
+    # Task type (only LINK or VISIT are considered active)
+    task_type = models.CharField(
+        max_length=12, choices=TaskType.choices, default=TaskType.VISIT
+    )
+
+    # Client/site specifics used by the details page
+    client_site_domain = models.CharField(max_length=180, blank=True)
+    rules = models.TextField(blank=True)
+
+    # VISIT flow: how to find code + the actual code users must submit
+    code_instructions = models.TextField(
+        blank=True, help_text="How VISIT participants can find the code"
+    )
+    visit_code = models.CharField(  # <<< NEW
+        max_length=64, blank=True, help_text="The verification code users must enter for VISIT tasks"
+    )
+
+    # LINK SEO helpers
+    seo_keywords = models.CharField(max_length=400, blank=True)
+
+    # Assets (used by cards/hero/favibox)
+    image_url = models.URLField(blank=True)        # card/hero image
+    favicon_url = models.URLField(blank=True)      # small icon in details
+
+    # Rewards and window
+    pool_usdt = models.DecimalField(
+        max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal("0"))]
+    )
+    payout_usdt = models.DecimalField(
+        max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal("0"))]
+    )
+    start = models.DateField()
+    end = models.DateField()
+
+    # Optional: airdrop knobs for announcements sidebar logic
+    airdrop_enabled = models.BooleanField(default=False)
+    airdrop_first_n = models.PositiveIntegerField(null=True, blank=True)
+    airdrop_amount_per_user = models.DecimalField(
+        max_digits=18, decimal_places=8, null=True, blank=True,
+        validators=[MinValueValidator(Decimal("0"))]
+    )
+    airdrop_token_symbol = models.CharField(max_length=24, blank=True)
+    airdrop_network = models.CharField(max_length=48, blank=True)
+    airdrop_note = models.CharField(max_length=240, blank=True)
+
+    # Admin toggles
+    is_published = models.BooleanField(
+        default=False,
+        help_text="Published campaigns appear on /rewards and details pages.",
+    )
+    is_paused = models.BooleanField(
+        default=False,
+        help_text="Pause to stop accepting new submissions without unpublishing.",
+    )
+
+    # Optional link to the application that spawned this campaign
+    source_application = models.ForeignKey(
+        CampaignApplication, null=True, blank=True, on_delete=models.SET_NULL, related_name="campaigns"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = [("campaign", "code")]
-        indexes = [models.Index(fields=["campaign", "is_used", "code"])]
+        ordering = ["-start", "-id"]
 
-    def __str__(self):
-        return f"{self.campaign.slug}:{self.code}"
+    # ----- Derived fields used by templates -----
+    @property
+    def has_visit(self) -> bool:
+        return self.task_type in (TaskType.VISIT, TaskType.MIXED_LEGACY)
+
+    @property
+    def has_link(self) -> bool:
+        return self.task_type in (TaskType.LINK, TaskType.MIXED_LEGACY)
+
+    @property
+    def is_open_now(self) -> bool:
+        today = timezone.localdate()
+        return (self.start <= today <= self.end) and not self.is_paused and self.is_published
+
+    @property
+    def participants(self) -> int:
+        # Number of distinct users that have at least one submission
+        return (
+            self.submissions.exclude(wallet_address__isnull=True)
+            .exclude(wallet_address__exact="")
+            .values("wallet_address")
+            .distinct()
+            .count()
+        )
+
+    @property
+    def claimed_percent(self) -> int:
+        """
+        For the progress bar. We interpret "claimed" as USDT paid out so far / pool_usdt.
+        """
+        total_paid = self.payouts.aggregate(s=models.Sum("amount_usdt"))["s"] or Decimal("0")
+        if not self.pool_usdt or self.pool_usdt == 0:
+            return 0
+        pct = int(min(100, (total_paid / self.pool_usdt * 100).quantize(Decimal("1"))))
+        return pct
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title) or "campaign"
+            candidate = base
+            i = 2
+            while Campaign.objects.filter(slug=candidate).exclude(pk=self.pk).exists():
+                candidate = f"{base}-{i}"
+                i += 1
+            self.slug = candidate
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.title} ({self.get_task_type_display()})"
 
 
+# ---------- User submissions ----------
 class Submission(models.Model):
-    class Status(models.TextChoices):
-        PENDING = "PENDING", "Pending"
-        APPROVED = "APPROVED", "Approved"
-        REJECTED = "REJECTED", "Rejected"
+    id = models.BigAutoField(primary_key=True)
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="submissions")
 
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
-    user = models.ForeignKey(WalletUser, on_delete=models.CASCADE)
-    status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
+    # Link to wallet user (address-login). Keep admins on AUTH_USER for reviews/payouts.
+    user = models.ForeignKey(
+        WalletUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="submissions"
+    )
 
-    # Common fields
-    comment = models.TextField(blank=True, null=True)
-    wallet_used = models.CharField(max_length=64, blank=True, null=True)
+    # Wallet info (required on forms)
+    wallet_address = models.CharField(max_length=128)
+    network = models.CharField(max_length=8, choices=Network.choices)
 
-    # For LINK tasks
-    post_url = models.URLField(blank=True, null=True)
+    # Two task shapes (only one will be actually used depending on campaign.task_type):
+    # LINK
+    post_url = models.URLField(blank=True)
+    comment = models.TextField(blank=True)
 
-    # For VISIT/SEARCH tasks
-    visited_url = models.URLField(blank=True, null=True)
-    code_entered = models.CharField(max_length=120, blank=True, null=True)
+    # VISIT
+    visited_url = models.URLField(blank=True)  # optional if you want to capture landing
+    code_entered = models.CharField(max_length=64, blank=True)
 
-    proof_score = models.IntegerField(default=0)
-    rank_guess = models.IntegerField(blank=True, null=True)
+    # Review / moderation
+    status = models.CharField(max_length=12, choices=SubmissionStatus.choices, default=SubmissionStatus.PENDING)
+    proof_score = models.PositiveSmallIntegerField(
+        null=True, blank=True, help_text="Admin-assigned proof-of-work score (e.g., quality/DA)"
+    )
+    reviewer_note = models.TextField(blank=True)
 
-    reviewer_note = models.TextField(blank=True, null=True)
-    reviewed_at = models.DateTimeField(blank=True, null=True)
+    reviewed_by = models.ForeignKey(
+        getattr(settings, "AUTH_USER_MODEL", "auth.User"),
+        null=True, blank=True, on_delete=models.SET_NULL, related_name="reviewed_submissions"
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    # Convenience “approved & paid” toggles for quick admin filtering.
+    is_approved = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = [("campaign", "user")]
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["campaign", "status"]),
-            models.Index(fields=["user"]),
+            models.Index(fields=["wallet_address"]),
         ]
 
-    def __str__(self):
-        return f"{self.user} → {self.campaign} ({self.status})"
+    def mark_approved(self, reviewer=None, score: int | None = None, note: str | None = None):
+        self.status = SubmissionStatus.APPROVED
+        self.is_approved = True
+        self.reviewed_at = timezone.now()
+        if reviewer:
+            self.reviewed_by = reviewer
+        if score is not None:
+            self.proof_score = score
+        if note:
+            self.reviewer_note = (self.reviewer_note + "\n" if self.reviewer_note else "") + note
+        self.save(update_fields=[
+            "status", "is_approved", "reviewed_at", "reviewed_by", "proof_score", "reviewer_note"
+        ])
+
+    def __str__(self) -> str:
+        return f"Submission #{self.pk} to {self.campaign}"
 
 
+# ---------- Payout ledger (manual transfer logging) ----------
 class Payout(models.Model):
-    submission = models.OneToOneField(Submission, on_delete=models.CASCADE)
-    currency = models.CharField(max_length=24, default="USDT")
-    amount = models.DecimalField(max_digits=18, decimal_places=6, default=0)
-    tx_hash = models.CharField(max_length=120, blank=True, null=True)
-    status = models.CharField(
-        max_length=12,
-        choices=[("QUEUED", "Queued"), ("SENT", "Sent")],
-        default="QUEUED",
+    """
+    Optional but recommended for transparency.
+    Admins log the actual coin payout (after manual transfer), tying it to a submission.
+    """
+    id = models.BigAutoField(primary_key=True)
+    submission = models.OneToOneField(
+        Submission, on_delete=models.CASCADE, related_name="payout",
+        help_text="One payout per submission (simplest model)."
     )
-    paid_at = models.DateTimeField(blank=True, null=True)
-    note = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="payouts")
+    amount_usdt = models.DecimalField(
+        max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal("0"))]
+    )
+    token_symbol = models.CharField(max_length=16, default="USDT", help_text="What was sent (e.g., USDT, PEPE, BONK)")
+    network = models.CharField(max_length=8, choices=Network.choices)
+    tx_hash = models.CharField(max_length=120, blank=True)
+    paid_at = models.DateTimeField(default=timezone.now)
+    paid_by = models.ForeignKey(
+        getattr(settings, "AUTH_USER_MODEL", "auth.User"),
+        null=True, blank=True, on_delete=models.SET_NULL, related_name="payouts_made"
+    )
+    note = models.CharField(max_length=240, blank=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-paid_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["submission"], name="one_payout_per_submission"),
+        ]
 
-    def __str__(self):
-        return f"Payout #{self.pk} for submission {self.submission_id}"
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Reflect state on submission for fast admin filters
+        if self.submission and (not self.submission.is_paid or self.submission.status != SubmissionStatus.PAID):
+            Submission.objects.filter(pk=self.submission_id).update(
+                is_paid=True, status=SubmissionStatus.PAID
+            )
+
+    def __str__(self) -> str:
+        return f"Payout {self.amount_usdt} {self.token_symbol} for Sub#{self.submission_id}"
 
 
+# ---------- Events / Announcements ----------
 class Event(models.Model):
     class Lang(models.TextChoices):
         EN = "en", "English"
@@ -173,9 +386,9 @@ class Event(models.Model):
         ZH = "zh", "Chinese"
 
     title = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=220)
     summary = models.TextField(blank=True, null=True)
-    body = models.TextField(blank=True, null=True)  # Markdown or HTML—your call
+    body = models.TextField(blank=True, null=True)  # You can store Markdown or HTML
     # Accepts http(s) or data:image/*;base64,... so admins can paste either.
     thumb_src = models.TextField(blank=True, null=True)
 
@@ -190,4 +403,4 @@ class Event(models.Model):
         indexes = [models.Index(fields=["is_published", "lang", "posted_at"])]
 
     def __str__(self):
-        return self.title
+        return f"[{self.lang}] {self.title}"

@@ -1,0 +1,965 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=1280, initial-scale=1">
+        <!-- desktop-first -->
+        <title>{{ meta.title|default:"LinkHash | Web3 SEO Rewards" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'Data-driven backlinks & web3 rewards platform.' }}">
+        <!-- OG/Twitter -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{% static 'img/favicon-32x32.png' %}"
+        >
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="{% static 'img/favicon-16x16.png' %}"
+        >
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+        <!-- Swiper CSS -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.css"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        >
+        <style>
+    /* ======= THEME ======= */
+    :root{
+      --bg:#0a0b0d;
+      --bg-elev:#0f1115;
+      --panel:#11141a;
+      --panel-2:#0e1318;
+      --grid:#0b0f13;
+      --line:#1a212d;
+      --text:#e6f1ee;
+      --muted:#9fb0aa;
+      --green:#16a34a;          /* LinkHash green (Matrix-ish) */
+      --green-2:#23d16a;
+      --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+      --radius:16px;
+      --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+      --shadow-md:0 16px 40px rgba(0,0,0,.45);
+      --noise:transparent url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\
+        <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+        <rect width=\"120\" height=\"120\" filter=\"url(%23n)\" opacity=\".04\"/></svg>') repeat;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text);
+      background:
+        radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+        radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+        linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+      font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+      letter-spacing:.2px;
+      background-attachment: fixed;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{width:1200px; margin:0 auto; padding:0 20px;}
+
+    /* ===== NAV ===== */
+    .nav{
+      position:sticky; top:0; z-index:60;
+      backdrop-filter: blur(10px);
+      background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px;
+      color:#d8ffe7;
+      text-shadow:0 0 18px rgba(35,209,106,.24);
+    }
+    .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+    .nav .links{display:flex; gap:24px; align-items:center;}
+    .nav .links a{color:#cfe7dd; opacity:.9}
+    .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+    .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+    /* ===== HERO (no matrix rain, just glow) ===== */
+    .hero{position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,.06);}
+    .hero::before{
+      content:""; position:absolute; inset:-10%; background:
+        radial-gradient(70rem 40rem at 20% -10%, rgba(22,163,74,.18), transparent 60%),
+        radial-gradient(60rem 40rem at 120% 10%, rgba(22,163,74,.10), transparent 60%);
+      filter: blur(40px); z-index:0; opacity:.6;
+    }
+    .hero .container{height:680px; display:flex; align-items:center; position:relative; z-index:1;}
+    .hero h1{font-size:58px; line-height:1.1; margin:0 0 14px; letter-spacing:0.4px;}
+    .hero p{color:var(--muted); font-size:18px; margin:0 0 28px;}
+    .hero .cta{display:flex; gap:14px;}
+    .hero .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(22,163,74,.14); border:1px solid rgba(35,209,106,.35); color:#aef2c9; font-weight:700; margin-bottom:16px;}
+
+    /* ===== PINNED 3D STAGE ===== */
+    .stage{position:relative; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);}
+    .stage .pin-wrap{height:520vh; position:relative;} /* big scroll area */
+    .stage .sticky{position:sticky; top:0; height:86vh; display:flex; align-items:center; justify-content:center;}
+    #stage3d{width:100%; height:100%; display:block}
+    .stage .panels{position:absolute; inset:0; pointer-events:none;}
+    .stage .panel{
+      position:absolute; left:50%; transform:translateX(-50%);
+      width:820px; padding:18px 22px; text-align:center;
+      background:linear-gradient(180deg, rgba(10,12,16,.8), rgba(12,14,18,.4));
+      border:1px solid rgba(255,255,255,.06); border-radius:16px; box-shadow:var(--shadow-md);
+      opacity:0;
+    }
+    .stage .panel h3{margin:0 0 8px; font-size:28px;}
+    .stage .panel p{margin:0; color:#b4c5bf}
+
+    /* ===== EXPLAINER ===== */
+    .section{padding:88px 0; background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.65)), var(--noise);}
+    .section h2{font-size:36px; margin:0 0 12px;}
+    .section p.lead{color:#9fb0aa; margin:0 0 28px;}
+    .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+    .card{
+      background:linear-gradient(180deg, #0f1419, #0c1116);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:16px; box-shadow:var(--shadow-lg); padding:22px;
+      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .card:hover{transform:translateY(-3px); border-color:rgba(35,209,106,.35); box-shadow:0 40px 80px rgba(22,163,74,.18)}
+    .card h3{margin:0 0 8px;}
+    .card p{margin:0; color:#b9c9c3}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+    .chip{padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px; display:inline-flex; align-items:center; gap:6px;}
+
+    /* ===== PROJECTS (CAROUSEL) ===== */
+    .projects{padding:90px 0 110px; background:radial-gradient(90rem 50rem at -15% 10%, rgba(22,163,74,.10), transparent 60%), linear-gradient(180deg, #0a0d11, #0b0e12);}
+    .projects h2{font-size:34px; margin:0 0 6px;}
+    .projects .sub{color:#9fb0aa; margin:0 0 22px;}
+    .project-card{
+      width:360px; height:460px; display:flex; flex-direction:column; overflow:hidden;
+      background:linear-gradient(180deg, #0d1217, #0b0f14);
+      border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
+    }
+    .project-card .thumb{position:relative; height:190px; background:#0b1117; overflow:hidden;}
+    .project-card .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.92; transform:scale(1.03)}
+    .task-badges{position:absolute; left:12px; bottom:12px; display:flex; gap:8px;}
+    .task-badge{padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(14,18,25,.8); border:1px solid rgba(255,255,255,.08);}
+    .task-badge.visit{color:#a0f2bd; border-color:#2a6f47}
+    .task-badge.link{color:#b2f5ff; border-color:#2a455e}
+    .project-card .body{flex:1; padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px;}
+    .project-card h3{font-size:18px; margin:0}
+    .project-card p{color:#b7c8c1; font-size:14px; margin:0 0 6px}
+    .meta{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
+    .meta .pill{background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:8px;}
+    .progress{height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:6px;}
+    .progress .bar{height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)}
+    .project-card .foot{display:flex; justify-content:flex-end; margin-top:auto;}
+    .project-card .foot .btn{padding:10px 12px;}
+    .swiper{padding:8px}
+    .swiper-slide{width:auto}
+
+    /* Section headings with "View more" link */
+    .section-head{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:8px;}
+    .more-link{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-weight:700; border:1px solid rgba(255,255,255,.08); background:rgba(14,18,25,.6); color:#d9f6e6}
+    .more-link:hover{border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18)}
+
+    /* (desktop only, as requested) */
+    @media (max-width:1140px){ .container{width:1000px} }
+    @media (max-width:1000px){ .container{width:920px} }
+        </style>
+    </head>
+    <body>
+        <!-- ===== NAV ===== -->
+        <header class="nav">
+            <div class="container row">
+                <div class="brand">
+                    <span class="dot"></span>
+                    <span>LinkHash</span>
+                </div>
+                <nav class="links">
+                {% if meta.lang == "ko" %}
+                {% url 'home_ko' as home_url %}
+                {% url 'events_ko' as events_url %}
+                {% url 'rewards_ko' as rewards_url %}
+                {% url 'rewards_apply_ko' as apply_url %}
+                {% else %}
+                {% url 'home_en' as home_url %}
+                {% url 'events_en' as events_url %}
+                {% url 'rewards_en' as rewards_url %}
+                {% url 'rewards_apply_en' as apply_url %}
+                {% endif %}
+
+                <a href="{{ home_url }}"   style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                <a href="{{ events_url }}" >{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                <a href="/leaderboard/" >{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+
+                <!-- NEW: Apply for campaign (locale-aware) -->
+                <a class="btn-outline" href="{{ apply_url }}">
+                {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+                </a>
+
+                {% if wallet_user %}
+                <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+                    {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+                </a>
+                {% else %}
+                <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+                    {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+                </a>
+                {% endif %}
+            </nav>
+            </div>
+        </header>
+        <!-- ===== HERO ===== -->
+        <section class="hero">
+            <div class="container">
+                <div class="content">
+                    <div class="badge">Web3 · SEO · Rewards</div>
+                    <h1>
+                        Boost rankings with
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">transparent, white-hat</span>
+                        campaigns that pay your community.
+                    </h1>
+                    <p>Advertisers fund pools in USDT. Users complete visit & link-share tasks. Everyone sees the numbers.</p>
+                    <div class="cta">
+                        <a class="btn" href="#projects">Explore Campaigns</a>
+                        <a class="btn-outline" href="{{ rewards_url }}">How rewards work</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== PINNED 3D STAGE ===== -->
+        <section id="story" class="stage">
+            <div class="pin-wrap">
+                <div class="sticky">
+                    <canvas id="stage3d"></canvas>
+                    <div class="panels">
+                        <div class="panel" id="p1" style="top:10%">
+                            <h3>1) Client funds a USDT pool</h3>
+                            <p>Choose budget & dates. We open tasks with clear rules (platforms, links allowed, do/don’ts) and publish the live pool size.</p>
+                        </div>
+                        <div class="panel" id="p2" style="top:40%">
+                            <h3>2) Tasks go live & are verified</h3>
+                            <p>
+                                Contributors pick missions:
+                                <b>Visit</b>
+                                (find a code on the page) or
+                                <b>Link-share</b>
+                                (Naver, Instagram, Facebook, etc.). Anti-spam checks + review keep everything white-hat.
+                            </p>
+                        </div>
+                        <div class="panel" id="p3" style="top:70%">
+                            <h3>3) Rewards claimed instantly</h3>
+                            <p>Every approved action pays from the pool in USDT. Progress is public — pool left, participants, claim % — so both sides trust the results.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== EXPLAINERS ===== -->
+        <section id="explain" class="section">
+            <div class="container">
+                <h2>Built for two sides — one transparent system</h2>
+                <p class="lead">Data-driven placements, visible progress, and playful UX so people actually enjoy participating.</p>
+                <div class="cards">
+                    <div class="card">
+                        <h3>For Advertisers</h3>
+                        <p>Launch safe link-building with curated placements, live progress & detailed reports.</p>
+                        <div class="chips">
+                            <span class="chip">White-hat</span>
+                            <span class="chip">Topical fit</span>
+                            <span class="chip">Transparent</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>For Contributors</h3>
+                        <p>Complete visit/link tasks; earn USDT from the pool. Rules are public and easy.</p>
+                        <div class="chips">
+                            <span class="chip">Visit tasks</span>
+                            <span class="chip">Link sharing</span>
+                            <span class="chip">Instant rewards</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Safety by design</h3>
+                        <p>Anti-spam heuristics, manual review where needed, and clear consequences for abuse.</p>
+                        <div class="chips">
+                            <span class="chip">Spam guard</span>
+                            <span class="chip">Appeals</span>
+                            <span class="chip">Reporting</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== PROJECTS: LIVE (2-row Swiper grid) ===== -->
+        <section id="projects" class="projects">
+            <div class="container">
+                <div class="section-head">
+                    <h2>Live Campaigns</h2>
+                    <a class="more-link" href="https://link-hash.com/rewards/">
+                        View more
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+                <p class="sub">Browse tasks like a shop — pick a mission, complete it, claim rewards.</p>
+                <div class="swiper" id="campaign-swiper">
+                    <div class="swiper-wrapper">
+                        {% if projects %}
+            {% for c in projects %}
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{{ c.image_url }}" alt="">
+                                    <div class="task-badges">
+                                        {% if c.has_visit %}
+                                        <span class="task-badge visit">VISIT</span>
+                                        {% endif %}
+                      {% if c.has_link %}
+                                        <span class="task-badge link">LINK</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>{{ c.title }}</h3>
+                                    <p>{{ c.summary }}</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; {{ c.pool_usdt }} USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; {{ c.participants }}
+                                        </div>
+                                    </div>
+                                    <div class="progress" aria-label="claimed progress">
+                                        <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>{{ c.claimed_percent }}% claimed</span>
+                                        <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">{{ c.cta|default:"View details" }}</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {% endfor %}
+          {% else %}
+                        <!-- Live Campaigns (6 examples to fill 2 rows nicely) -->
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{% static 'img/cards/neon-city.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1542751110-97427bbecf20?q=80&w=1200&auto=format&fit=crop'" alt="Neon city hero">
+                                    <div class="task-badges">
+                                        <span class="task-badge visit">VISIT</span>
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>SimpleQuant: Blog launch</h3>
+                                    <p>Read the post, find the hidden code in the article, submit & earn.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 2,000&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 842
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="63"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>63% claimed</span>
+                                        <span>2025-09-01 → 2025-10-31</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{% static 'img/cards/bitcoin-close.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=1200&auto=format&fit=crop'" alt="Bitcoin close up">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Naver review sprint</h3>
+                                    <p>Write a genuine Naver Blog review with dofollow link back.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 5,000&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 412
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="40"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>40% claimed</span>
+                                        <span>2025-10-05 → 2025-11-15</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="{% static 'img/cards/green-office.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop'" alt="Green office">
+                                    <div class="task-badges">
+                                        <span class="task-badge visit">VISIT</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Product page engagement</h3>
+                                    <p>Scroll & interact; find the code at the end of the page.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 1,500&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 230
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="15"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>15% claimed</span>
+                                        <span>2025-10-10 → 2025-12-01</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Analytics dashboard">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                        <span class="task-badge visit">VISIT</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>SEO Suite: Case study tour</h3>
+                                    <p>Visit 3 pages, collect codes, and share a short review post.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 3,200&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 516
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="52"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>52% claimed</span>
+                                        <span>2025-10-01 → 2025-11-30</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.pexels.com/photos/29831433/pexels-photo-29831433.jpeg?cs=srgb&dl=pexels-tugaykocaturk-29831433.jpg&fm=jpg" alt="Crypto wallet">
+                                    <div class="task-badges">
+                                        <span class="task-badge visit">VISIT</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Wallet onboarding quest</h3>
+                                    <p>Create a demo wallet, browse settings, and submit the code from the FAQ.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 1,000&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 190
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="28"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>28% claimed</span>
+                                        <span>2025-11-01 → 2025-12-10</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" alt="Laptop coding">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>DevTools beta feedback</h3>
+                                    <p>Share a thoughtful beta review on your blog with a contextual backlink.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 2,750&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 304
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="71"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>71% claimed</span>
+                                        <span>2025-10-15 → 2025-12-05</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== PAST CAMPAIGNS (2-row Swiper grid) ===== -->
+        <section id="past-projects" class="projects">
+            <div class="container">
+                <div class="section-head">
+                    <h2>Past Campaigns</h2>
+                    <a class="more-link" href="https://link-hash.com/rewards/">
+                        Browse all
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+                <p class="sub">Closed pools with public metrics — see what a good campaign looks like.</p>
+                <div class="swiper" id="past-swiper">
+                    <div class="swiper-wrapper">
+                        <!-- Past examples (6 distinct) -->
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/MobileHCI2008_Audience.jpg" alt="Tech conference">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Creator Tools launch week</h3>
+                                    <p>Publish a how-to article with screenshots and a dofollow resource link.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 3,400&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 528
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="100"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>100% claimed</span>
+                                        <span>2025-08-01 → 2025-09-01</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">See summary</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.pexels.com/photos/374147/pexels-photo-374147.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Desk with plant">
+                                    <div class="task-badges">
+                                        <span class="task-badge visit">VISIT</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Landing page QA hunt</h3>
+                                    <p>Find 3 minor UX issues and submit the on-page code at the footer.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 900&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 167
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="100"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>100% claimed</span>
+                                        <span>2025-07-12 → 2025-08-10</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">See summary</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Team discussion">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                        <span class="task-badge visit">VISIT</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Community spotlight series</h3>
+                                    <p>Interview a power user, publish highlights, and verify the unique code.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 1,800&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 294
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="100"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>100% claimed</span>
+                                        <span>2025-06-05 → 2025-07-05</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">See summary</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop" alt="Hackathon group">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Hackathon wrap-up posts</h3>
+                                    <p>Publish your team’s recap with links to demo and docs.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 2,200&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 351
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="100"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>100% claimed</span>
+                                        <span>2025-05-10 → 2025-06-10</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">See summary</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=1200&auto=format&fit=crop" alt="Analytics screen">
+                                    <div class="task-badges">
+                                        <span class="task-badge visit">VISIT</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Docs deep-dive quest</h3>
+                                    <p>Walk through 5 docs pages and submit the breadcrumb code.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 1,200&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 205
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="100"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>100% claimed</span>
+                                        <span>2025-04-15 → 2025-05-20</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">See summary</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="swiper-slide">
+                            <article class="project-card">
+                                <div class="thumb">
+                                    <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=1200&auto=format&fit=crop" alt="Notebook planning">
+                                    <div class="task-badges">
+                                        <span class="task-badge link">LINK</span>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <h3>Feature spotlight blogs</h3>
+                                    <p>Publish a feature teardown with a contextual dofollow citation.</p>
+                                    <div class="meta">
+                                        <div class="pill">
+                                            <strong>Pool</strong>
+                                            &nbsp; 1,950&nbsp;USDT
+                                        </div>
+                                        <div class="pill">
+                                            <strong>People</strong>
+                                            &nbsp; 277
+                                        </div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" data-pct="100"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                        <span>100% claimed</span>
+                                        <span>2025-03-01 → 2025-04-01</span>
+                                    </div>
+                                    <div class="foot">
+                                        <a class="btn" href="/rewards/">See summary</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    ©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+            </div>
+        </footer>
+        <!-- ===== LIBS ===== -->
+        <!-- THREE as ESM -->
+        <script type="module">
+          // ---- ESM imports (no global <script> tags required) ----
+          import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.module.js';
+          import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+          import ScrollTrigger from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger.js';
+          import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs';
+          import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
+          // If your network blocks jsDelivr, swap the previous line for:
+          // import Lenis from 'https://unpkg.com/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
+
+          console.log('Module loaded:', { THREE: !!THREE, gsap: !!gsap, ScrollTrigger: !!ScrollTrigger, Swiper: !!Swiper, Lenis: !!Lenis });
+          gsap.registerPlugin(ScrollTrigger);
+
+          // ---- Lenis (SMOOTH SCROLL) correctly wired with ScrollTrigger ----
+          const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.45, smoothWheel: true, normalizeWheel: true });
+          lenis.on('scroll', () => ScrollTrigger.update());
+          function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+          requestAnimationFrame(raf);
+          gsap.ticker.add(() => ScrollTrigger.update()); // extra nudge
+
+          // ---- THREE scene ----
+          const canvas = document.getElementById('stage3d');
+          // TEMP debug: see the pinned area
+          canvas.style.background = 'rgba(35,209,106,.05)';
+
+          const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+
+          const scene = new THREE.Scene();
+          scene.fog = new THREE.Fog(0x0a0c10, 8, 18);
+
+          const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+          camera.position.set(0, 0.5, 6);
+
+          function size(){
+            const h = Math.floor(window.innerHeight*0.86);
+            renderer.setSize(window.innerWidth, h);
+            renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+            camera.aspect = window.innerWidth / h;
+            camera.updateProjectionMatrix();
+          }
+          size(); window.addEventListener('resize', size);
+
+          const light1 = new THREE.DirectionalLight(0x3bf27c, .8); light1.position.set(3,3,4);
+          const light2 = new THREE.DirectionalLight(0x1a9f4d, .6); light2.position.set(-4,2,-2);
+          const amb = new THREE.AmbientLight(0x22303a, .5);
+          scene.add(light1, light2, amb);
+
+          const group = new THREE.Group(); scene.add(group);
+
+          // Coin body
+          const bodyGeo = new THREE.CylinderGeometry(1.1, 1.1, 0.2, 96, 1, false);
+          const matSide = new THREE.MeshStandardMaterial({ color:0x18231c, metalness:.9, roughness:.25 });
+          const matFace = new THREE.MeshStandardMaterial({ color:0x0f1712, metalness:.9, roughness:.2 });
+          const coin = new THREE.Mesh(bodyGeo, [matSide, matFace, matFace]);
+          coin.rotation.x = Math.PI/2;
+          group.add(coin);
+
+          // Emblem ring + USDT-like “T” (procedural, no trademark asset)
+          const ring = new THREE.RingGeometry(0.4, 0.9, 96);
+          const ringMat = new THREE.MeshStandardMaterial({ color:0xc6ffd8, metalness:.2, roughness:.6, emissive:0x124d2c, emissiveIntensity:.35 });
+          const ringMesh = new THREE.Mesh(ring, ringMat); ringMesh.position.z = 0.105; group.add(ringMesh);
+
+          const emMat = new THREE.MeshStandardMaterial({ color:0x19b357, metalness:.85, roughness:.25, emissive:0x0a3f22, emissiveIntensity:.25 });
+          const barH = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.18, 0.03), emMat);
+          const barV = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.60, 0.03), emMat);
+          barH.position.z = 0.1055; barV.position.z = 0.106; barV.position.y = -0.02;
+          group.add(new THREE.Group().add(barH, barV));
+
+          // Stars
+          const stars = new THREE.Points(
+            new THREE.BufferGeometry().setAttribute('position',
+              new THREE.Float32BufferAttribute(Array.from({length:6000}, ()=> (Math.random()-0.5)*40), 3)),
+            new THREE.PointsMaterial({ color:0x1e2a36, size:0.02 })
+          );
+          scene.add(stars);
+
+          // Render loop
+          const clock = new THREE.Clock();
+          function render(){
+            const t = clock.getElapsedTime();
+            group.rotation.y += 0.004;
+            group.position.y = Math.sin(t*0.6)*0.12;
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+          }
+          render();
+
+          // ---- ScrollTrigger pin + anims ----
+          ScrollTrigger.create({
+            trigger: document.querySelector('.stage .pin-wrap'),
+            start: "top top",
+            end: "bottom bottom",
+            pin: ".stage .sticky",
+            scrub: true
+          });
+
+          gsap.to(camera.position, {
+            z: 3.3, x: 0.8, y: 0.4,
+            scrollTrigger: { trigger: ".stage .pin-wrap", start: "top top", end: "80% top", scrub: true }
+          });
+
+          gsap.to(group.rotation, {
+            y: Math.PI * 2,
+            scrollTrigger: { trigger: ".stage .pin-wrap", start: "20% top", end: "85% top", scrub: true }
+          });
+
+          ["#p1","#p2","#p3"].forEach((sel, i)=>{
+            gsap.to(sel, { opacity: 1, y: 0,
+              scrollTrigger:{ trigger: ".stage .pin-wrap", start: `${10 + i*25}% top`, end: `${23 + i*25}% top`, scrub: true }});
+            gsap.to(sel, { opacity: 0,
+              scrollTrigger:{ trigger: ".stage .pin-wrap", start: `${20 + i*25}% top`, end: `${32 + i*25}% top`, scrub: true }});
+          });
+
+          // ---- Swiper (ESM) : 2-row grids ----
+          const liveSwiper = new Swiper('#campaign-swiper', {
+            spaceBetween: 18,
+            grid: { rows: 2, fill: 'row' },
+            slidesPerView: 3,
+            mousewheel: true,
+            grabCursor: true,
+            breakpoints: {
+              0:   { slidesPerView: 1 },
+              900: { slidesPerView: 2 },
+              1200:{ slidesPerView: 3 }
+            }
+          });
+
+          const pastSwiper = new Swiper('#past-swiper', {
+            spaceBetween: 18,
+            grid: { rows: 2, fill: 'row' },
+            slidesPerView: 3,
+            mousewheel: true,
+            grabCursor: true,
+            breakpoints: {
+              0:   { slidesPerView: 1 },
+              900: { slidesPerView: 2 },
+              1200:{ slidesPerView: 3 }
+            }
+          });
+
+          // Progress bars
+          document.querySelectorAll('.progress .bar').forEach(b=>{
+            const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
+            b.style.width = "0%";
+            gsap.to(b, { width: target, duration: 1.2, ease: "power2.out",
+              scrollTrigger: { trigger: b, start: "top 90%" }});
+          });
+        </script>
+    </body>
+</html>

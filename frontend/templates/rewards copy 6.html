@@ -1,0 +1,932 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1280, initial-scale=1">
+    <title>{{ meta.title|default:"LinkHash | Rewards" }}</title>
+    <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="LinkHash">
+    <meta name="description" content="{{ meta.description|default:'Earn USDT for white-hat contributions.' }}">
+    <!-- OG/Twitter -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LinkHash">
+    <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+    <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+    <meta property="og:url" content="{{ meta.url }}">
+    <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+    <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+    <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+    <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+
+    <style>
+      /* ======= THEME (match home.html) ======= */
+      :root{
+        --bg:#0a0b0d;
+        --bg-elev:#0f1115;
+        --panel:#11141a;
+        --panel-2:#0e1318;
+        --grid:#0b0f13;
+        --line:#1a212d;
+        --text:#e6f1ee;
+        --muted:#9fb0aa;
+        --green:#16a34a;
+        --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px;
+        --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 16px 40px rgba(0,0,0,.45);
+        --noise:transparent url('data:image/svg+xml;utf8,\
+          <svg xmlns="http://www.w3.org/2000/svg" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\
+          <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+          <rect width=\"120\" height=\"120\" filter=\"url(%23n)\" opacity=\".04\"/></svg>') repeat;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", Arial, sans-serif;
+        letter-spacing:.2px;
+        background-attachment: fixed;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:1200px; margin:0 auto; padding:0 20px;}
+
+      /* ===== NAV (same as home) ===== */
+      .nav{
+        position:sticky; top:0; z-index:60;
+        backdrop-filter: blur(10px);
+        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+      .brand{
+        display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px;
+        color:#d8ffe7;
+        text-shadow:0 0 18px rgba(35,209,106,.24);
+      }
+      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+      .nav .links{display:flex; gap:24px; align-items:center;}
+      .nav .links a{color:#cfe7dd; opacity:.9}
+      .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+      /* ===== PAGE HEADER ===== */
+      .page-head{
+        padding:50px 0 10px;
+        background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)), var(--noise);
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .page-head h1{margin:0 0 10px; font-size:36px; letter-spacing:.3px;}
+      .page-head .sub{color:var(--muted); margin:0}
+
+      /* ===== TABS & FILTERS ===== */
+      .controls{
+        display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 0 22px;
+      }
+      .tabs{display:flex; gap:12px;}
+      .tab{
+        padding:14px 20px; border-radius:999px; border:1px solid #2a333f;
+        background:linear-gradient(180deg, rgba(14,18,25,.85), rgba(14,18,25,.55));
+        color:#cfe7dd; font-weight:800; cursor:pointer; letter-spacing:.3px; font-size:15px;
+        transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      }
+      .tab:hover{ transform:translateY(-2px); border-color:rgba(35,209,106,.35); box-shadow:0 14px 30px rgba(22,163,74,.18) }
+      .tab.active{
+        border-color:#2fe07a; color:#05160c; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:var(--glow);
+        transform:translateY(-1px);
+      }
+
+      /* Custom dropdown */
+      .filters{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+      .dropdown{position:relative;}
+      .dropdown-toggle{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:12px 16px; border-radius:12px; border:1px solid #2a333f;
+        background:#0b1117; color:#d9f6e6; font-weight:700; cursor:pointer;
+        transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+      }
+      .dropdown-toggle:hover{ border-color:rgba(35,209,106,.35); box-shadow:0 10px 22px rgba(22,163,74,.15) }
+      .dropdown-toggle .caret{ font-size:12px; opacity:.8 }
+      .dropdown-menu{
+        position:absolute; top:110%; left:0; min-width:240px; padding:8px;
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.08); border-radius:14px; box-shadow:var(--shadow-md);
+        display:none; z-index:20;
+      }
+      .dropdown.open .dropdown-menu{ display:block; }
+      .dropdown-menu [role="option"]{
+        padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:600; color:#cfe7dd;
+      }
+      .dropdown-menu [role="option"]:hover{
+        background:rgba(22,163,74,.12); color:#eafff4;
+      }
+      .dropdown-menu [aria-selected="true"]{
+        background:rgba(22,163,74,.18); color:#eafff4; border:1px solid rgba(35,209,106,.35);
+      }
+
+      /* ===== GRID & CARDS ===== */
+      .grid{
+        display:grid; grid-template-columns:repeat(3, 1fr); gap:18px;
+      }
+      .project-card{
+        position:relative; width:100%; height:460px; display:flex; flex-direction:column; overflow:hidden;
+        background:linear-gradient(180deg, #0d1217, #0b0f14);
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
+        opacity:0; transform:translateY(8px); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      }
+      /* radiant hover */
+      .project-card::after{
+        content:""; position:absolute; inset:-20%; pointer-events:none; opacity:0;
+        background:radial-gradient(60% 60% at 50% 10%, rgba(35,209,106,.14), transparent 60%);
+        transition:opacity .2s ease;
+      }
+      .project-card:hover{
+        transform:translateY(-3px) scale(1.02);
+        border-color:rgba(35,209,106,.35);
+        box-shadow:0 40px 80px rgba(22,163,74,.18), var(--shadow-md);
+      }
+      .project-card:hover::after{ opacity:1; }
+
+      .project-card .thumb{position:relative; height:190px; background:#0b1117; overflow:hidden;}
+      .project-card .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.92; transform:scale(1.03)}
+      .task-badges{position:absolute; left:12px; bottom:12px; display:flex; gap:8px;}
+      .task-badge{padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(14,18,25,.8); border:1px solid rgba(255,255,255,.08);}
+      .task-badge.visit{color:#a0f2bd; border-color:#2a6f47}
+      .task-badge.link{color:#b2f5ff; border-color:#2a455e}
+      .project-card .body{flex:1; padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px;}
+      .project-card h3{font-size:18px; margin:0}
+      .project-card p{color:#b7c8c1; font-size:14px; margin:0 0 6px}
+      .meta{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
+      .meta .pill{background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:8px;}
+      .progress{height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:6px;}
+      .progress .bar{height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)}
+      .project-card .foot{display:flex; justify-content:flex-end; margin-top:auto;}
+      .project-card .foot .btn{padding:10px 12px;}
+
+      /* show/hide by tab */
+      .panel{display:none;}
+      .panel.active{display:block;}
+
+      /* ===== Language dropdown (nav) ===== */
+    .lang{ position:relative; margin-left:8px; }
+    .lang-btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:10px 12px; font-weight:700; border-radius:12px;
+    border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6;
+    cursor:pointer;
+    }
+    .lang-btn:hover{ border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18) }
+    .lang .chev{ opacity:.8 }
+
+    .lang-menu{
+    position:absolute; top:110%; right:0; width:210px;
+    background:linear-gradient(180deg, #0f1419, #0c1116);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45);
+    padding:6px; display:none; z-index:70;
+    }
+    .lang.open .lang-menu{ display:block; animation:menuIn .14s ease-out }
+    @keyframes menuIn{ from{ transform:translateY(-6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+
+    .lang-item{
+    display:flex; align-items:center; gap:10px; padding:10px 10px; border-radius:10px;
+    cursor:pointer; color:#cfe7dd; font-weight:700;
+    }
+    .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
+
+    .flag-emoji{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:18px; height:18px; line-height:18px;
+    font-size:14px; border-radius:3px;
+    background:rgba(255,255,255,.06);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+    /* keep existing .links row spacing happy */
+    .links{ display:flex; gap:24px; align-items:center; }
+
+
+      /* footer */
+      .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; margin-top:60px;}
+
+      /* responsive (desktop-first per your setup) */
+      @media (max-width:1140px){ .container{width:1000px} }
+      @media (max-width:1000px){ .container{width:920px} .grid{grid-template-columns:repeat(2,1fr)} }
+      @media (max-width:680px){ .grid{grid-template-columns:1fr} .tab{padding:12px 16px} }
+    </style>
+  </head>
+  <body>
+
+    <!-- REPLACE your entire <header class="nav">...</header> with this -->
+    <header class="nav">
+    <div class="container row">
+        <div class="brand">
+        <span class="dot"></span>
+        <span>LinkHash</span>
+        </div>
+        <nav class="links">
+        <!-- Home -->
+        <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+            {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
+        </a>
+
+        <!-- Rewards (current page) -->
+        <a href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}"
+            style="font-weight:700;color:#d8ffe7">
+            {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
+        </a>
+
+        <!-- Events -->
+        <a href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
+            {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
+        </a>
+
+        <!-- Leaderboard -->
+        <a href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
+            {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}ランキング{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+        </a>
+
+        <!-- Apply for campaign -->
+        <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
+            {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
+        </a>
+
+        {% if wallet_user %}
+            <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+            <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+            {% if meta.lang == 'ko' %}대시보드{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Dashboard{% endif %}
+            </a>
+        {% else %}
+            <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+            {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
+            </a>
+        {% endif %}
+        <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+            <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span class="flag-emoji" aria-hidden="true"></span>
+                <span class="label">
+                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+                </span>
+                <svg class="chev" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+                <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
+                <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
+                <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
+                <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
+                <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
+            </ul>
+            </div>
+        </nav>
+    </div>
+    </header>
+
+
+    <!-- ===== PAGE HEADER ===== -->
+    <section class="page-head">
+      <div class="container">
+        <h1>
+          {% if meta.lang == 'ko' %}리워드 캠페인{% elif meta.lang == 'ja' %}リワードキャンペーン{% elif meta.lang == 'zh' %}奖励活动{% else %}Reward Campaigns{% endif %}
+        </h1>
+        <p class="sub">
+          {% if meta.lang == 'ko' %}
+            화이트햇 활동으로 USDT를 적립하세요. 실시간 진행률과 투명한 규칙.
+          {% elif meta.lang == 'ja' %}
+            ホワイトハット活動でUSDTを獲得。進捗はリアルタイム、ルールは透明。
+          {% elif meta.lang == 'zh' %}
+            通过白帽贡献赚取USDT。实时进度，规则透明。
+          {% else %}
+            Earn USDT for white-hat contributions. Live progress and transparent rules.
+          {% endif %}
+        </p>
+
+        <!-- Tabs + Custom Dropdown Filters -->
+        <div class="controls">
+          <div class="tabs" role="tablist" aria-label="Campaign tabs">
+            <button class="tab active" data-target="#live" role="tab" aria-selected="true" id="tab-live">
+              {% if meta.lang == 'ko' %}진행중{% elif meta.lang == 'ja' %}進行中{% elif meta.lang == 'zh' %}进行中{% else %}Live{% endif %}
+            </button>
+            <button class="tab" data-target="#past" role="tab" aria-selected="false" id="tab-past">
+              {% if meta.lang == 'ko' %}종료됨{% elif meta.lang == 'ja' %}終了{% elif meta.lang == 'zh' %}已结束{% else %}Past{% endif %}
+            </button>
+          </div>
+
+          <div class="filters">
+            <!-- Custom dropdown -->
+            <div class="dropdown" id="sortDropdown" data-value="ending">
+              <button class="dropdown-toggle" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span class="dropdown-label">
+                  {% if meta.lang == 'ko' %}마감 임박{% elif meta.lang == 'ja' %}まもなく終了{% elif meta.lang == 'zh' %}即将结束{% else %}Ending soon{% endif %}
+                </span>
+                <span class="caret">▾</span>
+              </button>
+              <ul class="dropdown-menu" role="listbox" aria-labelledby="sortDropdown">
+                <li role="option" data-value="ending" aria-selected="true">
+                  {% if meta.lang == 'ko' %}마감 임박{% elif meta.lang == 'ja' %}まもなく終了{% elif meta.lang == 'zh' %}即将结束{% else %}Ending soon{% endif %}
+                </li>
+                <li role="option" data-value="new">
+                  {% if meta.lang == 'ko' %}최신 시작{% elif meta.lang == 'ja' %}新着{% elif meta.lang == 'zh' %}最新上线{% else %}Newly launched{% endif %}
+                </li>
+                <li role="option" data-value="payout">
+                  {% if meta.lang == 'ko' %}개별 보상 큼{% elif meta.lang == 'ja' %}最大報酬{% elif meta.lang == 'zh' %}单次奖励最高{% else %}Biggest payout{% endif %}
+                </li>
+                <li role="option" data-value="pool">
+                  {% if meta.lang == 'ko' %}리워드 풀 큼{% elif meta.lang == 'ja' %}最大プール{% elif meta.lang == 'zh' %}奖励池最大{% else %}Largest pool{% endif %}
+                </li>
+                <li role="option" data-value="popular">
+                  {% if meta.lang == 'ko' %}인기 캠페인{% elif meta.lang == 'ja' %}人気順{% elif meta.lang == 'zh' %}最受欢迎{% else %}Most popular{% endif %}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PANELS ===== -->
+    <main class="container" style="padding:24px 0 0">
+      <!-- LIVE -->
+      <section id="live" class="panel active" aria-labelledby="tab-live">
+        <div class="grid" id="liveGrid">
+          {% if projects %}
+            {% for c in projects %}
+              <article
+                class="project-card"
+                data-start="{{ c.start|date:'Y-m-d' }}"
+                data-end="{{ c.end|date:'Y-m-d' }}"
+                data-pool="{{ c.pool_usdt|default:0 }}"
+                data-payout="{{ c.payout_usdt|default:0 }}"
+                data-pop="{{ c.participants|default:0 }}"
+              >
+                <div class="thumb">
+                  <img src="{{ c.image_url }}" alt="">
+                  <div class="task-badges">
+                    {% if c.has_visit %}<span class="task-badge visit">VISIT</span>{% endif %}
+                    {% if c.has_link %}<span class="task-badge link">LINK</span>{% endif %}
+                  </div>
+                </div>
+                <div class="body">
+                  <h3>{{ c.title }}</h3>
+                  <p>{{ c.summary }}</p>
+                  <div class="meta">
+                    <div class="pill">
+                      <strong>
+                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
+                      </strong>&nbsp; {{ c.pool_usdt }} USDT
+                    </div>
+                    <div class="pill">
+                      <strong>
+                        {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
+                      </strong>&nbsp; {{ c.participants }}
+                    </div>
+                  </div>
+                  <div class="progress">
+                    <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}"></div>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                    <span>{{ c.claimed_percent }}% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                    <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
+                  </div>
+                  <div class="foot">
+                    <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/" aria-label="View details for {{ c.title }}">
+                      {% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}
+                    </a>
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          {% else %}
+            <!-- Sample LIVE cards -->
+            <article class="project-card" data-start="2025-10-01" data-end="2025-11-30" data-pool="3200" data-payout="6" data-pop="516">
+              <div class="thumb">
+                <img src="https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Analytics dashboard">
+                <div class="task-badges">
+                  <span class="task-badge visit">VISIT</span>
+                  <span class="task-badge link">LINK</span>
+                </div>
+              </div>
+              <div class="body">
+                <h3>SEO Suite: Case study tour</h3>
+                <p>
+                  {% if meta.lang == 'ko' %}3개 페이지를 방문해 코드를 수집하고, 짧은 리뷰를 게시하세요.{% elif meta.lang == 'ja' %}3ページを訪問してコードを集め、短いレビューを投稿。{% elif meta.lang == 'zh' %}访问3个页面收集代码，然后发布简短评测。{% else %}Visit 3 pages, collect codes, then post a short review with insights.{% endif %}
+                </p>
+                <div class="meta">
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 3,200 USDT</div>
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 516</div>
+                </div>
+                <div class="progress"><div class="bar" data-pct="52"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                  <span>52% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                  <span>2025-10-01 → 2025-11-30</span>
+                </div>
+                <div class="foot">
+                  <a class="btn" href="/rewards/seo-suite-case-study-tour-1/">
+                    {% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card" data-start="2025-11-01" data-end="2025-12-10" data-pool="1000" data-payout="2" data-pop="190">
+              <div class="thumb">
+                <img src="https://images.pexels.com/photos/29831433/pexels-photo-29831433.jpeg?cs=srgb&dl=pexels-tugaykocaturk-29831433.jpg&fm=jpg" alt="Crypto wallet on phone">
+                <div class="task-badges"><span class="task-badge visit">VISIT</span></div>
+              </div>
+              <div class="body">
+                <h3>Wallet onboarding quest</h3>
+                <p>{% if meta.lang == 'ko' %}데모 지갑 생성 후 FAQ의 숨은 코드를 제출하세요.{% elif meta.lang == 'ja' %}デモウォレットを作成し、FAQの隠しコードを送信。{% elif meta.lang == 'zh' %}创建演示钱包，提交FAQ中的隐藏代码。{% else %}Create a demo wallet, browse settings, submit the hidden FAQ code.{% endif %}</p>
+                <div class="meta">
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 1,000 USDT</div>
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 190</div>
+                </div>
+                <div class="progress"><div class="bar" data-pct="28"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                  <span>28% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                  <span>2025-11-01 → 2025-12-10</span>
+                </div>
+                <div class="foot">
+                  <a class="btn" href="/rewards/wallet-onboarding-quest-2/">{% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card" data-start="2025-10-05" data-end="2025-11-15" data-pool="5000" data-payout="15" data-pop="412">
+              <div class="thumb">
+                <img src="{% static 'img/cards/bitcoin-close.jpg' %}" alt="Bitcoin close up">
+                <div class="task-badges"><span class="task-badge link">LINK</span></div>
+              </div>
+              <div class="body">
+                <h3>Naver review sprint</h3>
+                <p>{% if meta.lang == 'ko' %}진정성 있는 네이버 블로그 리뷰와 컨텍스트 도팔로우 링크 작성.{% elif meta.lang == 'ja' %}誠実なNaverブログレビューと文脈に合うdofollowリンクを掲載。{% elif meta.lang == 'zh' %}撰写真实的Naver博客评测并添加上下文相关的dofollow链接。{% else %}Write a genuine Naver Blog review with a contextual dofollow link.{% endif %}</p>
+                <div class="meta">
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 5,000 USDT</div>
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 412</div>
+                </div>
+                <div class="progress"><div class="bar" data-pct="40"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                  <span>40% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                  <span>2025-10-05 → 2025-11-15</span>
+                </div>
+                <div class="foot">
+                  <a class="btn" href="/rewards/naver-review-sprint-3/">{% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card" data-start="2025-10-10" data-end="2025-12-01" data-pool="1500" data-payout="3" data-pop="230">
+              <div class="thumb">
+                <img src="{% static 'img/cards/green-office.jpg' %}" alt="Green office desk">
+                <div class="task-badges"><span class="task-badge visit">VISIT</span></div>
+              </div>
+              <div class="body">
+                <h3>Product page engagement</h3>
+                <p>{% if meta.lang == 'ko' %}스크롤·상호작용 후 하단의 검증 코드를 찾으세요.{% elif meta.lang == 'ja' %}スクロールして操作し、下部の検証コードを見つけてください。{% elif meta.lang == 'zh' %}滚动并交互，在底部找到验证代码。{% else %}Scroll & interact; find the verification code at the bottom.{% endif %}</p>
+                <div class="meta">
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 1,500 USDT</div>
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 230</div>
+                </div>
+                <div class="progress"><div class="bar" data-pct="15"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                  <span>15% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                  <span>2025-10-10 → 2025-12-01</span>
+                </div>
+                <div class="foot">
+                  <a class="btn" href="/rewards/product-page-engagement-4/">{% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card" data-start="2025-10-15" data-end="2025-12-05" data-pool="2750" data-payout="8" data-pop="304">
+              <div class="thumb">
+                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" alt="Laptop coding">
+                <div class="task-badges"><span class="task-badge link">LINK</span></div>
+              </div>
+              <div class="body">
+                <h3>DevTools beta feedback</h3>
+                <p>{% if meta.lang == 'ko' %}심도 있는 베타 리뷰를 블로그에 게시하고 인용 링크를 추가하세요.{% elif meta.lang == 'ja' %}丁寧なベータレビューをブログに掲載し、引用リンクを付与。{% elif meta.lang == 'zh' %}发布有深度的测试版评测，并添加引用链接。{% else %}Publish a thoughtful beta review on your blog with a citation link.{% endif %}</p>
+                <div class="meta">
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 2,750 USDT</div>
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 304</div>
+                </div>
+                <div class="progress"><div class="bar" data-pct="71"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                  <span>71% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                  <span>2025-10-15 → 2025-12-05</span>
+                </div>
+                <div class="foot">
+                  <a class="btn" href="/rewards/devtools-beta-feedback-5/">{% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card" data-start="2025-09-01" data-end="2025-10-31" data-pool="2000" data-payout="4" data-pop="842">
+              <div class="thumb">
+                <img src="{% static 'img/cards/neon-city.jpg' %}" alt="Neon city hero">
+                <div class="task-badges">
+                  <span class="task-badge visit">VISIT</span>
+                  <span class="task-badge link">LINK</span>
+                </div>
+              </div>
+              <div class="body">
+                <h3>SimpleQuant: Blog launch</h3>
+                <p>{% if meta.lang == 'ko' %}게시물을 읽고 숨은 코드를 찾아 제출하세요.{% elif meta.lang == 'ja' %}記事を読んで隠しコードを見つけ、提出。{% elif meta.lang == 'zh' %}阅读文章并找到隐藏代码后提交。{% else %}Read the post, find the hidden code, submit & earn.{% endif %}</p>
+                <div class="meta">
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 2,000 USDT</div>
+                  <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 842</div>
+                </div>
+                <div class="progress"><div class="bar" data-pct="63"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                  <span>63% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                  <span>2025-09-01 → 2025-10-31</span>
+                </div>
+                <div class="foot">
+                  <a class="btn" href="/rewards/simplequant-blog-launch-6/">{% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}</a>
+                </div>
+              </div>
+            </article>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- PAST -->
+      <section id="past" class="panel" aria-labelledby="tab-past">
+        <div class="grid" id="pastGrid">
+          <!-- Sample PAST cards -->
+          <article class="project-card" data-start="2025-08-01" data-end="2025-09-01" data-pool="3400" data-payout="10" data-pop="528">
+            <div class="thumb">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/MobileHCI2008_Audience.jpg" alt="Tech conference">
+              <div class="task-badges"><span class="task-badge link">LINK</span></div>
+            </div>
+            <div class="body">
+              <h3>Creator Tools launch week</h3>
+              <p>{% if meta.lang == 'ko' %}스크린샷과 인용 링크를 포함한 사용법 글을 게시하세요.{% elif meta.lang == 'ja' %}スクリーンショットと引用リンク付きのハウツー記事を公開。{% elif meta.lang == 'zh' %}发布带截图和引用链接的教程文章。{% else %}Publish a how-to article with screenshots and a dofollow citation.{% endif %}</p>
+              <div class="meta">
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 3,400 USDT</div>
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 528</div>
+              </div>
+              <div class="progress"><div class="bar" data-pct="100"></div></div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                <span>2025-08-01 → 2025-09-01</span>
+              </div>
+              <div class="foot">
+                <a class="btn" href="/rewards/creator-tools-launch-week-101/">{% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-start="2025-07-12" data-end="2025-08-10" data-pool="900" data-payout="1" data-pop="167">
+            <div class="thumb">
+              <img src="https://images.pexels.com/photos/374147/pexels-photo-374147.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Desk with plant">
+              <div class="task-badges"><span class="task-badge visit">VISIT</span></div>
+            </div>
+            <div class="body">
+              <h3>Landing page QA hunt</h3>
+              <p>{% if meta.lang == 'ko' %}UX 이슈 3가지를 찾아 제출하고 푸터 코드 제출.{% elif meta.lang == 'ja' %}UXの軽微な問題を3つ見つけ、フッターコードを提出。{% elif meta.lang == 'zh' %}找到3个小的UX问题并提交，同时提交底部代码。{% else %}Find 3 minor UX issues and submit the footer code.{% endif %}</p>
+              <div class="meta">
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 900 USDT</div>
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 167</div>
+              </div>
+              <div class="progress"><div class="bar" data-pct="100"></div></div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                <span>2025-07-12 → 2025-08-10</span>
+              </div>
+              <div class="foot">
+                <a class="btn" href="/rewards/landing-page-qa-hunt-102/">{% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-start="2025-06-05" data-end="2025-07-05" data-pool="1800" data-payout="3" data-pop="294">
+            <div class="thumb">
+              <img src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&h=800" alt="Team discussion">
+              <div class="task-badges">
+                <span class="task-badge link">LINK</span>
+                <span class="task-badge visit">VISIT</span>
+              </div>
+            </div>
+            <div class="body">
+              <h3>Community spotlight series</h3>
+              <p>{% if meta.lang == 'ko' %}파워 유저 인터뷰를 게시하고 고유 코드를 검증하세요.{% elif meta.lang == 'ja' %}パワーユーザーのインタビュー記事を公開し、固有コードを検証。{% elif meta.lang == 'zh' %}发布资深用户采访并验证唯一代码。{% else %}Interview a power user, publish highlights, verify unique code.{% endif %}</p>
+              <div class="meta">
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 1,800 USDT</div>
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 294</div>
+              </div>
+              <div class="progress"><div class="bar" data-pct="100"></div></div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                <span>2025-06-05 → 2025-07-05</span>
+              </div>
+              <div class="foot">
+                <a class="btn" href="/rewards/community-spotlight-series-103/">{% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-start="2025-05-10" data-end="2025-06-10" data-pool="2200" data-payout="5" data-pop="351">
+            <div class="thumb">
+              <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop" alt="Hackathon group">
+              <div class="task-badges"><span class="task-badge link">LINK</span></div>
+            </div>
+            <div class="body">
+              <h3>Hackathon wrap-up posts</h3>
+              <p>{% if meta.lang == 'ko' %}팀 회고를 게시하고 데모/문서 링크를 포함하세요.{% elif meta.lang == 'ja' %}チームの振り返り記事を公開し、デモとドキュメントのリンクを掲載。{% elif meta.lang == 'zh' %}发布团队复盘，附上演示和文档链接。{% else %}Publish your team’s recap with links to demo and docs.{% endif %}</p>
+              <div class="meta">
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 2,200 USDT</div>
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 351</div>
+              </div>
+              <div class="progress"><div class="bar" data-pct="100"></div></div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                <span>2025-05-10 → 2025-06-10</span>
+              </div>
+              <div class="foot">
+                <a class="btn" href="/rewards/hackathon-wrap-up-posts-104/">{% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-start="2025-04-15" data-end="2025-05-20" data-pool="1200" data-payout="2" data-pop="205">
+            <div class="thumb">
+              <img src="https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=1200&auto=format&fit=crop" alt="Analytics screen">
+              <div class="task-badges"><span class="task-badge visit">VISIT</span></div>
+            </div>
+            <div class="body">
+              <h3>Docs deep-dive quest</h3>
+              <p>{% if meta.lang == 'ko' %}문서 5페이지를 탐색하고 브레드크럼 코드를 제출하세요.{% elif meta.lang == 'ja' %}ドキュメント5ページを巡り、パンくずコードを提出。{% elif meta.lang == 'zh' %}浏览5个文档页面并提交面包屑代码。{% else %}Walk through 5 docs pages and submit the breadcrumb code.{% endif %}</p>
+              <div class="meta">
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 1,200 USDT</div>
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 205</div>
+              </div>
+              <div class="progress"><div class="bar" data-pct="100"></div></div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                <span>2025-04-15 → 2025-05-20</span>
+              </div>
+              <div class="foot">
+                <a class="btn" href="/rewards/docs-deep-dive-quest-105/">{% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-start="2025-03-01" data-end="2025-04-01" data-pool="1950" data-payout="4" data-pop="277">
+            <div class="thumb">
+              <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=1200&auto=format&fit=crop" alt="Notebook planning">
+              <div class="task-badges"><span class="task-badge link">LINK</span></div>
+            </div>
+            <div class="body">
+              <h3>Feature spotlight blogs</h3>
+              <p>{% if meta.lang == 'ko' %}기능 분석 글을 게시하고 컨텍스트 도팔로우 링크를 추가하세요.{% elif meta.lang == 'ja' %}機能の分解記事を公開し、文脈に合うdofollowリンクを付与。{% elif meta.lang == 'zh' %}发布功能解析并添加上下文相关的dofollow链接。{% else %}Publish a feature teardown with a contextual dofollow citation.{% endif %}</p>
+              <div class="meta">
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>&nbsp; 1,950 USDT</div>
+                <div class="pill"><strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}</strong>&nbsp; 277</div>
+              </div>
+              <div class="progress"><div class="bar" data-pct="100"></div></div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                <span>2025-03-01 → 2025-04-01</span>
+              </div>
+              <div class="foot">
+                <a class="btn" href="/rewards/feature-spotlight-blogs-106/">{% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+        <div>© <strong>LinkHash</strong></div>
+        <div style="opacity:.7">
+          {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
+        </div>
+      </div>
+    </footer>
+
+    <!-- ===== LIGHT INTERACTIONS (no ScrollTrigger) ===== -->
+    <script type="module">
+      import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+      import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
+
+      // Smooth scroll (kept)
+      const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.8, smoothWheel: true, normalizeWheel: true });
+      function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+
+      // Tabs
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.panel');
+      tabs.forEach(tab=>{
+        tab.addEventListener('click', ()=>{
+          tabs.forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+          panels.forEach(p=>p.classList.remove('active'));
+          tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+          const target = document.querySelector(tab.dataset.target);
+          if(target){ target.classList.add('active'); }
+          // re-trigger reveals + progress anim
+          revealCards();
+          animateBarsWhenVisible();
+        });
+      });
+
+      // ----- Custom dropdown (accessible-ish)
+      const dd = document.getElementById('sortDropdown');
+      const toggle = dd.querySelector('.dropdown-toggle');
+      const menu = dd.querySelector('.dropdown-menu');
+      const label = dd.querySelector('.dropdown-label');
+
+      function setDropdownValue(val, text){
+        dd.dataset.value = val;
+        label.textContent = text;
+        menu.querySelectorAll('[role="option"]').forEach(opt=>{
+          opt.setAttribute('aria-selected', String(opt.dataset.value === val));
+        });
+        applySort();
+        revealCards();
+        animateBarsWhenVisible();
+      }
+
+      toggle.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const open = dd.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if(open){
+          const current = menu.querySelector('[aria-selected="true"]');
+          (current || menu.firstElementChild).focus?.();
+        }
+      });
+
+      menu.querySelectorAll('[role="option"]').forEach(opt=>{
+        opt.tabIndex = 0;
+        opt.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          setDropdownValue(opt.dataset.value, opt.textContent.trim());
+          dd.classList.remove('open');
+          toggle.setAttribute('aria-expanded','false');
+        });
+        opt.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            setDropdownValue(opt.dataset.value, opt.textContent.trim());
+            dd.classList.remove('open');
+            toggle.setAttribute('aria-expanded','false');
+            toggle.focus();
+          }
+          if(e.key === 'Escape'){
+            dd.classList.remove('open');
+            toggle.setAttribute('aria-expanded','false');
+            toggle.focus();
+          }
+        });
+      });
+
+      document.addEventListener('click', ()=>{
+        if(dd.classList.contains('open')){
+          dd.classList.remove('open');
+          toggle.setAttribute('aria-expanded','false');
+        }
+      });
+
+      // Sorting / Filters
+      function parseNum(el, attr){ return parseFloat(el.getAttribute(attr) || '0'); }
+      function parseDate(el, attr){
+        const v = el.getAttribute(attr);
+        return v ? new Date(v + 'T00:00:00Z') : new Date(0);
+      }
+      function sortGrid(gridEl, mode, isLive=true){
+        const cards = Array.from(gridEl.querySelectorAll('.project-card'));
+        let sorter;
+        if(mode === 'ending'){
+          sorter = (a,b)=> parseDate(a,'data-end') - parseDate(b,'data-end');
+          if(!isLive) sorter = (a,b)=> parseDate(b,'data-end') - parseDate(a,'data-end');
+        }else if(mode === 'new'){
+          sorter = (a,b)=> parseDate(b,'data-start') - parseDate(a,'data-start');
+        }else if(mode === 'payout'){
+          sorter = (a,b)=> parseNum(b,'data-payout') - parseNum(a,'data-payout');
+        }else if(mode === 'pool'){
+          sorter = (a,b)=> parseNum(b,'data-pool') - parseNum(a,'data-pool');
+        }else if(mode === 'popular'){
+          sorter = (a,b)=> parseNum(b,'data-pop') - parseNum(a,'data-pop');
+        }else{
+          sorter = ()=>0;
+        }
+        cards.sort(sorter).forEach(c=> gridEl.appendChild(c));
+      }
+
+      const liveGrid = document.getElementById('liveGrid');
+      const pastGrid = document.getElementById('pastGrid');
+      function applySort(){
+        const mode = dd.dataset.value || 'ending';
+        sortGrid(liveGrid, mode, true);
+        sortGrid(pastGrid, mode, false);
+      }
+
+      // Reveal animation for cards (no ScrollTrigger)
+      function revealCards(){
+        const cards = document.querySelectorAll('.panel.active .project-card');
+        cards.forEach((card, i)=>{
+          gsap.fromTo(card, {autoAlpha:0, y:8}, {autoAlpha:1, y:0, duration:.28, delay: i * 0.04, overwrite:true});
+        });
+      }
+
+      // Progress bars animate when they enter viewport using IntersectionObserver
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            const b = entry.target;
+            const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
+            gsap.fromTo(b, { width: "0%" }, { width: target, duration: 1.2, ease: "power2.out" });
+            io.unobserve(b);
+          }
+        });
+      }, { root: null, rootMargin: "0px 0px -10% 0px", threshold: 0.1 });
+
+      function animateBarsWhenVisible(){
+        document.querySelectorAll('.panel.active .progress .bar').forEach(b=> io.observe(b));
+      }
+
+      // Initial apply + animations
+      applySort();
+      revealCards();
+      animateBarsWhenVisible();
+    </script>
+    <script>
+        (function(){
+        const $wrap = document.getElementById('langSwitcher');
+        if(!$wrap) return;
+        const $btn  = $wrap.querySelector('.lang-btn');
+        const $menu = $wrap.querySelector('.lang-menu');
+        const current = ($wrap.dataset.current || 'en').toLowerCase();
+
+        const flagEl = $btn.querySelector('.flag-emoji');
+        const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
+        flagEl.textContent = flagMap[current] || '🇺🇸';
+
+        function open(){ $wrap.classList.add('open'); $btn.setAttribute('aria-expanded','true'); }
+        function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
+        $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
+        document.addEventListener('click', ()=> close());
+        document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
+
+        function pathFor(lang){
+            const loc = window.location;
+            const path = loc.pathname;
+            const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
+
+            const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
+
+            // /rewards/apply/ variants
+            const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
+            if(isApply){
+            if(lang === 'en') return '/rewards/apply/?lang=en';
+            return `/rewards/apply/${lang}/`;
+            }
+
+            if(baseMap[clean]){
+            if(lang === 'en'){
+                const q = new URLSearchParams(loc.search);
+                q.set('lang','en');
+                return clean + (q.toString() ? `?${q.toString()}` : '');
+            }
+            return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
+            }
+
+            // Unknown/other page (e.g., /rewards/some-slug-5/) → keep path, toggle ?lang=xx
+            const params = new URLSearchParams(loc.search);
+            params.set('lang', lang);
+            return path + (params.toString() ? `?${params.toString()}` : '');
+        }
+
+        $menu.querySelectorAll('.lang-item').forEach(li=>{
+            li.addEventListener('click', ()=>{
+            const lang = li.getAttribute('data-lang');
+            const emoji = li.getAttribute('data-flag') || '';
+            flagEl.textContent = emoji;
+            $wrap.querySelector('.label').textContent =
+                lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
+            close();
+            const target = pathFor(lang);
+            if(target) window.location.href = target;
+            });
+        });
+        })();
+        </script>
+
+  </body>
+</html>

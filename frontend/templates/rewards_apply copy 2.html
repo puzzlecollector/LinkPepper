@@ -1,0 +1,451 @@
+<!doctype html>
+{% load static %}
+<html lang="{{ meta.lang|default:'en' }}">
+  <head>
+    <meta charset="utf-8">
+    <!-- Desktop-first like the new UI -->
+    <meta name="viewport" content="width=1280, initial-scale=1">
+    <title>{{ meta.title|default:"LinkHash | Launch a Campaign" }}</title>
+    <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+    <meta name="robots" content="index,follow">
+    <meta name="author" content="LinkHash">
+    <meta name="description" content="{{ meta.description|default:'Request a new LinkHash reward campaign.' }}">
+    <!-- OG/Twitter -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LinkHash">
+    <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+    <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+    <meta property="og:url" content="{{ meta.url }}">
+    <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+    <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+    <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+    <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+
+    <style>
+      /* ======= THEME (match new dark UI) ======= */
+      :root{
+        --bg:#0a0b0d; --bg-elev:#0f1115; --panel:#11141a; --panel-2:#0e1318; --grid:#0b0f13; --line:#1a212d;
+        --text:#e6f1ee; --muted:#9fb0aa; --green:#16a34a; --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px; --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 16px 40px rgba(0,0,0,.45);
+        --noise:transparent url('data:image/svg+xml;utf8,\
+          <svg xmlns="http://www.w3.org/2000/svg" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\">\
+          <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.9\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+          <rect width=\"120\" height=\"120\" filter=\"url(%23n)\" opacity=\".04\"/></svg>') repeat;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+        letter-spacing:.2px; background-attachment:fixed;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:1200px; margin:0 auto; padding:0 20px;}
+
+      /* ===== NAV (same look as new pages) ===== */
+      .nav{
+        position:sticky; top:0; z-index:60; backdrop-filter: blur(10px);
+        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+      .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; color:#d8ffe7; text-shadow:0 0 18px rgba(35,209,106,.24);}
+      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+      .nav .links{display:flex; gap:24px; align-items:center;}
+      .nav .links a{color:#cfe7dd; opacity:.9}
+      .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+      /* ===== HEADER ===== */
+      .page-head{
+        padding:50px 0 16px;
+        background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)), var(--noise);
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .page-head h1{margin:0 0 10px; font-size:36px; letter-spacing:.3px;}
+      .page-head .sub{color:var(--muted); margin:0}
+
+      /* ===== FORM LAYOUT ===== */
+      .grid{display:grid; grid-template-columns:2fr 1fr; gap:18px; padding:22px 0;}
+      .card{
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.06);
+        border-radius:18px; box-shadow:var(--shadow-lg);
+      }
+      .card .head{display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.06)}
+      .card .body{padding:18px}
+      .hint{color:var(--muted); font-size:13px}
+      .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+      .row.three{grid-template-columns:1fr 1fr 1fr}
+      .row.full{grid-template-columns:1fr}
+      label{display:block; font-weight:700; margin:2px 0 8px;}
+      .opt{color:var(--muted); font-weight:600; font-size:12px; margin-left:6px}
+      input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], input[type="date"], textarea, select{
+        width:100%; padding:12px 14px; border:1px solid #2a333f; border-radius:12px; background:#0b1117; color:#e6f1ee; outline:none;
+        transition:border-color .15s ease, box-shadow .15s ease;
+      }
+      textarea{min-height:110px}
+      input:focus, textarea:focus, select:focus{ border-color:#1ad36a; box-shadow:0 0 0 4px rgba(35,209,106,.15) }
+      .chips{display:flex; gap:8px; flex-wrap:wrap}
+      .chip{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#0b1218; border:1px solid #1d2836; color:#cde6da; font-weight:700; cursor:pointer}
+      .chip input{accent-color:#19b357}
+
+      .foot-actions{display:flex; justify-content:flex-end; gap:10px; padding:16px 18px; border-top:1px solid rgba(255,255,255,.06)}
+      .divider{height:1px; background:#1d2836; margin:14px 0}
+
+      /* Right column (Summary/Notes) */
+      .side{display:flex; flex-direction:column; gap:12px}
+      .note{padding:14px; border:1px dashed #243040; border-radius:14px; background:#0a1117; color:#b9c9c3}
+      .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px}
+      .stack{display:flex; flex-wrap:wrap; gap:8px}
+
+      /* Footer */
+      .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; margin-top:40px;}
+
+      /* Responsive (desktop-first) */
+      @media (max-width:1140px){ .container{width:1000px} }
+      @media (max-width:1000px){
+        .container{width:920px}
+        .grid{grid-template-columns:1fr}
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== NAV ===== -->
+    <header class="nav">
+      <div class="container row">
+        <div class="brand">
+          <span class="dot"></span><span>LinkHash</span>
+        </div>
+        <nav class="links">
+        {% if meta.lang == "ko" %}
+          {% url 'home_ko' as home_url %}
+          {% url 'events_ko' as events_url %}
+          {% url 'rewards_ko' as rewards_url %}
+          {% url 'rewards_apply_ko' as apply_url %}
+        {% else %}
+          {% url 'home_en' as home_url %}
+          {% url 'events_en' as events_url %}
+          {% url 'rewards_en' as rewards_url %}
+          {% url 'rewards_apply_en' as apply_url %}
+        {% endif %}
+
+        <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+        <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+        <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+        <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+
+        <!-- NEW: Apply for campaign (locale-aware) -->
+        <a class="btn-outline" href="{{ apply_url }}"  style="font-weight:700;color:#d8ffe7">
+          {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+        </a>
+
+        {% if wallet_user %}
+          <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+          <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+            {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+          </a>
+        {% else %}
+          <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+            {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+          </a>
+        {% endif %}
+      </nav>
+
+      </div>
+    </header>
+
+    <!-- ===== PAGE HEADER ===== -->
+    <section class="page-head">
+      <div class="container">
+        <h1>
+          {% if meta.lang == 'ko' %}캠페인 런칭 신청{% else %}Request a New Campaign{% endif %}
+        </h1>
+        <p class="sub">
+          {% if meta.lang == 'ko' %}
+            이메일과 전화번호만 있으면 접수가 가능합니다. 나머지 정보는 선택 사항이며, 담당자가 후속 안내를 드립니다.
+          {% else %}
+            Only email and phone are required to get started. Everything else is optional—we’ll follow up for details.
+          {% endif %}
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== FORM ===== -->
+    <main class="container" id="apply" style="padding-bottom:20px">
+      <div class="grid">
+        <!-- Left: Application form -->
+        <section class="card" aria-labelledby="formTitle">
+          <div class="head">
+            <h2 id="formTitle" style="margin:0">
+              {% if meta.lang == 'ko' %}신청 정보{% else %}Application Details{% endif %}
+            </h2>
+            <div class="stack">
+              <span class="pill">Web3 · SEO · Rewards</span>
+              <span class="pill">{% if meta.lang == 'ko' %}화이트햇{% else %}White-hat{% endif %}</span>
+            </div>
+          </div>
+
+          {% url 'rewards_apply_submit' as apply_submit_url %}
+          <form class="body" method="post" action="{{ apply_submit_url|default:'#' }}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Contact -->
+            <div class="row">
+              <div>
+                <label for="email">Email *</label>
+                <input id="email" name="email" type="email" required placeholder="name@example.com">
+                <div class="hint">{% if meta.lang == 'ko' %}필수{% else %}Required{% endif %}</div>
+              </div>
+              <div>
+                <label for="phone">{% if meta.lang == 'ko' %}전화번호{% else %}Phone{% endif %} *</label>
+                <input id="phone" name="phone" type="tel" required placeholder="+82 10 1234 1234">
+                <div class="hint">{% if meta.lang == 'ko' %}국가코드 포함{% else %}Include country code{% endif %}</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="country">{% if meta.lang == 'ko' %}국가{% else %}Country{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="country" name="country" type="text" placeholder="{% if meta.lang == 'ko' %}예: 대한민국{% else %}e.g. South Korea{% endif %}">
+              </div>
+              <div>
+                <label for="title">{% if meta.lang == 'ko' %}캠페인 제목{% else %}Campaign Title{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="title" name="campaign_title" type="text" placeholder="{% if meta.lang == 'ko' %}예: SimpleQuant 블로그 런칭{% else %}e.g. SimpleQuant Blog Launch{% endif %}">
+              </div>
+            </div>
+
+            <!-- Website -->
+            <div class="row">
+              <div>
+                <label for="site_url">{% if meta.lang == 'ko' %}웹사이트 URL{% else %}Website URL{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="site_url" name="website_url" type="url" placeholder="https://example.com">
+              </div>
+              <div>
+                <label for="thumb">{% if meta.lang == 'ko' %}썸네일 이미지{% else %}Thumbnail Image{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="thumb" name="thumbnail" type="file" accept="image/*">
+              </div>
+            </div>
+
+            <div class="row full">
+              <div>
+                <label for="site_desc">{% if meta.lang == 'ko' %}웹사이트 설명{% else %}Website Description{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <textarea id="site_desc" name="website_description" placeholder="{% if meta.lang == 'ko' %}예: 퀀트 투자 관련 튜토리얼과 도구 제공{% else %}e.g. Tutorials and tools for quantitative investing{% endif %}"></textarea>
+              </div>
+            </div>
+
+            <!-- Task Types -->
+            <div class="row full">
+              <div>
+                <label>{% if meta.lang == 'ko' %}과제 유형 선택{% else %}Select Task Type(s){% endif %}</label>
+                <div class="chips" role="group" aria-label="Task types">
+                  <label class="chip">
+                    <input type="checkbox" name="task_types" value="VISIT" id="t_visit"> VISIT
+                  </label>
+                  <label class="chip">
+                    <input type="checkbox" name="task_types" value="LINK" id="t_link"> LINK
+                  </label>
+                </div>
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}
+                    VISIT: 사이트에서 코드 찾기 / LINK: SNS·블로그에 리뷰+백링크
+                  {% else %}
+                    VISIT: find a code on your site · LINK: publish a review with a backlink
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- VISIT settings (conditional) -->
+            <div id="visitBlock" class="row full" style="display:none">
+              <div>
+                <label for="visit_code">
+                  {% if meta.lang == 'ko' %}검증 코드 (VISIT){% else %}Verification Code (VISIT){% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}참여자가 페이지에서 찾을 코드{% else %}code participants must find on your page{% endif %})</span>
+                </label>
+                <input id="visit_code" name="visit_code" type="text" placeholder="e.g. CODE: X6K9Q2">
+                <div class="hint">
+                  {% if meta.lang == 'ko' %}예: 하단 푸터에 ‘코드: X6K9Q2’ 표시{% else %}Example: show “Code: X6K9Q2” in your footer{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- LINK settings (conditional) -->
+            <div id="linkBlock" class="row">
+              <div>
+                <label for="expected_keywords">
+                  {% if meta.lang == 'ko' %}리뷰 예상 키워드 (LINK){% else %}Expected Review Keywords (LINK){% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}쉼표로 구분{% else %}comma-separated{% endif %})</span>
+                </label>
+                <input id="expected_keywords" name="expected_review_keywords" type="text" placeholder="e.g. quant, backtesting, crypto tools">
+              </div>
+              <div>
+                <label for="seo_keywords">
+                  {% if meta.lang == 'ko' %}현재 SEO 키워드 (사이트){% else %}Current Site SEO Keywords{% endif %}
+                  <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span>
+                </label>
+                <input id="seo_keywords" name="current_seo_keywords" type="text" placeholder="e.g. algorithmic trading, strategy builder">
+              </div>
+            </div>
+
+            <!-- Rewards & Window -->
+            <div class="row">
+              <div>
+                <label for="pool">{% if meta.lang == 'ko' %}총 리워드 풀 (USDT){% else %}Total Reward Pool (USDT){% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="pool" name="reward_pool_usdt" type="number" min="1" step="1" placeholder="e.g. 2500">
+              </div>
+              <div>
+                <label for="payout">{% if meta.lang == 'ko' %}건당 예상 보상 (USDT){% else %}Expected Payout per Task (USDT){% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="payout" name="payout_per_task_usdt" type="number" min="0" step="0.01" placeholder="e.g. 3.50">
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="start">{% if meta.lang == 'ko' %}캠페인 시작일{% else %}Start Date{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="start" name="start_date" type="date">
+              </div>
+              <div>
+                <label for="end">{% if meta.lang == 'ko' %}캠페인 종료일{% else %}End Date{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                <input id="end" name="end_date" type="date">
+              </div>
+            </div>
+
+            <!-- Airdrop -->
+            <div class="row full">
+              <div>
+                <label for="airdrop_toggle">{% if meta.lang == 'ko' %}에어드롭 이벤트{% else %}Airdrop Event{% endif %}</label>
+                <div class="chips">
+                  <label class="chip">
+                    <input id="airdrop_toggle" type="checkbox" name="airdrop_enabled" value="true"> {% if meta.lang == 'ko' %}에어드롭 진행{% else %}Enable Airdrop{% endif %}
+                  </label>
+                </div>
+                <div id="airdropBlock" style="display:none; margin-top:12px">
+                  <div class="row three">
+                    <div>
+                      <label for="airdrop_first_n">{% if meta.lang == 'ko' %}선착순 인원 (N){% else %}First N People{% endif %}</label>
+                      <input id="airdrop_first_n" name="airdrop_first_n" type="number" min="1" step="1" placeholder="e.g. 100">
+                    </div>
+                    <div>
+                      <label for="airdrop_amount">{% if meta.lang == 'ko' %}1인당 지급 (M){% else %}Amount per Person (M){% endif %}</label>
+                      <input id="airdrop_amount" name="airdrop_amount_per_user" type="number" min="0" step="0.0001" placeholder="e.g. 25">
+                    </div>
+                    <div>
+                      <label for="airdrop_symbol">{% if meta.lang == 'ko' %}코인/토큰 심볼{% else %}Token Symbol{% endif %}</label>
+                      <input id="airdrop_symbol" name="airdrop_token_symbol" type="text" placeholder="e.g. LKH">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div>
+                      <label for="airdrop_chain">{% if meta.lang == 'ko' %}체인/네트워크{% else %}Chain / Network{% endif %}</label>
+                      <input id="airdrop_chain" name="airdrop_network" type="text" placeholder="e.g. Ethereum, Polygon">
+                    </div>
+                    <div>
+                      <label for="airdrop_note">{% if meta.lang == 'ko' %}추가 조건{% else %}Additional Conditions{% endif %} <span class="opt">({% if meta.lang == 'ko' %}선택{% else %}optional{% endif %})</span></label>
+                      <input id="airdrop_note" name="airdrop_note" type="text" placeholder="{% if meta.lang == 'ko' %}예: KYC 필요 없음{% else %}e.g. no KYC required{% endif %}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Submit -->
+            <div class="foot-actions">
+              <button class="btn-outline" type="reset">{% if meta.lang == 'ko' %}초기화{% else %}Reset{% endif %}</button>
+              <button class="btn" type="submit">{% if meta.lang == 'ko' %}신청 보내기{% else %}Submit Application{% endif %}</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Right: Tips / Summary -->
+        <aside class="side">
+          <section class="card">
+            <div class="head"><h3 style="margin:0">{% if meta.lang == 'ko' %}가이드{% else %}Guide{% endif %}</h3></div>
+            <div class="body">
+              <div class="note">
+                {% if meta.lang == 'ko' %}
+                  기본 연락처(이메일·전화)가 확인되면 담당자가 24시간 내로 연락드립니다. 상세 규칙, 예산, 기간은 이후 조율 가능합니다.
+                {% else %}
+                  Once we have your email and phone, our team will contact you within 24 hours. Rules, budget, and dates can be finalized later.
+                {% endif %}
+              </div>
+              <div style="height:8px"></div>
+              <div class="stack">
+                <span class="pill">White-hat</span>
+                <span class="pill">Transparent</span>
+                <span class="pill">Instant Rewards</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="head"><h3 style="margin:0">{% if meta.lang == 'ko' %}작동 방식{% else %}How It Works{% endif %}</h3></div>
+            <div class="body">
+              <ol style="margin:0 0 10px 18px; color:#cde6da; line-height:1.5">
+                <li>{% if meta.lang == 'ko' %}보상 풀과 기간 설정{% else %}Set pool & window{% endif %}</li>
+                <li>{% if meta.lang == 'ko' %}규칙 공개 (VISIT/LINK){% else %}Publish task rules (VISIT/LINK){% endif %}</li>
+                <li>{% if meta.lang == 'ko' %}제출 검증 & 즉시 보상{% else %}Verify submissions & pay instantly{% endif %}</li>
+              </ol>
+              <div class="note">
+                {% if meta.lang == 'ko' %}
+                  에어드롭 옵션을 사용하면 선착순 N명에게 M개의 토큰을 자동 분배하는 이벤트를 추가할 수 있습니다.
+                {% else %}
+                  With airdrops enabled, the first N participants can automatically receive M tokens as a bonus event.
+                {% endif %}
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+        <div>© <strong>LinkHash</strong></div>
+        <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>
+      </div>
+    </footer>
+
+    <!-- ===== LIGHT INTERACTIONS (no external libs needed) ===== -->
+    <script type="module">
+      // Toggle conditional blocks for VISIT and LINK task types + Airdrop
+      const visitCb   = document.getElementById('t_visit');
+      const linkCb    = document.getElementById('t_link');
+      const visitBlk  = document.getElementById('visitBlock');
+      const linkBlk   = document.getElementById('linkBlock');
+      const airTgl    = document.getElementById('airdrop_toggle');
+      const airBlk    = document.getElementById('airdropBlock');
+
+      function updateBlocks(){
+        visitBlk.style.display = visitCb?.checked ? 'block' : 'none';
+        // LINK block primarily helpful for link tasks, but we keep visible by default for optional SEO fields.
+        linkBlk.style.display  = linkCb?.checked ? 'grid' : 'grid'; // keep shown to allow optional SEO inputs
+      }
+      function updateAirdrop(){ airBlk.style.display = airTgl?.checked ? 'block' : 'none'; }
+
+      visitCb?.addEventListener('change', updateBlocks);
+      linkCb?.addEventListener('change', updateBlocks);
+      airTgl?.addEventListener('change', updateAirdrop);
+
+      // Initialize on load (default: show LINK block for optional fields; hide VISIT specifics)
+      updateBlocks();
+      updateAirdrop();
+    </script>
+  </body>
+</html>
