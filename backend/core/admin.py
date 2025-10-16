@@ -13,6 +13,7 @@ from .models import (
     SubmissionStatus,
     TaskType,
     Network,
+    Event
 )
 
 # ---------- Helpers
@@ -584,3 +585,107 @@ class PayoutAdmin(admin.ModelAdmin):
             return obj.submission.wallet_address
         except Exception:
             return "-"
+
+# 2) paste this near the bottom of admin.py (e.g., after PayoutAdmin)
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    """
+    Full CRUD for site announcements/events.
+    - Supports http(s) and data:image/* thumbnails.
+    - One-click publish/unpublish actions.
+    - Quick frontend link.
+    """
+    list_display = (
+        "id",
+        "title",
+        "lang",
+        "is_published",
+        "posted_at",
+        "thumb_small",
+        "open_link",
+    )
+    list_filter = ("is_published", "lang", "posted_at")
+    search_fields = ("title", "slug", "summary", "body")
+    prepopulated_fields = {"slug": ("title",)}
+    date_hierarchy = "posted_at"
+    ordering = ("-posted_at", "-id")
+    readonly_fields = ("created_at", "thumb_large_preview")
+
+    fieldsets = (
+        (None, {
+            "fields": ("title", "slug", "lang", "is_published", "posted_at"),
+        }),
+        ("Content", {
+            "fields": ("summary", "body"),
+        }),
+        ("Thumbnail (URL or data URI)", {
+            "fields": ("thumb_src", "thumb_large_preview"),
+            "description": "Accepts http(s) or data:image/*;base64,...",
+        }),
+        ("Timestamps", {
+            "classes": ("collapse",),
+            "fields": ("created_at",),
+        }),
+    )
+
+    actions = ("publish_selected", "unpublish_selected", "duplicate_selected")
+
+    # ----- helpers / columns
+
+    @admin.display(description="Thumbnail")
+    def thumb_small(self, obj):
+        src = getattr(obj, "thumb_src", "") or ""
+        hint = f"event_{obj.pk}_thumb"
+        # Reuse the shared preview+download helper
+        return _img_with_download(src, f"{obj.title} thumbnail", size_px=32, filename_hint=hint)
+
+    @admin.display(description="Thumbnail preview")
+    def thumb_large_preview(self, obj):
+        src = getattr(obj, "thumb_src", "") or ""
+        hint = f"event_{obj.pk}_thumb"
+        return _img_with_download(src, f"{obj.title} thumbnail", size_px=120, filename_hint=hint)
+
+    @admin.display(description="Open")
+    def open_link(self, obj):
+        if not obj.slug:
+            return "-"
+        return format_html('<a href="/events/{}/" target="_blank" rel="noopener">View</a>', obj.slug)
+
+    # ----- actions
+
+    @admin.action(description="Publish selected")
+    def publish_selected(self, request, qs):
+        n = qs.update(is_published=True)
+        self.message_user(request, f"Published {n} event(s).", level=messages.SUCCESS)
+
+    @admin.action(description="Unpublish selected")
+    def unpublish_selected(self, request, qs):
+        n = qs.update(is_published=False)
+        self.message_user(request, f"Unpublished {n} event(s).", level=messages.WARNING)
+
+    @admin.action(description="Duplicate selected (adds “-copy” to title/slug)")
+    def duplicate_selected(self, request, qs):
+        created = 0
+        for e in qs:
+            # Make a unique slug based on the original
+            base_slug = (e.slug or "event-copy").rstrip("-")
+            slug = base_slug + "-copy"
+            i = 2
+            from django.utils.text import slugify as _slug
+            # ensure uniqueness
+            while Event.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-copy-{i}"
+                i += 1
+            Event.objects.create(
+                title=f"{e.title} (copy)",
+                slug=slug,
+                summary=e.summary,
+                body=e.body,
+                thumb_src=e.thumb_src,
+                lang=e.lang,
+                is_published=False,
+                posted_at=timezone.now(),
+            )
+            created += 1
+        self.message_user(request, f"Created {created} duplicate event(s). Edit and publish when ready.", level=messages.SUCCESS)
