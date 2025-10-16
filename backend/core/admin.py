@@ -3,6 +3,10 @@ from django.contrib import admin, messages
 from django.utils import timezone
 from django.utils.html import format_html
 from django.db.models import Count, Sum
+import os
+from django import forms
+from django.core.files.storage import default_storage
+from django.utils.text import slugify
 
 from .models import (
     WalletUser,
@@ -586,24 +590,32 @@ class PayoutAdmin(admin.ModelAdmin):
         except Exception:
             return "-"
 
-# 2) paste this near the bottom of admin.py (e.g., after PayoutAdmin)
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     """
-    Full CRUD for site announcements/events.
-    - Supports http(s) and data:image/* thumbnails.
-    - One-click publish/unpublish actions.
-    - Quick frontend link.
+    Event CRUD with file-uploaded thumbnail.
+    - Shows an <input type="file"> in the form (thumb_upload)
+    - Stores the uploaded file in default storage and writes its URL to Event.thumb_src
+    - Keeps a large/small preview with a Download link
     """
+    class Form(forms.ModelForm):
+        thumb_upload = forms.ImageField(
+            required=False,
+            help_text="Upload a thumbnail image (PNG/JPG/WebP/SVG). "
+                      "This will overwrite the current thumbnail."
+        )
+
+        class Meta:
+            model = Event
+            # We exclude thumb_src so users don't edit the raw URL/data URI.
+            exclude = ("thumb_src",)
+
+    form = Form
+
     list_display = (
-        "id",
-        "title",
-        "lang",
-        "is_published",
-        "posted_at",
-        "thumb_small",
-        "open_link",
+        "id", "title", "lang", "is_published", "posted_at",
+        "thumb_small", "open_link",
     )
     list_filter = ("is_published", "lang", "posted_at")
     search_fields = ("title", "slug", "summary", "body")
@@ -619,9 +631,10 @@ class EventAdmin(admin.ModelAdmin):
         ("Content", {
             "fields": ("summary", "body"),
         }),
-        ("Thumbnail (URL or data URI)", {
-            "fields": ("thumb_src", "thumb_large_preview"),
-            "description": "Accepts http(s) or data:image/*;base64,...",
+        ("Thumbnail", {
+            "fields": ("thumb_upload", "thumb_large_preview"),
+            "description": "Upload a new image to replace the thumbnail. "
+                           "Preview updates after you save.",
         }),
         ("Timestamps", {
             "classes": ("collapse",),
@@ -631,13 +644,12 @@ class EventAdmin(admin.ModelAdmin):
 
     actions = ("publish_selected", "unpublish_selected", "duplicate_selected")
 
-    # ----- helpers / columns
+    # ---------- previews / columns
 
     @admin.display(description="Thumbnail")
     def thumb_small(self, obj):
         src = getattr(obj, "thumb_src", "") or ""
         hint = f"event_{obj.pk}_thumb"
-        # Reuse the shared preview+download helper
         return _img_with_download(src, f"{obj.title} thumbnail", size_px=32, filename_hint=hint)
 
     @admin.display(description="Thumbnail preview")
@@ -652,7 +664,36 @@ class EventAdmin(admin.ModelAdmin):
             return "-"
         return format_html('<a href="/events/{}/" target="_blank" rel="noopener">View</a>', obj.slug)
 
-    # ----- actions
+    # ---------- save hook to persist uploaded file
+
+    def save_model(self, request, obj, form, change):
+        """
+        If an image was uploaded, store it and write its URL to obj.thumb_src.
+        """
+        upload = form.cleaned_data.get("thumb_upload")
+        if upload:
+            # Build a stable-ish filename
+            base = slugify(obj.slug or obj.title) or "event"
+            root, ext = os.path.splitext(upload.name or "")
+            if not ext:
+                # fallback if no extension present
+                ext = ".png"
+            filename = f"events/thumbs/{base}{ext}"
+
+            # If file exists, make it unique (append counter)
+            if default_storage.exists(filename):
+                i = 2
+                while default_storage.exists(f"events/thumbs/{base}-{i}{ext}"):
+                    i += 1
+                filename = f"events/thumbs/{base}-{i}{ext}"
+
+            # Save to storage; default_storage will handle chunks if needed
+            saved_path = default_storage.save(filename, upload)
+            obj.thumb_src = default_storage.url(saved_path)
+
+        super().save_model(request, obj, form, change)
+
+    # ---------- actions
 
     @admin.action(description="Publish selected")
     def publish_selected(self, request, qs):
@@ -668,12 +709,9 @@ class EventAdmin(admin.ModelAdmin):
     def duplicate_selected(self, request, qs):
         created = 0
         for e in qs:
-            # Make a unique slug based on the original
-            base_slug = (e.slug or "event-copy").rstrip("-")
-            slug = base_slug + "-copy"
+            base_slug = (e.slug or slugify(e.title) or "event-copy").rstrip("-")
+            slug = f"{base_slug}-copy"
             i = 2
-            from django.utils.text import slugify as _slug
-            # ensure uniqueness
             while Event.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-copy-{i}"
                 i += 1
@@ -682,7 +720,7 @@ class EventAdmin(admin.ModelAdmin):
                 slug=slug,
                 summary=e.summary,
                 body=e.body,
-                thumb_src=e.thumb_src,
+                thumb_src=e.thumb_src,   # keep the same thumbnail for the copy
                 lang=e.lang,
                 is_published=False,
                 posted_at=timezone.now(),
