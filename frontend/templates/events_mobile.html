@@ -103,62 +103,144 @@
     .body-text{margin:0 0 6px}
 
     .note{padding:12px; border:1px dashed #243040; border-radius:14px; background:#0a1117; color:#b9c9c3; margin-top:10px}
+    /* ===== MOBILE HEADER (namespaced .mnav) ===== */
+.mnav{position:sticky; top:0; z-index:80; padding-top:env(safe-area-inset-top);
+  background:linear-gradient(180deg, rgba(15,17,21,.82), rgba(15,17,21,.52));
+  backdrop-filter: blur(12px); border-bottom:1px solid rgba(255,255,255,.06);}
+.mnav-bar{display:flex; align-items:center; justify-content:space-between; height:56px; gap:8px;}
 
+.mnav-brand{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#d8ffe7; text-shadow:0 0 14px rgba(35,209,106,.22);}
+.mnav-brand .dot{width:8px;height:8px;border-radius:999px;background:#16a34a;box-shadow:0 0 16px rgba(22,163,74,.42)}
+.mnav-brand .name{font-size:16px; letter-spacing:.2px}
+
+.mnav-actions{display:flex; align-items:center; gap:8px;}
+.mnav .btn{display:inline-flex; align-items:center; gap:6px; padding:8px 10px; font-weight:800; border-radius:10px; border:1px solid #2fe07a;
+  background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:0 0 22px rgba(22,163,74,.25);}
+.mnav .pill-addr{max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #2a333f; background:#0b1117;
+  color:#d9f6e6; border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700;}
+
+.mnav-toggle{display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px;
+  border:1px solid #2a333f; background:#0b1117; color:#e6f1ee;}
+.mnav-toggle:active{transform:scale(.98)}
+
+/* Sheet */
+.mnav-sheet{position:relative; background:linear-gradient(180deg,#0f1419,#0c1116);
+  border-top:1px solid rgba(255,255,255,.06); box-shadow:0 30px 60px rgba(0,0,0,.5);
+  padding:12px 12px calc(12px + env(safe-area-inset-bottom));}
+.mnav-sheet[hidden]{display:none;}
+.mnav-list{display:grid; gap:8px; margin:4px 0 10px;}
+.mnav-list .item{display:flex; align-items:center; gap:8px; padding:12px 12px; border-radius:12px; font-weight:800;
+  border:1px solid #263040; background:rgba(14,18,25,.65); color:#cfe7dd;}
+.mnav-list .item:hover{border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18)}
+.mnav-list .item.active{color:#05160c; border-color:#2fe07a; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:0 0 22px rgba(22,163,74,.25)}
+.mnav-list .item.outline{background:#0b1117}
+
+/* Language */
+.mnav-lang{margin:2px 0 10px; position:relative;}
+.mnav .lang-btn{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; font-weight:800; border-radius:12px; border:1px solid #2a333f; background:#0b1117; color:#cfe7dd}
+.mnav .flag-emoji{display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; line-height:18px; font-size:14px; border-radius:3px;
+  background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
+.mnav .lang-menu{position:absolute; top:110%; left:0; min-width:200px; padding:6px; margin:0; list-style:none; display:none; z-index:90;
+  background:linear-gradient(180deg,#0f1419,#0c1116); border:1px solid rgba(255,255,255,.08); border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45)}
+.mnav .lang.open .lang-menu{display:block; animation:mnavMenuIn .14s ease-out}
+@keyframes mnavMenuIn{from{transform:translateY(-6px);opacity:0} to{transform:translateY(0);opacity:1}}
+.mnav .lang-item{display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; color:#cfe7dd; font-weight:700;}
+.mnav .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
+
+/* Logout button inside sheet */
+.mnav .danger{width:100%; margin-top:6px; padding:11px 12px; border-radius:12px; border:1px solid #3b2020;
+  background:linear-gradient(180deg,#6e2c2c,#5a2222); color:#ffeaea; font-weight:800}
+
+/* Ultra-narrow friendliness (Galaxy Fold cover width ~320px) */
+@media (max-width:360px){
+  .mnav .pill-addr{max-width:98px}
+  .mnav-bar{height:52px}
+  .mnav-brand .name{font-size:15px}
+}
+
+/* Large-fold (unfolded) still uses mobile header but breathes a bit */
+@media (min-width:720px){
+  .mnav-bar{height:60px}
+}
     /* FOOTER */
     .footer{padding:18px 0 24px; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; font-size:12px; margin-top:18px}
   </style>
 </head>
 <body>
   <!-- NAV -->
-  <header class="nav">
-    <div class="container row">
-      <div class="brand"><span class="dot"></span><span>LinkHash</span></div>
-      <nav class="links">
-        <a class="link-min" href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
-          {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
-        </a>
-        <a class="link-min" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
-          {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
-        </a>
-        <a class="link-min" href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}" style="font-weight:800;color:#d8ffe7">
-          {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
-        </a>
-        <a class="link-min" href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
-          {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
-        </a>
+  <!-- ===== MOBILE HEADER (copy/paste) ===== -->
+  <header class="mnav" role="banner">
+    <div class="container mnav-bar">
+      <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}"
+        class="mnav-brand" aria-label="LinkHash Home">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="name">LinkHash</span>
+      </a>
 
+      <div class="mnav-actions">
         {% if wallet_user %}
-          <span class="btn-outline pill-addr">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-          <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-            {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ログアウト{% elif meta.lang == 'zh' %}退出{% else %}Logout{% endif %}
-          </a>
+          <span class="pill-addr" title="{{ wallet_user.address }}">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
         {% else %}
-          <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+          <button class="btn" type="button" onclick="(window.connectWallet||(()=>alert('Wallet script missing')))()">
             {% if meta.lang == 'ko' %}지갑{% elif meta.lang == 'ja' %}ウォレット{% elif meta.lang == 'zh' %}钱包{% else %}Wallet{% endif %}
-          </a>
+          </button>
         {% endif %}
 
-        <!-- Language dropdown -->
-        <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
-          <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
-            <span class="flag-emoji" aria-hidden="true"></span>
-            <span class="label">
-              {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
-            </span>
-            <svg class="chev" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true">
-              <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-          <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
-            <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-            <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-            <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-            <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
-          </ul>
-        </div>
+        <button class="mnav-toggle" id="mnavToggle" type="button" aria-controls="mnavSheet" aria-expanded="false" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Slide-down sheet -->
+    <div class="mnav-sheet" id="mnavSheet" hidden>
+      <nav class="mnav-list" aria-label="Primary">
+        <a class="item" href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+          🏠 {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
+        </a>
+        <a class="item" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
+          🎁 {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
+        </a>
+        <a class="item active" href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
+          📣 {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
+        </a>
+        <a class="item" href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
+          🏆 {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+        </a>
+        <a class="item outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
+          📝 {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
+        </a>
       </nav>
+
+      <!-- Language switcher -->
+      <div class="mnav-lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+        <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="flag-emoji" aria-hidden="true"></span>
+          <span class="label">
+            {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+          </span>
+          <svg class="chev" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true">
+            <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
+          <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
+          <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
+          <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
+          <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
+        </ul>
+      </div>
+
+      {% if wallet_user %}
+        <button class="danger" type="button" onclick="(window.logoutWallet||(()=>alert('Wallet script missing')))()">
+          {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ログアウト{% elif meta.lang == 'zh' %}退出{% else %}Logout{% endif %}
+        </button>
+      {% endif %}
     </div>
   </header>
+
 
   <!-- HEADER -->
   <section class="page-head">
@@ -369,5 +451,80 @@
     window.connectWallet = connectWallet;
     window.logoutWallet  = logoutWallet;
   </script>
+  <script>
+(function(){
+  // Sheet toggle
+  const $toggle = document.getElementById('mnavToggle');
+  const $sheet  = document.getElementById('mnavSheet');
+  if($toggle && $sheet){
+    const open = ()=>{ $sheet.hidden = false; $toggle.setAttribute('aria-expanded','true'); document.documentElement.style.overflow='hidden'; };
+    const close= ()=>{ $sheet.hidden = true;  $toggle.setAttribute('aria-expanded','false'); document.documentElement.style.overflow=''; };
+    $toggle.addEventListener('click', ()=> $sheet.hidden ? open() : close());
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
+
+    // Close sheet on outside click (only when open)
+    document.addEventListener('click', (e)=>{
+      if($sheet.hidden) return;
+      const within = e.target.closest('#mnavSheet') || e.target.closest('#mnavToggle');
+      if(!within) close();
+    });
+  }
+
+  // Language switcher (same routing rules as desktop)
+  const $wrap = document.getElementById('langSwitcher');
+  if($wrap){
+    const $btn  = $wrap.querySelector('.lang-btn');
+    const $menu = $wrap.querySelector('.lang-menu');
+    const current = ($wrap.dataset.current || 'en').toLowerCase();
+    const flagEl = $btn.querySelector('.flag-emoji');
+    const labelEl= $btn.querySelector('.label');
+    const flagMap= { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
+    flagEl.textContent = flagMap[current] || '🇺🇸';
+
+    function closeMenu(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
+    function openMenu(){  $wrap.classList.add('open');    $btn.setAttribute('aria-expanded','true');  }
+
+    $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.contains('open') ? closeMenu() : openMenu(); });
+    document.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
+
+    function pathFor(lang){
+      const loc = window.location;
+      const path = loc.pathname;
+      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix
+      const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
+      const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
+      if(isApply){
+        if(lang === 'en') return '/rewards/apply/?lang=en';
+        return `/rewards/apply/${lang}/`;
+      }
+      if(baseMap[clean]){
+        if(lang === 'en'){
+          const q = new URLSearchParams(loc.search);
+          q.set('lang','en');
+          return clean + (q.toString() ? `?${q.toString()}` : '');
+        }
+        return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
+      }
+      const params = new URLSearchParams(loc.search);
+      params.set('lang', lang);
+      return path + (params.toString() ? `?${params.toString()}` : '');
+    }
+
+    $menu.querySelectorAll('.lang-item').forEach(li=>{
+      li.addEventListener('click', ()=>{
+        const lang  = li.getAttribute('data-lang');
+        const emoji = li.getAttribute('data-flag') || '';
+        flagEl.textContent = emoji;
+        labelEl.textContent = lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
+        closeMenu();
+        const target = pathFor(lang);
+        if(target) window.location.href = target;
+      });
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
