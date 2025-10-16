@@ -438,55 +438,106 @@
 
     <!-- CSRF + Wallet helpers (same pattern as your other pages) -->
     <script>
-      function getCookie(name){
-        const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
-        return m ? decodeURIComponent(m[2]) : null;
-      }
-      async function apiGet(url){
-        const r = await fetch(url, { credentials: 'same-origin' });
-        if(!r.ok) throw new Error((await r.text()) || ('GET ' + url + ' failed'));
-        return r.json();
-      }
-      async function apiPost(url, json){
-        const r = await fetch(url, {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || '' },
-          body: JSON.stringify(json || {})
-        });
-        if(!r.ok){
-          let msg;
-          try{ msg = (await r.json()).error }catch(e){ msg = await r.text(); }
-          throw new Error(msg || ('POST ' + url + ' failed'));
+  // ---------- CSRF + API ----------
+  function getCookie(name){
+    const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
+    return m ? decodeURIComponent(m[2]) : null;
+  }
+  async function apiGet(url){
+    const r = await fetch(url, { credentials: 'same-origin' });
+    if(!r.ok) throw new Error((await r.text()) || ('GET ' + url + ' failed'));
+    return r.json();
+  }
+  async function apiPost(url, json){
+    const r = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || '' },
+      body: JSON.stringify(json || {})
+    });
+    if(!r.ok){
+      let msg; try{ msg = (await r.json()).error }catch(e){ msg = await r.text(); }
+      throw new Error(msg || ('POST ' + url + ' failed'));
+    }
+    return r.json();
+  }
+
+  // ---------- EIP-1193 provider helpers ----------
+  function pickEthereumProvider(){
+    // Some wallets expose multiple providers under window.ethereum.providers
+    const eth = window.ethereum;
+    if(!eth) return null;
+    if(Array.isArray(eth.providers)){
+      // Prefer MetaMask if present, else first provider
+      const mm = eth.providers.find(p => p.isMetaMask);
+      return mm || eth.providers[0] || eth;
+    }
+    return eth;
+  }
+  function isMobile(){
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+  }
+
+  // Build a MetaMask deep-link to open your site inside the in-app browser
+  function buildMetaMaskDeepLink(){
+    // MetaMask expects https://metamask.app.link/dapp/<host><path><search><hash> (no scheme on the dapp URL)
+    const dapp = location.host + location.pathname + location.search + location.hash;
+    return 'https://metamask.app.link/dapp/' + dapp;
+  }
+
+  // ---------- Wallet connect flow (desktop + mobile) ----------
+  async function connectWallet(){
+    try{
+      const provider = pickEthereumProvider();
+
+      if(!provider){
+        // No injected provider: on mobile, try deep-link into MetaMask; on desktop, show install message
+        if(isMobile()){
+          // Open in MetaMask app browser
+          window.location.href = buildMetaMaskDeepLink();
+          return;
+        }else{
+          alert('MetaMask not detected. Please install MetaMask and refresh.');
+          return;
         }
-        return r.json();
       }
-      async function connectWallet(){
-        try{
-          if(!window.ethereum){ alert('MetaMask not detected. Please install MetaMask.'); return; }
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const address = (accounts && accounts[0]) ? accounts[0] : null;
-          if(!address){ alert('No account selected.'); return; }
-          const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
-          if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
-          const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
-          const signature = await window.ethereum.request({ method: 'personal_sign', params: [ message, address ] });
-          const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
-          if(verifyRes && verifyRes.ok){ window.location.reload(); } else { alert('Login failed.'); }
-        }catch(err){ console.error(err); alert('Wallet login failed: ' + (err && err.message ? err.message : err)); }
+
+      // Standard EIP-1193 request (works in MetaMask in-app browser on mobile and in desktop extensions)
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      const address = (accounts && accounts[0]) ? accounts[0] : null;
+      if(!address){ alert('No account selected.'); return; }
+
+      // Nonce + signature (SIWE-style)
+      const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
+      if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
+      const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
+
+      const signature = await provider.request({
+        method: 'personal_sign',
+        params: [ message, address ]
+      });
+
+      const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
+      if(verifyRes && verifyRes.ok){
+        window.location.reload();
+      }else{
+        alert('Login failed.');
       }
-      async function logoutWallet(){
-        try{
-          await apiPost('/api/auth/logout', {});
-          window.location.reload();
-        }catch(err){
-          console.error(err);
-          alert('Logout failed: ' + (err && err.message ? err.message : err));
-        }
-      }
-      window.connectWallet = connectWallet;
-      window.logoutWallet  = logoutWallet;
-    </script>
+    }catch(err){
+      console.error(err);
+      alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+    }
+  }
+
+  async function logoutWallet(){
+    try{ await apiPost('/api/auth/logout', {}); window.location.reload(); }
+    catch(err){ console.error(err); alert('Logout failed: ' + (err && err.message ? err.message : err)); }
+  }
+
+  window.connectWallet = connectWallet;
+  window.logoutWallet  = logoutWallet;
+</script>
+
     <script>
 (function(){
   // Sheet toggle
