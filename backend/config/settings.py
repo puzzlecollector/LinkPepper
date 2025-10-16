@@ -122,6 +122,10 @@ USE_TZ = True
 # --------------------------------------------------------------------------------------
 # Static / Media
 # --------------------------------------------------------------------------------------
+# serve user uploads from /media/
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 # App/static collection target (for collectstatic in prod)
 STATIC_URL = "/static/"
 STATIC_ROOT = PROJECT_ROOT / "staticfiles"
