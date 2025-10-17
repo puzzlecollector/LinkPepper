@@ -700,9 +700,9 @@ def _clean_network(value: str) -> str | None:
 
 @require_POST
 def submit_link(request, slug):
-    need = _need_login(request)
-    if need:
-        return need
+    # need = _need_login(request)
+    # if need:
+    #     return need
 
     user = get_wallet_user(request)
     campaign = get_object_or_404(Campaign, slug=slug)
@@ -738,9 +738,9 @@ def submit_link(request, slug):
 
 @require_POST
 def submit_visit(request, slug):
-    need = _need_login(request)
-    if need:
-        return need
+    # need = _need_login(request)
+    # if need:
+    #     return need
 
     user = get_wallet_user(request)
     campaign = get_object_or_404(Campaign, slug=slug)
