@@ -463,14 +463,13 @@
                                     <div class="example">
                                         <div style="margin-bottom:6px;">
                                             {% if s.post_url %}
-                                            <a
-                                                href="{{ s.post_url }}"
-                                                target="_blank"
-                                                rel="noopener"
-                                                style="text-decoration:underline; color:#d8ffe7"
-                                            >{{ s.post_url }}</a>
+                                            <span style="color:#cfe7dd">
+                                                {% if meta.lang == 'ko' %}외부 게시물 제출{% elif meta.lang == 'ja' %}外部投稿を提出{% elif meta.lang == 'zh' %}已提交外部帖子{% else %}External post submitted{% endif %}
+                                            </span>
                                             {% elif s.visited_url %}
-                                            <span style="color:#cfe7dd">{{ s.visited_url }}</span>
+                                            <span style="color:#cfe7dd">
+                                                {% if meta.lang == 'ko' %}방문 완료{% elif meta.lang == 'ja' %}訪問完了{% elif meta.lang == 'zh' %}已访问{% else %}Visit recorded{% endif %}
+                                            </span>
                                             {% else %}
                                             <span style="color:#cfe7dd">{{ s.comment|default:"(no comment)" }}</span>
                                             {% endif %}
