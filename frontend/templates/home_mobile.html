@@ -638,7 +638,7 @@
                                     <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
                                 </div>
                                 <div class="foot">
-                                    <a class="btn" href="/rewards/{{ c.slug }}/">{% if meta.lang == 'ko' %}자세히{% elif meta.lang == 'ja' %}詳細{% elif meta.lang == 'zh' %}详情{% else %}Details{% endif %}</a>
+                                    <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/">{% if meta.lang == 'ko' %}자세히{% elif meta.lang == 'ja' %}詳細{% elif meta.lang == 'zh' %}详情{% else %}Details{% endif %}</a>
                                 </div>
                             </div>
                         </article>
@@ -707,7 +707,7 @@
                                     <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
                                 </div>
                                 <div class="foot">
-                                    <a class="btn" href="/rewards/{{ c.slug }}/">{% if meta.lang == 'ko' %}요약{% elif meta.lang == 'ja' %}サマリー{% elif meta.lang == 'zh' %}总结{% else %}Summary{% endif %}</a>
+                                    <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/">{% if meta.lang == 'ko' %}요약{% elif meta.lang == 'ja' %}サマリー{% elif meta.lang == 'zh' %}总结{% else %}Summary{% endif %}</a>
                                 </div>
                             </div>
                         </article>
