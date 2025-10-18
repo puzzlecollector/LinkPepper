@@ -776,17 +776,20 @@
         </script>
         <!-- Remove any previous WC/Web3Modal script tags -->
         <script>
-/** WalletConnect v2 UMD loader (jsDelivr) + global shim */
-const WC_UMD_URL = "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js";
+/** WalletConnect v2 UMD loader with fallback + robust global detection */
+const WC_UMD_URLS = [
+  "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js",
+  "https://unpkg.com/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js",
+  "https://cdn.walletconnect.com/ethereum-provider@2.11.2/index.umd.min.js"
+];
 
-/** Load once and wait until it actually executes */
+/** Load a script tag exactly once for a given src */
 function loadScriptOnce(src){
   return new Promise((resolve, reject)=>{
     if (document.querySelector(`script[data-wc="${src}"]`)) return resolve();
     const s = document.createElement('script');
     s.src = src;
-    s.async = true;
-    s.defer = true;
+    // Intentionally DO NOT set async/defer to reduce race conditions for UMD globals.
     s.setAttribute('data-wc', src);
     s.onload = ()=> resolve();
     s.onerror = ()=> reject(new Error('Failed to load ' + src));
@@ -794,19 +797,59 @@ function loadScriptOnce(src){
   });
 }
 
-/** Get the EthereumProvider constructor regardless of UMD name differences */
+/** Try multiple CDNs in order */
+async function loadWalletConnectUMD(){
+  let lastErr;
+  for (const url of WC_UMD_URLS){
+    try{
+      await loadScriptOnce(url);
+      return url;
+    }catch(err){
+      lastErr = err;
+    }
+  }
+  throw lastErr || new Error('Failed to load WC UMD from all CDNs');
+}
+
+/** Probe every plausible UMD global for @walletconnect/ethereum-provider v2 */
 function getEthereumProviderGlobal(){
+  // Official default in many builds:
   if (window.EthereumProvider && typeof window.EthereumProvider.init === 'function') {
     return window.EthereumProvider;
   }
-  if (window.WalletConnectProvider && window.WalletConnectProvider.EthereumProvider) {
-    return window.WalletConnectProvider.EthereumProvider;
+  // Some UMD builds expose this name:
+  if (window.WalletConnectEthereumProvider && typeof window.WalletConnectEthereumProvider.init === 'function') {
+    return window.WalletConnectEthereumProvider;
+  }
+  // Some wrappers/namespaces:
+  if (window.WalletConnectProvider) {
+    // Sometimes default export is nested under .default
+    if (window.WalletConnectProvider.default && typeof window.WalletConnectProvider.default.init === 'function') {
+      return window.WalletConnectProvider.default;
+    }
+    // Sometimes exposed under a property
+    if (window.WalletConnectProvider.EthereumProvider && typeof window.WalletConnectProvider.EthereumProvider.init === 'function') {
+      return window.WalletConnectProvider.EthereumProvider;
+    }
   }
   return null;
 }
+
+/** Wait briefly for the global to appear (in case UMD takes a tick) */
+function waitForEthereumProviderGlobal(timeoutMs = 1500){
+  const start = Date.now();
+  return new Promise((resolve)=>{
+    (function check(){
+      const EP = getEthereumProviderGlobal();
+      if (EP) return resolve(EP);
+      if (Date.now() - start > timeoutMs) return resolve(null);
+      setTimeout(check, 50);
+    })();
+  });
+}
         </script>
         <script>
-/** Replace with your Reown Project ID (App project, not Wallet project) */
+/** Your Reown Project ID (must be an App project, and your domain must be allow-listed) */
 const WC_PROJECT_ID = 'c1a3ea2d1e5c23e1f3abb31b0d7dc565';
 
 const PRIMARY_CHAIN = 1;                        // mainnet
@@ -836,14 +879,21 @@ async function apiPost(url, body){
 async function ensureProvider(){
   if (wcProvider) return wcProvider;
 
-  // 1) Load the UMD file
-  await loadScriptOnce(WC_UMD_URL);
+  // 1) Load the UMD (with multi-CDN fallback)
+  const usedCdn = await loadWalletConnectUMD();
 
-  // 2) Grab the constructor
-  const EP = getEthereumProviderGlobal();
+  // 2) Try to find the global (with a short wait loop)
+  const EP = await waitForEthereumProviderGlobal(2000);
   if (!EP) {
-    // If this triggers, check CSP/ad-block/HTTPS, or self-host the UMD
-    throw new Error('WalletConnect provider script present but no global found');
+    const hint = [
+      'WalletConnect provider script present but no global found.',
+      'Quick checks:',
+      '• CSP: allow the CDN in script-src (or self-host the UMD).',
+      '• Ad blockers / content blockers.',
+      '• HTTPS origin + correct domain allowlist in Reown.',
+      '• If self-hosting, update WC_UMD_URLS to your local path.'
+    ].join('\n');
+    throw new Error(hint + `\nCDN used: ${usedCdn}`);
   }
 
   // 3) Initialize the provider
@@ -863,7 +913,6 @@ async function ensureProvider(){
     }
   });
 
-  // Optional: listeners
   wcProvider.on?.('disconnect', () => { /* console.log('WalletConnect disconnected'); */ });
 
   return wcProvider;
@@ -900,7 +949,7 @@ async function connectWallet(){
     if (!nonceRes.ok) throw new Error(nonceRes.error || 'Nonce fetch failed');
     const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
 
-    // personal_sign (with fallbacks)
+    // personal_sign with fallbacks
     let signature;
     try{
       signature = await provider.request({ method:'personal_sign', params:[message, address] });

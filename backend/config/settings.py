@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "csp",
     CORE_APP,  # core
 ]
 
@@ -62,9 +63,48 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = "config.urls"
+
+# --- CSP baseline ---
+CSP_DEFAULT_SRC = ("'self'",)
+
+# Allow your CDNs for the WalletConnect UMD
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://cdn.walletconnect.com")
+
+
+# WalletConnect uses HTTPS + WebSockets to *.walletconnect.com relays
+CSP_CONNECT_SRC = (
+    "'self'",
+    "https://*.walletconnect.com",
+    "wss://*.walletconnect.com",
+    # If your API endpoints are on a different origin, add them here:
+    # "https://api.yourdomain.com",
+)
+
+# The modal / assets may pull images/icons from your origin and allowed CDNs
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",                      # for base64 tiny images (safe)
+    "https://cdn.jsdelivr.net",
+    "https://unpkg.com",
+    "https://cdn.walletconnect.com",
+)
+
+# Fonts (if any)
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+
+# Styles (if you have inline styles, prefer a nonce; avoid 'unsafe-inline' if you can)
+CSP_STYLE_SRC = ("'self'", "https://fonts.googleapis.com")
+
+# Frames (most WC v2 modals are in-page, but allow iframes just in case)
+CSP_FRAME_SRC = ("'self'",)
+
+# OPTIONAL hardening
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
 
 # --------------------------------------------------------------------------------------
 # Templates
