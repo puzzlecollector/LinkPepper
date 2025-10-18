@@ -774,63 +774,87 @@
       }, { threshold: .25 });
       document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(el));
         </script>
-        <script src="https://unpkg.com/@walletconnect/ethereum-provider@2/dist/index.umd.js"></script>
+        <!-- Remove any previous WC/Web3Modal script tags -->
         <script>
-/**
- * WalletConnect v2 (bare EIP-1193 provider, no Web3Modal).
- * Flow: connect -> eth_requestAccounts -> personal_sign -> POST verify
- * Works on Android Chrome with deep links and on desktop via QR.
- */
+/** Dynamically load the v2 UMD bundle and wait for it. */
+const WC_UMD_URL = "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js";
 
-const WC_PROJECT_ID = '5f67bb72c98437b5e3e3c8f778cbd626'; // <- replace
+function loadScriptOnce(src){
+  return new Promise((resolve, reject)=>{
+    if (document.querySelector(`script[data-wc="${src}"]`)) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.defer = true;
+    s.setAttribute('data-wc', src);
+    s.onload = ()=> resolve();
+    s.onerror = ()=> reject(new Error('Failed to load ' + src));
+    document.head.appendChild(s);
+  });
+}
 
-// Preferred chains (edit as you like)
-const PRIMARY_CHAIN = 1; // Ethereum mainnet
+/** Get the global constructor regardless of UMD name differences. */
+function getEthereumProviderGlobal(){
+  // v2 UMD should expose window.EthereumProvider
+  if (window.EthereumProvider && typeof window.EthereumProvider.init === 'function') {
+    return window.EthereumProvider;
+  }
+  // Very rare edge: some builds nest under a namespace
+  if (window.WalletConnectProvider && window.WalletConnectProvider.EthereumProvider) {
+    return window.WalletConnectProvider.EthereumProvider;
+  }
+  return null;
+}
+        </script>
+        <script>
+const WC_PROJECT_ID = 'c1a3ea2d1e5c23e1f3abb31b0d7dc565'; // <-- your Project ID
+
+const PRIMARY_CHAIN = 1;                  // mainnet
 const OPTIONAL_CHAINS = [137, 42161, 8453, 10]; // polygon, arbitrum, base, optimism
 
 let wcProvider = null;
 let _isConnecting = false;
 
-/** Minimal fetch helpers (keep if you don't already have them) */
+/** Minimal fetch helpers (unchanged from your code) */
 async function apiGet(url){
   const res = await fetch(url, { credentials: 'include' });
-  const data = await res.json().catch(() => ({}));
+  const data = await res.json().catch(()=> ({}));
   return { ok: res.ok, ...data };
 }
 async function apiPost(url, body){
   const res = await fetch(url, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' },
-    body: JSON.stringify(body || {})
+    method:'POST',
+    credentials:'include',
+    headers:{ 'Content-Type':'application/json', 'X-Requested-With':'fetch' },
+    body: JSON.stringify(body||{})
   });
-  const data = await res.json().catch(() => ({}));
+  const data = await res.json().catch(()=> ({}));
   return { ok: res.ok, ...data };
 }
 
-/** Create (or reuse) the WalletConnect provider */
+/** Ensure the UMD is loaded *and* the global is available before using it */
 async function ensureProvider(){
   if (wcProvider) return wcProvider;
 
-  if (!window.EthereumProvider) {
-    throw new Error('WalletConnect provider script not loaded');
+  // 1) Load UMD (jsDelivr is very reliable; switch to self-host if you use a strict CSP)
+  await loadScriptOnce(WC_UMD_URL);
+
+  // 2) Get the global constructor safely
+  const EP = getEthereumProviderGlobal();
+  if (!EP) {
+    // If you see this alert, the script was blocked by CSP/adblock/https mismatch.
+    throw new Error('WalletConnect provider script present but no global found');
   }
 
-  wcProvider = await window.EthereumProvider.init({
+  // 3) Initialize the provider
+  wcProvider = await EP.init({
     projectId: WC_PROJECT_ID,
-    // Chain setup
     chains: [PRIMARY_CHAIN],
     optionalChains: OPTIONAL_CHAINS,
-    methods: ['eth_requestAccounts','personal_sign'], // what we need
-    optionalMethods: [],
+    methods: ['eth_requestAccounts','personal_sign'],
     events: ['accountsChanged','chainChanged','disconnect'],
-    optionalEvents: [],
-    // Show the QR modal if needed (desktop w/o wallet; on mobile it offers deep links)
     showQrModal: true,
-    qrModalOptions: {
-      themeMode: 'dark'
-    },
-    // App metadata shown in wallet & modal
+    qrModalOptions: { themeMode: 'dark' },
     metadata: {
       name: 'LinkHash',
       description: 'Web3 SEO Rewards',
@@ -839,14 +863,8 @@ async function ensureProvider(){
     }
   });
 
-  // Optional: keep UI in sync with account changes
-  wcProvider.on?.('accountsChanged', (accs) => {
-    // You can update the pill address or reload if you prefer
-    // console.log('accountsChanged', accs);
-  });
-  wcProvider.on?.('disconnect', () => {
-    // console.log('wc disconnected');
-  });
+  // Optional: listen to changes
+  wcProvider.on?.('disconnect', () => { /* console.log('wc disconnected') */ });
 
   return wcProvider;
 }
@@ -863,48 +881,33 @@ async function connectWallet(){
   try{
     const provider = await ensureProvider();
 
-    // 1) Start a session if we don't have one
-    //    (opens QR modal on desktop, deep links on mobile)
+    // Open a session if needed (QR modal on desktop, deep links on mobile)
     if (!provider.session) {
-      await provider.connect(); // waits for wallet approval
+      await provider.connect();
     }
 
-    // 2) Request accounts
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
     const address  = accounts && accounts[0];
     if (!address) throw new Error('No account selected');
 
-    // 3) Fetch nonce/message from your backend
     const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
     if (!nonceRes.ok) throw new Error(nonceRes.error || 'Nonce fetch failed');
     const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
 
-    // 4) Sign the message (try utf8, then fallbacks)
+    // personal_sign with fallbacks
     let signature;
     try{
-      signature = await provider.request({
-        method: 'personal_sign',
-        params: [message, address] // common order
-      });
+      signature = await provider.request({ method:'personal_sign', params:[message, address] });
     }catch(e1){
       try{
-        // Some wallets expect [address, message]
-        signature = await provider.request({
-          method: 'personal_sign',
-          params: [address, message]
-        });
+        signature = await provider.request({ method:'personal_sign', params:[address, message] });
       }catch(e2){
-        // Hex-encode as a last resort
         const hexMsg = '0x' + Array.from(new TextEncoder().encode(message))
           .map(b => b.toString(16).padStart(2,'0')).join('');
-        signature = await provider.request({
-          method: 'personal_sign',
-          params: [hexMsg, address]
-        });
+        signature = await provider.request({ method:'personal_sign', params:[hexMsg, address] });
       }
     }
 
-    // 5) Verify on backend -> session cookie
     const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
     if (verifyRes && verifyRes.ok){
       window.location.reload();
@@ -913,24 +916,22 @@ async function connectWallet(){
     throw new Error('Verify failed');
   }catch(err){
     console.error(err);
-    alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+    alert('Wallet login failed: ' + (err?.message || err));
   }finally{
     if (btn) { btn.disabled = false; btn.textContent = prev; }
     _isConnecting = false;
   }
 }
 
-/** Public: logout (kill WC session + your server session) */
+/** Public: logout (disconnect WC + your server) */
 async function logoutWallet(){
   try{
-    if (wcProvider && wcProvider.disconnect) {
-      await wcProvider.disconnect();
-    }
+    if (wcProvider?.disconnect) await wcProvider.disconnect();
     await apiPost('/api/auth/logout', {});
     window.location.reload();
   }catch(err){
     console.error(err);
-    alert('Logout failed: ' + (err && err.message ? err.message : err));
+    alert('Logout failed: ' + (err?.message || err));
   }
 }
 
