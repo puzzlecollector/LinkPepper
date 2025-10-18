@@ -774,99 +774,173 @@
       }, { threshold: .25 });
       document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(el));
         </script>
+        <!-- Web3Modal + WalletConnect (vanilla / no build) -->
+        <script src="https://unpkg.com/@web3modal/ethereum@^2/dist/index.umd.js"></script>
+        <script src="https://unpkg.com/@web3modal/html@^2/dist/index.umd.js"></script>
         <script>
-  // ---------- Lazy SDK loader (awaits the CDN script) ----------
-  let __mmSdk, __mmLoadingPromise;
+/**
+ * WalletConnect v2 + Web3Modal (vanilla)
+ * Flow: open modal -> connect -> request accounts -> personal_sign -> POST verify
+ * Works on Android Chrome (mobile) with deep links, and on desktop via QR.
+ */
 
-  function loadScriptOnce(src){
-    if (__mmLoadingPromise) return __mmLoadingPromise;
-    __mmLoadingPromise = new Promise((resolve, reject)=>{
-      // If already present (from other pages), resolve immediately
-      if (window.MetaMaskSDK) return resolve();
-      const s = document.createElement('script');
-      s.src = src;
-      s.async = true;
-      s.onload = ()=> resolve();
-      s.onerror = ()=> reject(new Error('Failed to load MetaMask SDK'));
-      document.head.appendChild(s);
+const WC_PROJECT_ID = '5f67bb72c98437b5e3e3c8f778cbd626'; // <-- 1) put your Project ID here
+
+// --- App chains (edit if you prefer different networks)
+const CHAINS = {
+  ethereum: { chainId: 1 },
+  // optional extras (modal lets user pick any; you can restrict)
+  polygon:  { chainId: 137 },
+  arbitrum: { chainId: 42161 },
+  base:     { chainId: 8453 },
+  optimism: { chainId: 10 }
+};
+
+// ---- Singletons
+let _w3m, _w3mProvider, _isConnecting = false;
+
+/** Minimal helpers (if you don’t already have them) */
+async function apiGet(url){
+  const res = await fetch(url, { credentials: 'include' });
+  const data = await res.json().catch(()=> ({}));
+  return { ok: res.ok, ...data };
+}
+async function apiPost(url, body){
+  const res = await fetch(url, {
+    method:'POST',
+    credentials:'include',
+    headers:{ 'Content-Type':'application/json', 'X-Requested-With':'fetch' },
+    body: JSON.stringify(body||{})
+  });
+  const data = await res.json().catch(()=> ({}));
+  return { ok: res.ok, ...data };
+}
+
+/** Initialize Web3Modal once (lazy) */
+function ensureWeb3Modal(){
+  if (_w3m && _w3mProvider) return { w3m: _w3m, provider: _w3mProvider };
+
+  const { EthereumClient, w3mProvider, w3mConnectors } = window.w3m.ethereum;
+  const { Web3Modal } = window.w3m;
+
+  // Build an EthereumClient (no React required)
+  const chains = [
+    CHAINS.ethereum,
+    CHAINS.polygon, CHAINS.arbitrum, CHAINS.base, CHAINS.optimism
+  ].filter(Boolean);
+
+  // Web3Modal needs an EthereumClient, which is created from wagmi config.
+  // The UMD provides a helper to assemble this without React.
+  const metadata = {
+    name: 'LinkHash',
+    description: 'Web3 SEO Rewards',
+    url: window.location.origin,
+    icons: ['https://favicone.com/linkhash.png'] // optional logo
+  };
+
+  const wagmiConfig = window.w3m.createConfig({
+    chains,
+    transports: chains.reduce((acc, c) => {
+      acc[c.chainId] = window.w3m.http(`https://rpc.walletconnect.com/v1/?projectId=${WC_PROJECT_ID}`);
+      return acc;
+    }, {}),
+    projectId: WC_PROJECT_ID,
+    metadata,
+    // Let users choose any wallet supported by WalletConnect
+    connectors: w3mConnectors({ projectId: WC_PROJECT_ID, chains })
+  });
+
+  const ethereumClient = new EthereumClient(wagmiConfig, chains);
+
+  _w3m = new Web3Modal({
+    projectId: WC_PROJECT_ID,
+    themeMode: 'dark',
+    themeVariables: { '--w3m-accent': '#19b357' },
+    enableAnalytics: false
+  }, ethereumClient);
+
+  // A convenience EIP-1193 provider that respects the connected wallet
+  _w3mProvider = window.w3m.getWalletConnectProvider({
+    projectId: WC_PROJECT_ID,
+    chains: chains.map(c => c.chainId),
+    optionalChains: [],
+    showQrModal: false // Web3Modal handles the UI
+  });
+
+  return { w3m: _w3m, provider: _w3mProvider };
+}
+
+/** Public: connect + sign-in */
+async function connectWallet(){
+  if (_isConnecting) return;
+  _isConnecting = true;
+
+  const btn = document.querySelector('.mnav .btn:not(.danger)');
+  const prev = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Connecting…'; }
+
+  try{
+    const { w3m, provider } = ensureWeb3Modal();
+
+    // 1) Open Web3Modal (mobile deep link / desktop QR)
+    await w3m.open(); // shows the modal
+
+    // 2) Request accounts via the EIP-1193 provider the modal connects
+    const accounts = await provider.request({ method: 'eth_requestAccounts' })
+      .catch(async (e) => {
+        // Some wallets require an explicit "connect" call first
+        if (e && String(e.message || e).includes('connect')) {
+          await provider.connect();
+          return provider.request({ method:'eth_requestAccounts' });
+        }
+        throw e;
+      });
+
+    const address = accounts && accounts[0];
+    if (!address) throw new Error('No account selected');
+
+    // 3) Get nonce/message from backend
+    const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
+    if(!nonceRes.ok) throw new Error(nonceRes.error || 'Nonce fetch failed');
+    const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
+
+    // 4) Sign (WalletConnect-compatible)
+    // Most wallets accept utf8; if a wallet complains, hex-encode the message.
+    const signature = await provider.request({
+      method: 'personal_sign',
+      params: [ message, address ] // note: some wallets accept [message, address]
     });
-    return __mmLoadingPromise;
-  }
 
-  async function ensureMMSDK(){
-    if (__mmSdk) return __mmSdk;
-    // Load CDN script only when first needed
-    await loadScriptOnce('https://unpkg.com/@metamask/sdk/dist/metamask-sdk.js');
-    if (!window.MetaMaskSDK) throw new Error('MetaMask SDK not available after load');
-    __mmSdk = new window.MetaMaskSDK({
-      useDeeplink: true,
-      extensionOnly: false,
-      dappMetadata: { name: 'LinkHash', url: location.origin }
-    });
-    return __mmSdk;
-  }
-
-  // ---------- Public actions ----------
-  let __walletBusy = false;
-
-  async function connectWallet(){
-    if (__walletBusy) return; // prevent double taps
-    __walletBusy = true;
-    try{
-      const btn = document.querySelector('.mnav .btn');
-      if (btn) { btn.disabled = true; btn.dataset.prev = btn.textContent; btn.textContent = 'Connecting…'; }
-
-      const ethereum = (await ensureMMSDK()).getProvider();
-
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      const address  = accounts && accounts[0];
-      if(!address) throw new Error('No account selected');
-
-      const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
-      if(!nonceRes || !nonceRes.ok) throw new Error(nonceRes && nonceRes.error || 'Nonce fetch failed');
-      const message  = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
-
-      const signature = await ethereum.request({ method: 'personal_sign', params: [message, address] });
-
-      const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
-      if(verifyRes && verifyRes.ok) { window.location.reload(); return; }
-
-      throw new Error('Verify failed');
-    }catch(err){
-      console.error(err);
-      alert('Wallet login failed: ' + (err && err.message ? err.message : err));
-    }finally{
-      __walletBusy = false;
-      const btn = document.querySelector('.mnav .btn');
-      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.prev || btn.textContent; }
+    // 5) Verify on backend -> create session
+    const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
+    if (verifyRes && verifyRes.ok){
+      window.location.reload();
+      return;
     }
+    throw new Error('Verify failed');
+  }catch(err){
+    console.error(err);
+    alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+  }finally{
+    if (btn) { btn.disabled = false; btn.textContent = prev; }
+    _isConnecting = false;
   }
+}
 
-  async function logoutWallet(){
-    try{ await apiPost('/api/auth/logout', {}); window.location.reload(); }
-    catch(err){ console.error(err); alert('Logout failed: ' + (err && err.message ? err.message : err)); }
+/** Public: logout (your backend ends session) */
+async function logoutWallet(){
+  try{
+    await apiPost('/api/auth/logout', {});
+    window.location.reload();
+  }catch(err){
+    console.error(err);
+    alert('Logout failed: ' + (err && err.message ? err.message : err));
   }
+}
 
-  // expose
-  window.connectWallet = connectWallet;
-  window.logoutWallet  = logoutWallet;
-
-  // ---------- Minimal fetch helpers (if you don’t already include them) ----------
-  async function apiGet(url){
-    const res = await fetch(url, { credentials:'include' });
-    const data = await res.json().catch(()=> ({}));
-    return { ok: res.ok, ...data };
-  }
-  async function apiPost(url, body){
-    const res = await fetch(url, {
-      method:'POST',
-      credentials:'include',
-      headers:{ 'Content-Type':'application/json', 'X-Requested-With':'fetch' },
-      body: JSON.stringify(body||{})
-    });
-    const data = await res.json().catch(()=> ({}));
-    return { ok: res.ok, ...data };
-  }
+// Expose for your button onclick
+window.connectWallet = connectWallet;
+window.logoutWallet  = logoutWallet;
         </script>
         <script>
 (function(){
