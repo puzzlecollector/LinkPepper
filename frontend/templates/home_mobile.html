@@ -739,7 +739,6 @@
             </div>
         </footer>
         <!-- ===== JS: progress/reveal + wallet + language ===== -->
-        <script src="https://unpkg.com/@metamask/sdk/dist/metamask-sdk.js"></script>
         <script>
       // Progress bars (animate when visible)
       const barsObserver = new IntersectionObserver((entries)=>{
@@ -776,13 +775,29 @@
       document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(el));
         </script>
         <script>
-  // --- Lazy, single-instance MetaMask SDK (safe on mobile/slow loads) ---
-  let __mmSdk; // not const (we assign once, then reuse)
-  function getMMSDK(){
+  // ---------- Lazy SDK loader (awaits the CDN script) ----------
+  let __mmSdk, __mmLoadingPromise;
+
+  function loadScriptOnce(src){
+    if (__mmLoadingPromise) return __mmLoadingPromise;
+    __mmLoadingPromise = new Promise((resolve, reject)=>{
+      // If already present (from other pages), resolve immediately
+      if (window.MetaMaskSDK) return resolve();
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = ()=> resolve();
+      s.onerror = ()=> reject(new Error('Failed to load MetaMask SDK'));
+      document.head.appendChild(s);
+    });
+    return __mmLoadingPromise;
+  }
+
+  async function ensureMMSDK(){
     if (__mmSdk) return __mmSdk;
-    if (!window.MetaMaskSDK) {
-      throw new Error('MetaMask SDK script not loaded yet');
-    }
+    // Load CDN script only when first needed
+    await loadScriptOnce('https://unpkg.com/@metamask/sdk/dist/metamask-sdk.js');
+    if (!window.MetaMaskSDK) throw new Error('MetaMask SDK not available after load');
     __mmSdk = new window.MetaMaskSDK({
       useDeeplink: true,
       extensionOnly: false,
@@ -791,33 +806,39 @@
     return __mmSdk;
   }
 
-  async function connectWallet(){
-    try{
-      const ethereum = getMMSDK().getProvider();
+  // ---------- Public actions ----------
+  let __walletBusy = false;
 
-      // 1) Request accounts (mobile => app switch)
+  async function connectWallet(){
+    if (__walletBusy) return; // prevent double taps
+    __walletBusy = true;
+    try{
+      const btn = document.querySelector('.mnav .btn');
+      if (btn) { btn.disabled = true; btn.dataset.prev = btn.textContent; btn.textContent = 'Connecting…'; }
+
+      const ethereum = (await ensureMMSDK()).getProvider();
+
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
       const address  = accounts && accounts[0];
-      if(!address){ alert('No account selected.'); return; }
+      if(!address) throw new Error('No account selected');
 
-      // 2) Get nonce/message from backend
       const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
-      if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
-      const message  = nonceRes.message;
+      if(!nonceRes || !nonceRes.ok) throw new Error(nonceRes && nonceRes.error || 'Nonce fetch failed');
+      const message  = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
 
-      // 3) Sign
-      const signature = await ethereum.request({
-        method: 'personal_sign',
-        params: [message, address]
-      });
+      const signature = await ethereum.request({ method: 'personal_sign', params: [message, address] });
 
-      // 4) Verify -> session
       const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
-      if(verifyRes && verifyRes.ok) window.location.reload();
-      else alert('Login failed.');
+      if(verifyRes && verifyRes.ok) { window.location.reload(); return; }
+
+      throw new Error('Verify failed');
     }catch(err){
       console.error(err);
       alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+    }finally{
+      __walletBusy = false;
+      const btn = document.querySelector('.mnav .btn');
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.prev || btn.textContent; }
     }
   }
 
@@ -826,8 +847,26 @@
     catch(err){ console.error(err); alert('Logout failed: ' + (err && err.message ? err.message : err)); }
   }
 
+  // expose
   window.connectWallet = connectWallet;
   window.logoutWallet  = logoutWallet;
+
+  // ---------- Minimal fetch helpers (if you don’t already include them) ----------
+  async function apiGet(url){
+    const res = await fetch(url, { credentials:'include' });
+    const data = await res.json().catch(()=> ({}));
+    return { ok: res.ok, ...data };
+  }
+  async function apiPost(url, body){
+    const res = await fetch(url, {
+      method:'POST',
+      credentials:'include',
+      headers:{ 'Content-Type':'application/json', 'X-Requested-With':'fetch' },
+      body: JSON.stringify(body||{})
+    });
+    const data = await res.json().catch(()=> ({}));
+    return { ok: res.ok, ...data };
+  }
         </script>
         <script>
 (function(){
