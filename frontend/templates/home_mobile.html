@@ -739,6 +739,7 @@
             </div>
         </footer>
         <!-- ===== JS: progress/reveal + wallet + language ===== -->
+        <script src="https://unpkg.com/@metamask/sdk/dist/metamask-sdk.js"></script>
         <script>
       // Progress bars (animate when visible)
       const barsObserver = new IntersectionObserver((entries)=>{
@@ -775,88 +776,41 @@
       document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(el));
         </script>
         <script>
-  // ---------- CSRF + API ----------
-  function getCookie(name){
-    const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
-    return m ? decodeURIComponent(m[2]) : null;
-  }
-  async function apiGet(url){
-    const r = await fetch(url, { credentials: 'same-origin' });
-    if(!r.ok) throw new Error((await r.text()) || ('GET ' + url + ' failed'));
-    return r.json();
-  }
-  async function apiPost(url, json){
-    const r = await fetch(url, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || '' },
-      body: JSON.stringify(json || {})
-    });
-    if(!r.ok){
-      let msg; try{ msg = (await r.json()).error }catch(e){ msg = await r.text(); }
-      throw new Error(msg || ('POST ' + url + ' failed'));
+  // ---- MetaMask SDK init (works on desktop & mobile) ----
+  const MMSDK = new MetaMaskSDK({
+    useDeeplink: true,                 // mobile: open the MetaMask app
+    extensionOnly: false,              // desktop fallback to extension if present
+    dappMetadata: {
+      name: 'LinkHash',
+      url: location.origin
     }
-    return r.json();
-  }
+    // You can also set logging, storage, etc.
+  });
 
-  // ---------- EIP-1193 provider helpers ----------
-  function pickEthereumProvider(){
-    // Some wallets expose multiple providers under window.ethereum.providers
-    const eth = window.ethereum;
-    if(!eth) return null;
-    if(Array.isArray(eth.providers)){
-      // Prefer MetaMask if present, else first provider
-      const mm = eth.providers.find(p => p.isMetaMask);
-      return mm || eth.providers[0] || eth;
-    }
-    return eth;
-  }
-  function isMobile(){
-    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
-  }
-
-  // Build a MetaMask deep-link to open your site inside the in-app browser
-  function buildMetaMaskDeepLink(){
-    // MetaMask expects https://metamask.app.link/dapp/<host><path><search><hash> (no scheme on the dapp URL)
-    const dapp = location.host + location.pathname + location.search + location.hash;
-    return 'https://metamask.app.link/dapp/' + dapp;
-  }
-
-  // ---------- Wallet connect flow (desktop + mobile) ----------
   async function connectWallet(){
     try{
-      const provider = pickEthereumProvider();
+      const ethereum = MMSDK.getProvider();
 
-      if(!provider){
-        // No injected provider: on mobile, try deep-link into MetaMask; on desktop, show install message
-        if(isMobile()){
-          // Open in MetaMask app browser
-          window.location.href = buildMetaMaskDeepLink();
-          return;
-        }else{
-          alert('MetaMask not detected. Please install MetaMask and refresh.');
-          return;
-        }
-      }
-
-      // Standard EIP-1193 request (works in MetaMask in-app browser on mobile and in desktop extensions)
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      // 1) Request accounts (this will app-switch on mobile)
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
       const address = (accounts && accounts[0]) ? accounts[0] : null;
       if(!address){ alert('No account selected.'); return; }
 
-      // Nonce + signature (SIWE-style)
+      // 2) Get nonce/message from your backend
       const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
       if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
       const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
 
-      const signature = await provider.request({
+      // 3) Ask MetaMask to sign your canonical message
+      const signature = await ethereum.request({
         method: 'personal_sign',
         params: [ message, address ]
       });
 
+      // 4) Verify on your backend (session will be created)
       const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
       if(verifyRes && verifyRes.ok){
-        window.location.reload();
+        window.location.reload(); // now request.user has a session (wallet_user)
       }else{
         alert('Login failed.');
       }
@@ -871,67 +825,9 @@
     catch(err){ console.error(err); alert('Logout failed: ' + (err && err.message ? err.message : err)); }
   }
 
+  // expose
   window.connectWallet = connectWallet;
   window.logoutWallet  = logoutWallet;
-        </script>
-        <script>
-      // Language dropdown (same routing logic as desktop)
-      (function(){
-        const $wrap = document.getElementById('langSwitcher');
-        if(!$wrap) return;
-        const $btn  = $wrap.querySelector('.lang-btn');
-        const $menu = $wrap.querySelector('.lang-menu');
-        const current = ($wrap.dataset.current || 'en').toLowerCase();
-
-        const flagEl = $btn.querySelector('.flag-emoji');
-        const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
-        flagEl.textContent = flagMap[current] || '🇺🇸';
-
-        function open(){ $wrap.classList.add('open'); $btn.setAttribute('aria-expanded','true'); }
-        function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
-        $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
-        document.addEventListener('click', ()=> close());
-        document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
-
-        function pathFor(lang){
-          const loc = window.location;
-          const path = loc.pathname;
-          const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
-
-          const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
-
-          const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
-          if(isApply){
-            if(lang === 'en') return '/rewards/apply/?lang=en';
-            return `/rewards/apply/${lang}/`;
-          }
-
-          if(baseMap[clean]){
-            if(lang === 'en'){
-              const q = new URLSearchParams(loc.search);
-              q.set('lang','en');
-              return clean + (q.toString() ? `?${q.toString()}` : '');
-            }
-            return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
-          }
-          const params = new URLSearchParams(loc.search);
-          params.set('lang', lang);
-          return path + (params.toString() ? `?${params.toString()}` : '');
-        }
-
-        $menu.querySelectorAll('.lang-item').forEach(li=>{
-          li.addEventListener('click', ()=>{
-            const lang = li.getAttribute('data-lang');
-            const emoji = li.getAttribute('data-flag') || '';
-            flagEl.textContent = emoji;
-            $wrap.querySelector('.label').textContent =
-              lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
-            close();
-            const target = pathFor(lang);
-            if(target) window.location.href = target;
-          });
-        });
-      })();
         </script>
         <script>
 (function(){
