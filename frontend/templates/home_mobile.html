@@ -742,10 +742,16 @@
     </body>
     <!-- 1) Load the WalletConnect UMD from your own static path (no async/defer) -->
     <!-- 0) Try to load the WalletConnect provider UMD (self-hosted) -->
-    <script src="/static/js/ethereum-provider.umd.min.js"></script>
-    <!-- 1) Progress / reveal helpers (unchanged) -->
+    <!-- WC provider: use ESM (self-hosted) on modern browsers, UMD (self-hosted) as legacy fallback -->
+    <script type="module">
+  // Import the ESM and explicitly expose it as a global so the rest of the code can just use window.EthereumProvider.
+  import { EthereumProvider as EPCtor } from "/static/js/ethereum-provider.esm.min.js";
+  window.EthereumProvider = EPCtor;
+  window.__WC_SOURCE = "esm-self"; // for debugging
+    </script>
+    <script nomodule src="/static/js/ethereum-provider.umd.min.js"></script>
+    <!-- Progress / reveal (unchanged) -->
     <script>
-// Progress bars (animate when visible)
 const barsObserver = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
@@ -759,7 +765,6 @@ const barsObserver = new IntersectionObserver((entries)=>{
 },{ threshold:.3 });
 document.querySelectorAll('.progress .bar').forEach(el=>barsObserver.observe(el));
 
-// Reveal animations
 const revealObserver = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{
     if(entry.isIntersecting){
@@ -779,105 +784,7 @@ const revealObserver = new IntersectionObserver((entries)=>{
 },{ threshold:.25 });
 document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(el));
     </script>
-    <!-- 2) WalletConnect loader: UMD global first, then ESM import fallback -->
-    <script>
-const WC_SOURCES = {
-  umdSelf: "/static/js/ethereum-provider.umd.min.js",
-  esmSelf: "/static/js/ethereum-provider.esm.min.js",
-  umdCdn: [
-    "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js",
-    "https://unpkg.com/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js",
-    "https://cdn.walletconnect.com/ethereum-provider@2.11.2/index.umd.min.js"
-  ],
-  esmCdn: "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.min.js"
-};
-
-function hasEP(){
-  const g = (globalThis || window);
-  return !!(g.EthereumProvider && typeof g.EthereumProvider.init === 'function')
-      || !!(g.WalletConnectEthereumProvider && typeof g.WalletConnectEthereumProvider.init === 'function')
-      || !!(g.WalletConnectProvider && (
-            (g.WalletConnectProvider.default && typeof g.WalletConnectProvider.default.init === 'function') ||
-            (g.WalletConnectProvider.EthereumProvider && typeof g.WalletConnectProvider.EthereumProvider.init === 'function')
-         ));
-}
-
-function pickEP(){
-  const g = (globalThis || window);
-  if (g.EthereumProvider && typeof g.EthereumProvider.init === 'function') return g.EthereumProvider;
-  if (g.WalletConnectEthereumProvider && typeof g.WalletConnectEthereumProvider.init === 'function') return g.WalletConnectEthereumProvider;
-  if (g.WalletConnectProvider){
-    if (g.WalletConnectProvider.default && typeof g.WalletConnectProvider.default.init === 'function') return g.WalletConnectProvider.default;
-    if (g.WalletConnectProvider.EthereumProvider && typeof g.WalletConnectProvider.EthereumProvider.init === 'function') return g.WalletConnectProvider.EthereumProvider;
-  }
-  return null;
-}
-
-function loadTag(src){
-  return new Promise((resolve, reject)=>{
-    if (document.querySelector(`script[data-wc="${src}"]`)) return resolve();
-    const s = document.createElement('script');
-    s.src = src;
-    s.setAttribute('data-wc', src);
-    s.onload  = ()=> resolve();
-    s.onerror = ()=> reject(new Error('Failed to load '+src));
-    document.head.appendChild(s);
-  });
-}
-
-async function tryUMDFallbacks(){
-  // We already included /static/js/... at the very top. If no global, try public UMDs.
-  for (const url of WC_SOURCES.umdCdn){
-    try { await loadTag(url); if (hasEP()) return true; } catch(e){}
-  }
-  return false;
-}
-
-async function tryESMImport(path){
-  try{
-    const mod = await import(path);
-    // Both jsDelivr ESM and the package export { EthereumProvider }
-    const EP = mod?.EthereumProvider || mod?.default?.EthereumProvider || mod?.default;
-    if (EP && typeof EP.init === 'function'){
-      // Normalize: expose as window.EthereumProvider for the rest of our code
-      window.EthereumProvider = EP;
-      return true;
-    }
-  }catch(e){}
-  return false;
-}
-
-/** Ensure a usable EthereumProvider constructor is available one way or another. */
-async function ensureEthereumProviderConstructor(){
-  // 1) Did the self-hosted UMD already attach a global?
-  if (hasEP()) return pickEP();
-
-  // 2) Try ESM from self-host (if you placed it there)
-  if (await tryESMImport(WC_SOURCES.esmSelf)) return pickEP();
-
-  // 3) Try UMD from public CDNs
-  if (await tryUMDFallbacks()) return pickEP();
-
-  // 4) Try ESM from CDN and normalize to global
-  if (await tryESMImport(WC_SOURCES.esmCdn)) return pickEP();
-
-  // 5) Give up with a diagnostic
-  const seen = Object.keys(window).filter(k=>/EthereumProvider|WalletConnect/.test(k)).join(', ') || '(none)';
-  throw new Error(
-    [
-      'WalletConnect provider script present but no global/module found.',
-      'Quick checks:',
-      '• Keep <script src="/static/js/ethereum-provider.umd.min.js"></' + 'script> BEFORE this block.',
-      "• Optionally self-host the ESM at /static/js/ethereum-provider.esm.min.js (see note).",
-      '• CSP SCRIPT-SRC must include self (so /static is allowed).',
-      '• Try a private window (content blockers).',
-      '• HTTPS origin + your domain allowlisted in Reown.',
-      'Seen window keys: ' + seen
-    ].join('\n')
-  );
-}
-    </script>
-    <!-- 3) App logic: init provider + connect/logout -->
+    <!-- WalletConnect init + connect/logout -->
     <script>
 const WC_PROJECT_ID   = 'c1a3ea2d1e5c23e1f3abb31b0d7dc565';
 const PRIMARY_CHAIN   = 1;
@@ -886,7 +793,7 @@ const OPTIONAL_CHAINS = [137, 42161, 8453, 10];
 let wcProvider = null;
 let _isConnecting = false;
 
-// Minimal fetch helpers
+// helpers
 async function apiGet(url){
   const res  = await fetch(url, { credentials:'include' });
   const data = await res.json().catch(()=> ({}));
@@ -903,10 +810,36 @@ async function apiPost(url, body){
   return { ok: res.ok, ...data };
 }
 
+// pick the constructor from whatever is available (ESM we set on window, or UMD legacy)
+function pickEthereumProviderCtor(){
+  const g = window;
+  if (g.EthereumProvider && typeof g.EthereumProvider.init === 'function') return g.EthereumProvider;
+  if (g.WalletConnectEthereumProvider && typeof g.WalletConnectEthereumProvider.init === 'function') return g.WalletConnectEthereumProvider;
+  if (g.WalletConnectProvider){
+    if (g.WalletConnectProvider.default && typeof g.WalletConnectProvider.default.init === 'function') return g.WalletConnectProvider.default;
+    if (g.WalletConnectProvider.EthereumProvider && typeof g.WalletConnectProvider.EthereumProvider.init === 'function') return g.WalletConnectProvider.EthereumProvider;
+  }
+  return null;
+}
+
 async function ensureProvider(){
   if (wcProvider) return wcProvider;
 
-  const EP = await ensureEthereumProviderConstructor(); // from loader block above
+  const EP = pickEthereumProviderCtor();
+  if (!EP){
+    const seen = Object.keys(window).filter(k=>/EthereumProvider|WalletConnect/.test(k)).join(', ') || '(none)';
+    throw new Error([
+      'WalletConnect provider not found.',
+      'Quick checks:',
+      '• Make sure this file exists on your server: /static/js/ethereum-provider.esm.min.js',
+      '• The very first <script type="module"> block must be present (see template).',
+      '• CSP allows scripts from self (your settings.py already does).',
+      '• Try a private window (content blockers).',
+      '• HTTPS origin + your domain allowlisted in Reown.',
+      'Seen window keys: ' + seen
+    ].join('\n'));
+  }
+
   wcProvider = await EP.init({
     projectId: WC_PROJECT_ID,
     chains: [PRIMARY_CHAIN],
@@ -923,7 +856,7 @@ async function ensureProvider(){
     }
   });
 
-  wcProvider.on?.('disconnect', ()=>{ /* no-op */ });
+  wcProvider.on?.('disconnect', ()=>{});
   return wcProvider;
 }
 
@@ -987,7 +920,7 @@ async function logoutWallet(){
 window.connectWallet = connectWallet;
 window.logoutWallet  = logoutWallet;
     </script>
-    <!-- 4) Mobile header (sheet + language switcher) -->
+    <!-- Mobile header / language switcher (unchanged) -->
     <script>
 (function(){
   // Sheet toggle
@@ -999,7 +932,6 @@ window.logoutWallet  = logoutWallet;
     $toggle.addEventListener('click', ()=> $sheet.hidden ? open() : close());
     document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
 
-    // Close sheet on outside click (only when open)
     document.addEventListener('click', (e)=>{
       if($sheet.hidden) return;
       const within = e.target.closest('#mnavSheet') || e.target.closest('#mnavToggle');
@@ -1007,7 +939,7 @@ window.logoutWallet  = logoutWallet;
     });
   }
 
-  // Language switcher (same routing rules as desktop)
+  // Language switcher
   const $wrap = document.getElementById('langSwitcher');
   if($wrap){
     const $btn  = $wrap.querySelector('.lang-btn');
@@ -1028,7 +960,7 @@ window.logoutWallet  = logoutWallet;
     function pathFor(lang){
       const loc = window.location;
       const path = loc.pathname;
-      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix
+      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
       const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
       const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
       if(isApply){
