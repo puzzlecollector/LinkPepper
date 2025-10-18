@@ -776,9 +776,10 @@
         </script>
         <!-- Remove any previous WC/Web3Modal script tags -->
         <script>
-/** Dynamically load the v2 UMD bundle and wait for it. */
+/** WalletConnect v2 UMD loader (jsDelivr) + global shim */
 const WC_UMD_URL = "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js";
 
+/** Load once and wait until it actually executes */
 function loadScriptOnce(src){
   return new Promise((resolve, reject)=>{
     if (document.querySelector(`script[data-wc="${src}"]`)) return resolve();
@@ -793,13 +794,11 @@ function loadScriptOnce(src){
   });
 }
 
-/** Get the global constructor regardless of UMD name differences. */
+/** Get the EthereumProvider constructor regardless of UMD name differences */
 function getEthereumProviderGlobal(){
-  // v2 UMD should expose window.EthereumProvider
   if (window.EthereumProvider && typeof window.EthereumProvider.init === 'function') {
     return window.EthereumProvider;
   }
-  // Very rare edge: some builds nest under a namespace
   if (window.WalletConnectProvider && window.WalletConnectProvider.EthereumProvider) {
     return window.WalletConnectProvider.EthereumProvider;
   }
@@ -807,15 +806,16 @@ function getEthereumProviderGlobal(){
 }
         </script>
         <script>
-const WC_PROJECT_ID = 'c1a3ea2d1e5c23e1f3abb31b0d7dc565'; // <-- your Project ID
+/** Replace with your Reown Project ID (App project, not Wallet project) */
+const WC_PROJECT_ID = 'c1a3ea2d1e5c23e1f3abb31b0d7dc565';
 
-const PRIMARY_CHAIN = 1;                  // mainnet
+const PRIMARY_CHAIN = 1;                        // mainnet
 const OPTIONAL_CHAINS = [137, 42161, 8453, 10]; // polygon, arbitrum, base, optimism
 
 let wcProvider = null;
 let _isConnecting = false;
 
-/** Minimal fetch helpers (unchanged from your code) */
+/** Minimal fetch helpers */
 async function apiGet(url){
   const res = await fetch(url, { credentials: 'include' });
   const data = await res.json().catch(()=> ({}));
@@ -832,17 +832,17 @@ async function apiPost(url, body){
   return { ok: res.ok, ...data };
 }
 
-/** Ensure the UMD is loaded *and* the global is available before using it */
+/** Ensure UMD is loaded and provider is initialized */
 async function ensureProvider(){
   if (wcProvider) return wcProvider;
 
-  // 1) Load UMD (jsDelivr is very reliable; switch to self-host if you use a strict CSP)
+  // 1) Load the UMD file
   await loadScriptOnce(WC_UMD_URL);
 
-  // 2) Get the global constructor safely
+  // 2) Grab the constructor
   const EP = getEthereumProviderGlobal();
   if (!EP) {
-    // If you see this alert, the script was blocked by CSP/adblock/https mismatch.
+    // If this triggers, check CSP/ad-block/HTTPS, or self-host the UMD
     throw new Error('WalletConnect provider script present but no global found');
   }
 
@@ -863,8 +863,8 @@ async function ensureProvider(){
     }
   });
 
-  // Optional: listen to changes
-  wcProvider.on?.('disconnect', () => { /* console.log('wc disconnected') */ });
+  // Optional: listeners
+  wcProvider.on?.('disconnect', () => { /* console.log('WalletConnect disconnected'); */ });
 
   return wcProvider;
 }
@@ -881,20 +881,26 @@ async function connectWallet(){
   try{
     const provider = await ensureProvider();
 
-    // Open a session if needed (QR modal on desktop, deep links on mobile)
+    if (!provider || !provider.request) {
+      throw new Error('WalletConnect provider not ready');
+    }
+
+    // Start a session if needed (desktop => QR, mobile => deep links)
     if (!provider.session) {
       await provider.connect();
     }
 
+    // Request accounts
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
     const address  = accounts && accounts[0];
     if (!address) throw new Error('No account selected');
 
+    // Get nonce/message from backend
     const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
     if (!nonceRes.ok) throw new Error(nonceRes.error || 'Nonce fetch failed');
     const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
 
-    // personal_sign with fallbacks
+    // personal_sign (with fallbacks)
     let signature;
     try{
       signature = await provider.request({ method:'personal_sign', params:[message, address] });
@@ -908,6 +914,7 @@ async function connectWallet(){
       }
     }
 
+    // Verify on backend -> session cookie
     const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
     if (verifyRes && verifyRes.ok){
       window.location.reload();
@@ -923,7 +930,7 @@ async function connectWallet(){
   }
 }
 
-/** Public: logout (disconnect WC + your server) */
+/** Public: logout (disconnect WC + your server session) */
 async function logoutWallet(){
   try{
     if (wcProvider?.disconnect) await wcProvider.disconnect();
@@ -935,6 +942,7 @@ async function logoutWallet(){
   }
 }
 
+// Expose for the header button
 window.connectWallet = connectWallet;
 window.logoutWallet  = logoutWallet;
         </script>
