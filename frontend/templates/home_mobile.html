@@ -740,18 +740,9 @@
         </footer>
         <!-- ===== JS: progress/reveal + wallet + language ===== -->
     </body>
-    <!-- 1) Load the WalletConnect UMD from your own static path (no async/defer) -->
-    <!-- 0) Try to load the WalletConnect provider UMD (self-hosted) -->
-    <!-- WC provider: use ESM (self-hosted) on modern browsers, UMD (self-hosted) as legacy fallback -->
-    <script type="module">
-  // Import the ESM and explicitly expose it as a global so the rest of the code can just use window.EthereumProvider.
-  import { EthereumProvider as EPCtor } from "/static/js/ethereum-provider.esm.min.js";
-  window.EthereumProvider = EPCtor;
-  window.__WC_SOURCE = "esm-self"; // for debugging
-    </script>
-    <script nomodule src="/static/js/ethereum-provider.umd.min.js"></script>
-    <!-- Progress / reveal (unchanged) -->
+    <!-- 1) Progress / reveal (unchanged from your page) -->
     <script>
+// Progress bars (animate when visible)
 const barsObserver = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
@@ -765,6 +756,7 @@ const barsObserver = new IntersectionObserver((entries)=>{
 },{ threshold:.3 });
 document.querySelectorAll('.progress .bar').forEach(el=>barsObserver.observe(el));
 
+// Reveal animations
 const revealObserver = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{
     if(entry.isIntersecting){
@@ -784,21 +776,30 @@ const revealObserver = new IntersectionObserver((entries)=>{
 },{ threshold:.25 });
 document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(el));
     </script>
-    <!-- WalletConnect init + connect/logout -->
+    <!-- 2) MetaMask / EIP-1193 login (no WalletConnect) -->
     <script>
-const WC_PROJECT_ID   = 'c1a3ea2d1e5c23e1f3abb31b0d7dc565';
-const PRIMARY_CHAIN   = 1;
-const OPTIONAL_CHAINS = [137, 42161, 8453, 10];
+/* ---------- Config ---------- */
+const REQUIRED_CHAIN_ID_HEX = '0x1'; // Ethereum mainnet (optional to enforce)
+const WC_PROJECT_ID_UNUSED = null;   // left here to signal WC is not used
 
-let wcProvider = null;
-let _isConnecting = false;
+/* ---------- Utilities ---------- */
+const isAndroid = /Android/i.test(navigator.userAgent);
+const isIOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isMobile  = isAndroid || isIOS;
 
-// helpers
+function openInMetaMaskApp(){
+  // Re-open current page inside MetaMask's in-app browser
+  // Format: https://metamask.app.link/dapp/<host><path><query>
+  const dappPath = window.location.host + window.location.pathname + window.location.search;
+  window.location.href = 'https://metamask.app.link/dapp/' + dappPath;
+}
+
 async function apiGet(url){
   const res  = await fetch(url, { credentials:'include' });
   const data = await res.json().catch(()=> ({}));
   return { ok: res.ok, ...data };
 }
+
 async function apiPost(url, body){
   const res  = await fetch(url, {
     method:'POST',
@@ -810,55 +811,47 @@ async function apiPost(url, body){
   return { ok: res.ok, ...data };
 }
 
-// pick the constructor from whatever is available (ESM we set on window, or UMD legacy)
-function pickEthereumProviderCtor(){
-  const g = window;
-  if (g.EthereumProvider && typeof g.EthereumProvider.init === 'function') return g.EthereumProvider;
-  if (g.WalletConnectEthereumProvider && typeof g.WalletConnectEthereumProvider.init === 'function') return g.WalletConnectEthereumProvider;
-  if (g.WalletConnectProvider){
-    if (g.WalletConnectProvider.default && typeof g.WalletConnectProvider.default.init === 'function') return g.WalletConnectProvider.default;
-    if (g.WalletConnectProvider.EthereumProvider && typeof g.WalletConnectProvider.EthereumProvider.init === 'function') return g.WalletConnectProvider.EthereumProvider;
+/* ---------- Provider helpers ---------- */
+function getInjectedProvider(){
+  // Prefer window.ethereum if present (MetaMask, Brave, etc.)
+  if (window.ethereum) return window.ethereum;
+  // Legacy providers sometimes put a list under ethereum.providers
+  if (window.ethereum && Array.isArray(window.ethereum.providers)) {
+    const mm = window.ethereum.providers.find(p => p.isMetaMask);
+    return mm || window.ethereum.providers[0];
   }
   return null;
 }
 
-async function ensureProvider(){
-  if (wcProvider) return wcProvider;
-
-  const EP = pickEthereumProviderCtor();
-  if (!EP){
-    const seen = Object.keys(window).filter(k=>/EthereumProvider|WalletConnect/.test(k)).join(', ') || '(none)';
-    throw new Error([
-      'WalletConnect provider not found.',
-      'Quick checks:',
-      '• Make sure this file exists on your server: /static/js/ethereum-provider.esm.min.js',
-      '• The very first <script type="module"> block must be present (see template).',
-      '• CSP allows scripts from self (your settings.py already does).',
-      '• Try a private window (content blockers).',
-      '• HTTPS origin + your domain allowlisted in Reown.',
-      'Seen window keys: ' + seen
-    ].join('\n'));
-  }
-
-  wcProvider = await EP.init({
-    projectId: WC_PROJECT_ID,
-    chains: [PRIMARY_CHAIN],
-    optionalChains: OPTIONAL_CHAINS,
-    methods: ['eth_requestAccounts','personal_sign'],
-    events: ['accountsChanged','chainChanged','disconnect'],
-    showQrModal: true,
-    qrModalOptions: { themeMode: 'dark' },
-    metadata: {
-      name: 'LinkHash',
-      description: 'Web3 SEO Rewards',
-      url: window.location.origin,
-      icons: ['https://favicone.com/linkhash.png']
+async function ensureChain(eth, desiredHex){
+  if (!eth || !desiredHex) return;
+  try{
+    const current = await eth.request({ method: 'eth_chainId' });
+    if (current && current.toLowerCase() === desiredHex.toLowerCase()) return;
+    try{
+      await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: desiredHex }] });
+    }catch(e){
+      // If the chain is not added, attempt to add (only for main known chains we can safely prefill)
+      if (e && (e.code === 4902 || e.code === -32603)) {
+        if (desiredHex === '0x1') {
+          await eth.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x1',
+              chainName: 'Ethereum Mainnet',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://rpc.ankr.com/eth'],
+              blockExplorerUrls: ['https://etherscan.io']
+            }]
+          });
+        }
+      }
     }
-  });
-
-  wcProvider.on?.('disconnect', ()=>{});
-  return wcProvider;
+  }catch(_){}
 }
+
+/* ---------- Public API used by your header button ---------- */
+let _isConnecting = false;
 
 async function connectWallet(){
   if (_isConnecting) return;
@@ -869,37 +862,59 @@ async function connectWallet(){
   if (btn) { btn.disabled = true; btn.textContent = 'Connecting…'; }
 
   try{
-    const provider = await ensureProvider();
+    const eth = getInjectedProvider();
 
-    if (!provider.session) await provider.connect();
+    // No injected provider => guide user into MetaMask app (mobile) or install page (desktop).
+    if (!eth){
+      if (isMobile){
+        if (confirm('MetaMask not detected in this browser.\nOpen this page inside the MetaMask app?')){
+          openInMetaMaskApp();
+        }
+      }else{
+        window.open('https://metamask.io/download/', '_blank', 'noopener');
+        alert('Please install MetaMask, then click Wallet again.');
+      }
+      return;
+    }
 
-    const accounts = await provider.request({ method:'eth_requestAccounts' });
+    // Optional: enforce mainnet before signing
+    await ensureChain(eth, REQUIRED_CHAIN_ID_HEX);
+
+    // Ask for accounts
+    const accounts = await eth.request({ method: 'eth_requestAccounts' });
     const address  = accounts && accounts[0];
     if (!address) throw new Error('No account selected');
 
+    // Get nonce from backend
     const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
     if (!nonceRes.ok) throw new Error(nonceRes.error || 'Nonce fetch failed');
     const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
 
+    // Sign (MetaMask prefers [message, address])
     let signature;
     try{
-      signature = await provider.request({ method:'personal_sign', params:[message, address] });
+      signature = await eth.request({ method:'personal_sign', params:[message, address] });
     }catch(e1){
       try{
-        signature = await provider.request({ method:'personal_sign', params:[address, message] });
+        signature = await eth.request({ method:'personal_sign', params:[address, message] });
       }catch(e2){
         const hexMsg = '0x' + Array.from(new TextEncoder().encode(message))
           .map(b=>b.toString(16).padStart(2,'0')).join('');
-        signature = await provider.request({ method:'personal_sign', params:[hexMsg, address] });
+        signature = await eth.request({ method:'personal_sign', params:[hexMsg, address] });
       }
     }
 
+    // Verify on backend -> session cookie
     const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
-    if (verifyRes && verifyRes.ok){ window.location.reload(); return; }
+    if (verifyRes && verifyRes.ok){
+      // keep page consistent with server-rendered wallet_user
+      window.location.reload();
+      return;
+    }
     throw new Error('Verify failed');
   }catch(err){
     console.error(err);
-    alert('Wallet login failed: ' + (err?.message || err));
+    alert('Wallet login failed: ' + (err && err.message ? err.message : err));
   }finally{
     if (btn) { btn.disabled = false; btn.textContent = prev; }
     _isConnecting = false;
@@ -908,19 +923,31 @@ async function connectWallet(){
 
 async function logoutWallet(){
   try{
-    if (wcProvider?.disconnect) await wcProvider.disconnect();
     await apiPost('/api/auth/logout', {});
+    // There is no persistent MetaMask "session" to kill; just clear our cookie
     window.location.reload();
   }catch(err){
     console.error(err);
-    alert('Logout failed: ' + (err?.message || err));
+    alert('Logout failed: ' + (err && err.message ? err.message : err));
   }
 }
 
+// Keep UI in sync with wallet changes when page stays open
+(function watchEthereum(){
+  const eth = getInjectedProvider();
+  if (!eth) return;
+  try{
+    eth.on && eth.on('accountsChanged', ()=> window.location.reload());
+    eth.on && eth.on('chainChanged',   ()=> window.location.reload());
+    eth.on && eth.on('disconnect',     ()=> console.log('ethereum disconnected'));
+  }catch(_){}
+})();
+
+// Expose to the header button
 window.connectWallet = connectWallet;
 window.logoutWallet  = logoutWallet;
     </script>
-    <!-- Mobile header / language switcher (unchanged) -->
+    <!-- 3) Mobile header (sheet + language switcher; unchanged from your page) -->
     <script>
 (function(){
   // Sheet toggle
@@ -932,6 +959,7 @@ window.logoutWallet  = logoutWallet;
     $toggle.addEventListener('click', ()=> $sheet.hidden ? open() : close());
     document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
 
+    // Close sheet on outside click (only when open)
     document.addEventListener('click', (e)=>{
       if($sheet.hidden) return;
       const within = e.target.closest('#mnavSheet') || e.target.closest('#mnavToggle');
@@ -939,7 +967,7 @@ window.logoutWallet  = logoutWallet;
     });
   }
 
-  // Language switcher
+  // Language switcher (same routing rules as desktop)
   const $wrap = document.getElementById('langSwitcher');
   if($wrap){
     const $btn  = $wrap.querySelector('.lang-btn');
@@ -960,7 +988,7 @@ window.logoutWallet  = logoutWallet;
     function pathFor(lang){
       const loc = window.location;
       const path = loc.pathname;
-      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
+      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix
       const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
       const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
       if(isApply){
