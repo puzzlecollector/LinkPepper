@@ -776,44 +776,45 @@
       document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(el));
         </script>
         <script>
-  // ---- MetaMask SDK init (works on desktop & mobile) ----
-  const MMSDK = new MetaMaskSDK({
-    useDeeplink: true,                 // mobile: open the MetaMask app
-    extensionOnly: false,              // desktop fallback to extension if present
-    dappMetadata: {
-      name: 'LinkHash',
-      url: location.origin
+  // --- Lazy, single-instance MetaMask SDK (safe on mobile/slow loads) ---
+  let __mmSdk; // not const (we assign once, then reuse)
+  function getMMSDK(){
+    if (__mmSdk) return __mmSdk;
+    if (!window.MetaMaskSDK) {
+      throw new Error('MetaMask SDK script not loaded yet');
     }
-    // You can also set logging, storage, etc.
-  });
+    __mmSdk = new window.MetaMaskSDK({
+      useDeeplink: true,
+      extensionOnly: false,
+      dappMetadata: { name: 'LinkHash', url: location.origin }
+    });
+    return __mmSdk;
+  }
 
   async function connectWallet(){
     try{
-      const ethereum = MMSDK.getProvider();
+      const ethereum = getMMSDK().getProvider();
 
-      // 1) Request accounts (this will app-switch on mobile)
+      // 1) Request accounts (mobile => app switch)
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      const address = (accounts && accounts[0]) ? accounts[0] : null;
+      const address  = accounts && accounts[0];
       if(!address){ alert('No account selected.'); return; }
 
-      // 2) Get nonce/message from your backend
+      // 2) Get nonce/message from backend
       const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
       if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
-      const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
+      const message  = nonceRes.message;
 
-      // 3) Ask MetaMask to sign your canonical message
+      // 3) Sign
       const signature = await ethereum.request({
         method: 'personal_sign',
-        params: [ message, address ]
+        params: [message, address]
       });
 
-      // 4) Verify on your backend (session will be created)
+      // 4) Verify -> session
       const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
-      if(verifyRes && verifyRes.ok){
-        window.location.reload(); // now request.user has a session (wallet_user)
-      }else{
-        alert('Login failed.');
-      }
+      if(verifyRes && verifyRes.ok) window.location.reload();
+      else alert('Login failed.');
     }catch(err){
       console.error(err);
       alert('Wallet login failed: ' + (err && err.message ? err.message : err));
@@ -825,7 +826,6 @@
     catch(err){ console.error(err); alert('Logout failed: ' + (err && err.message ? err.message : err)); }
   }
 
-  // expose
   window.connectWallet = connectWallet;
   window.logoutWallet  = logoutWallet;
         </script>
