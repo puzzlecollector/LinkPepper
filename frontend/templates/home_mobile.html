@@ -741,6 +741,7 @@
         <!-- ===== JS: progress/reveal + wallet + language ===== -->
     </body>
     <!-- 1) Progress / reveal (unchanged from your page) -->
+    <!-- 1) Progress / reveal (unchanged) -->
     <script>
 // Progress bars (animate when visible)
 const barsObserver = new IntersectionObserver((entries)=>{
@@ -779,44 +780,56 @@ document.querySelectorAll('.reveal, .mini').forEach(el=>revealObserver.observe(e
     <!-- 2) MetaMask / EIP-1193 login (no WalletConnect) -->
     <script>
 /* ---------- Config ---------- */
-const REQUIRED_CHAIN_ID_HEX = '0x1'; // Ethereum mainnet (optional to enforce)
-const WC_PROJECT_ID_UNUSED = null;   // left here to signal WC is not used
+const REQUIRED_CHAIN_ID_HEX = '0x1'; // Ethereum mainnet (optional enforcement)
 
-/* ---------- Utilities ---------- */
+/* ---------- Helpers ---------- */
 const isAndroid = /Android/i.test(navigator.userAgent);
 const isIOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 const isMobile  = isAndroid || isIOS;
 
 function openInMetaMaskApp(){
-  // Re-open current page inside MetaMask's in-app browser
-  // Format: https://metamask.app.link/dapp/<host><path><query>
+  // Re-open current URL inside MetaMask’s in-app browser
   const dappPath = window.location.host + window.location.pathname + window.location.search;
   window.location.href = 'https://metamask.app.link/dapp/' + dappPath;
 }
 
+// Read csrftoken from cookie (Django default name "csrftoken")
+function getCSRFCookie(){
+  const name = 'csrftoken';
+  const cookies = document.cookie ? document.cookie.split('; ') : [];
+  for (const c of cookies){
+    const [k, v] = c.split('=');
+    if (k === name) return decodeURIComponent(v || '');
+  }
+  return '';
+}
+
 async function apiGet(url){
   const res  = await fetch(url, { credentials:'include' });
-  const data = await res.json().catch(()=> ({}));
-  return { ok: res.ok, ...data };
+  let data   = {};
+  try{ data = await res.json(); }catch(_){}
+  return { ok: res.ok, status: res.status, ...data };
 }
 
 async function apiPost(url, body){
   const res  = await fetch(url, {
     method:'POST',
     credentials:'include',
-    headers:{ 'Content-Type':'application/json', 'X-Requested-With':'fetch' },
+    headers:{
+      'Content-Type':'application/json',
+      'X-Requested-With':'fetch',
+      'X-CSRFToken': getCSRFCookie(),   // <-- IMPORTANT for Django CSRF
+    },
     body: JSON.stringify(body || {})
   });
-  const data = await res.json().catch(()=> ({}));
-  return { ok: res.ok, ...data };
+  let data = {};
+  try{ data = await res.json(); }catch(_){}
+  return { ok: res.ok, status: res.status, ...data };
 }
 
-/* ---------- Provider helpers ---------- */
 function getInjectedProvider(){
-  // Prefer window.ethereum if present (MetaMask, Brave, etc.)
   if (window.ethereum) return window.ethereum;
-  // Legacy providers sometimes put a list under ethereum.providers
-  if (window.ethereum && Array.isArray(window.ethereum.providers)) {
+  if (window.ethereum && Array.isArray(window.ethereum.providers)){
     const mm = window.ethereum.providers.find(p => p.isMetaMask);
     return mm || window.ethereum.providers[0];
   }
@@ -829,28 +842,25 @@ async function ensureChain(eth, desiredHex){
     const current = await eth.request({ method: 'eth_chainId' });
     if (current && current.toLowerCase() === desiredHex.toLowerCase()) return;
     try{
-      await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: desiredHex }] });
+      await eth.request({ method:'wallet_switchEthereumChain', params:[{ chainId: desiredHex }] });
     }catch(e){
-      // If the chain is not added, attempt to add (only for main known chains we can safely prefill)
-      if (e && (e.code === 4902 || e.code === -32603)) {
-        if (desiredHex === '0x1') {
-          await eth.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: '0x1',
-              chainName: 'Ethereum Mainnet',
-              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-              rpcUrls: ['https://rpc.ankr.com/eth'],
-              blockExplorerUrls: ['https://etherscan.io']
-            }]
-          });
-        }
+      if (e && (e.code === 4902 || e.code === -32603) && desiredHex === '0x1'){
+        await eth.request({
+          method:'wallet_addEthereumChain',
+          params:[{
+            chainId:'0x1',
+            chainName:'Ethereum Mainnet',
+            nativeCurrency:{ name:'Ether', symbol:'ETH', decimals:18 },
+            rpcUrls:['https://rpc.ankr.com/eth'],
+            blockExplorerUrls:['https://etherscan.io']
+          }]
+        });
       }
     }
   }catch(_){}
 }
 
-/* ---------- Public API used by your header button ---------- */
+/* ---------- Public API (called by your header buttons) ---------- */
 let _isConnecting = false;
 
 async function connectWallet(){
@@ -863,8 +873,6 @@ async function connectWallet(){
 
   try{
     const eth = getInjectedProvider();
-
-    // No injected provider => guide user into MetaMask app (mobile) or install page (desktop).
     if (!eth){
       if (isMobile){
         if (confirm('MetaMask not detected in this browser.\nOpen this page inside the MetaMask app?')){
@@ -877,20 +885,22 @@ async function connectWallet(){
       return;
     }
 
-    // Optional: enforce mainnet before signing
     await ensureChain(eth, REQUIRED_CHAIN_ID_HEX);
 
-    // Ask for accounts
-    const accounts = await eth.request({ method: 'eth_requestAccounts' });
+    // Request accounts
+    const accounts = await eth.request({ method:'eth_requestAccounts' });
     const address  = accounts && accounts[0];
     if (!address) throw new Error('No account selected');
 
-    // Get nonce from backend
+    // 1) Get nonce + canonical message from backend
     const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
-    if (!nonceRes.ok) throw new Error(nonceRes.error || 'Nonce fetch failed');
-    const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}`;
+    if (!nonceRes.ok){
+      throw new Error(`Nonce fetch failed (${nonceRes.status}) ${nonceRes.error || ''}`.trim());
+    }
+    // Use the exact message returned by the server (must match _login_message on backend)
+    const message = nonceRes.message;
 
-    // Sign (MetaMask prefers [message, address])
+    // 2) Sign message (MetaMask prefers [message, address])
     let signature;
     try{
       signature = await eth.request({ method:'personal_sign', params:[message, address] });
@@ -904,17 +914,17 @@ async function connectWallet(){
       }
     }
 
-    // Verify on backend -> session cookie
+    // 3) Verify on backend (includes CSRF header)
     const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
     if (verifyRes && verifyRes.ok){
-      // keep page consistent with server-rendered wallet_user
       window.location.reload();
       return;
     }
-    throw new Error('Verify failed');
+    // Surface server error message if present
+    throw new Error(verifyRes.error || `Verify failed (${verifyRes.status || '??'})`);
   }catch(err){
     console.error(err);
-    alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+    alert('Wallet login failed: ' + (err?.message || err));
   }finally{
     if (btn) { btn.disabled = false; btn.textContent = prev; }
     _isConnecting = false;
@@ -923,16 +933,16 @@ async function connectWallet(){
 
 async function logoutWallet(){
   try{
-    await apiPost('/api/auth/logout', {});
-    // There is no persistent MetaMask "session" to kill; just clear our cookie
+    const res = await apiPost('/api/auth/logout', {});
+    if (!res.ok) throw new Error(res.error || `HTTP ${res.status}`);
     window.location.reload();
   }catch(err){
     console.error(err);
-    alert('Logout failed: ' + (err && err.message ? err.message : err));
+    alert('Logout failed: ' + (err?.message || err));
   }
 }
 
-// Keep UI in sync with wallet changes when page stays open
+// Keep UI in sync if page stays open
 (function watchEthereum(){
   const eth = getInjectedProvider();
   if (!eth) return;
@@ -943,11 +953,11 @@ async function logoutWallet(){
   }catch(_){}
 })();
 
-// Expose to the header button
+// Expose for header buttons
 window.connectWallet = connectWallet;
 window.logoutWallet  = logoutWallet;
     </script>
-    <!-- 3) Mobile header (sheet + language switcher; unchanged from your page) -->
+    <!-- 3) Mobile header (sheet + language switcher) -->
     <script>
 (function(){
   // Sheet toggle
@@ -959,7 +969,7 @@ window.logoutWallet  = logoutWallet;
     $toggle.addEventListener('click', ()=> $sheet.hidden ? open() : close());
     document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
 
-    // Close sheet on outside click (only when open)
+    // Close sheet on outside click
     document.addEventListener('click', (e)=>{
       if($sheet.hidden) return;
       const within = e.target.closest('#mnavSheet') || e.target.closest('#mnavToggle');
@@ -967,7 +977,7 @@ window.logoutWallet  = logoutWallet;
     });
   }
 
-  // Language switcher (same routing rules as desktop)
+  // Language switcher
   const $wrap = document.getElementById('langSwitcher');
   if($wrap){
     const $btn  = $wrap.querySelector('.lang-btn');
@@ -979,7 +989,7 @@ window.logoutWallet  = logoutWallet;
     flagEl.textContent = flagMap[current] || '🇺🇸';
 
     function closeMenu(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
-    function openMenu(){  $wrap.classList.add('open');    $btn.setAttribute('aria-expanded','true');  }
+    function openMenu(){  $wrap.classList.add('open');    $btn.setAttribute('aria-expanded','true'); }
 
     $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.contains('open') ? closeMenu() : openMenu(); });
     document.addEventListener('click', closeMenu);
@@ -988,7 +998,7 @@ window.logoutWallet  = logoutWallet;
     function pathFor(lang){
       const loc = window.location;
       const path = loc.pathname;
-      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix
+      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
       const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
       const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
       if(isApply){
