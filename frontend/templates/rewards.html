@@ -1,32 +1,41 @@
 <!doctype html>
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=1280, initial-scale=1">
-    <title>{{ meta.title|default:"LinkHash | Rewards" }}</title>
-    <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
-    <meta name="robots" content="index,follow">
-    <meta name="author" content="LinkHash">
-    <meta name="description" content="{{ meta.description|default:'Earn USDT for white-hat contributions.' }}">
-    <!-- OG/Twitter -->
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="LinkHash">
-    <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
-    <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
-    <meta property="og:url" content="{{ meta.url }}">
-    <meta property="og:image" content="{% static 'img/og-cover.png' %}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
-    <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
-    <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
-    <!-- Favicons -->
-    <link rel="icon" href="{% static 'img/favicon.ico' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
-
-    <style>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=1280, initial-scale=1">
+        <title>{{ meta.title|default:"LinkHash | Rewards" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'Earn USDT for white-hat contributions.' }}">
+        <!-- OG/Twitter -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{% static 'img/favicon-32x32.png' %}"
+        >
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="{% static 'img/favicon-16x16.png' %}"
+        >
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+        <style>
       /* ======= THEME (match home.html) ======= */
       :root{
         --bg:#0a0b0d;
@@ -146,6 +155,8 @@
         background:linear-gradient(180deg, #0d1217, #0b0f14);
         border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
         opacity:0; transform:translateY(8px); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        /* NEW: make the whole card feel clickable */
+        cursor: pointer;
       }
       /* radiant hover */
       .project-card::after{
@@ -236,83 +247,117 @@
       @media (max-width:1140px){ .container{width:1000px} }
       @media (max-width:1000px){ .container{width:920px} .grid{grid-template-columns:repeat(2,1fr)} }
       @media (max-width:680px){ .grid{grid-template-columns:1fr} .tab{padding:12px 16px} }
-    </style>
-  </head>
-  <body>
-
-    <!-- REPLACE your entire <header class="nav">...</header> with this -->
-    <header class="nav">
-        <div class="container row">
-            <div class="brand"><span class="dot"></span><span>LinkHash</span></div>
-
-            <nav class="links">
-            <!-- Left: same 4 links + Apply -->
-            <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}"
-                >
-                {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
-            </a>
-
-            <a href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}" style="font-weight:700;color:#d8ffe7">
-                {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
-            </a>
-
-            <a href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
-                {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
-            </a>
-
-            <a href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
-                {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
-            </a>
-
-            <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
-                {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
-            </a>
-
-            <!-- Wallet button (unchanged) -->
-            {% if wallet_user %}
-                <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-                <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-                {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Logout{% endif %}
-                </a>
-            {% else %}
-                <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
-                {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
-                </a>
-            {% endif %}
-
-            <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
-            <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
-            <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
-            <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
-            <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
-                <span class="flag-emoji" aria-hidden="true"></span>
-                <span class="label">
-                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
-                </span>
-                <svg class="chev" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
-                <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </button>
-            <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
-                <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-                <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-                <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-                <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
-            </ul>
+        </style>
+    </head>
+    <body>
+        <!-- REPLACE your entire <header class="nav">...</header> with this -->
+        <header class="nav">
+            <div class="container row">
+                <div class="brand">
+                    <span class="dot"></span>
+                    <span>LinkHash</span>
+                </div>
+                <nav class="links">
+                    <!-- Left: same 4 links + Apply -->
+                    <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+                        {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
+                    </a>
+                    <a href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}" style="font-weight:700;color:#d8ffe7">
+                        {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
+                    </a>
+                    <a href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
+                        {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
+                    </a>
+                    <a href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
+                        {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+                    </a>
+                    <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
+                        {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
+                    </a>
+                    <!-- Wallet button (unchanged) -->
+                    {% if wallet_user %}
+                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                    <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+                        {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Logout{% endif %}
+                    </a>
+                    {% else %}
+                    <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+                        {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
+                    </a>
+                    {% endif %}
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
+                    <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+                        <button
+                            class="lang-btn"
+                            type="button"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                        >
+                            <span class="flag-emoji" aria-hidden="true"></span>
+                            <span class="label">
+                                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+                            </span>
+                            <svg
+                                class="chev"
+                                viewBox="0 0 20 20"
+                                width="16"
+                                height="16"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M5 7l5 6 5-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                />
+                            </svg>
+                        </button>
+                        <ul
+                            class="lang-menu"
+                            role="listbox"
+                            tabindex="-1"
+                            aria-label="Select language"
+                        >
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="en"
+                                data-flag="🇺🇸"
+                            >🇺🇸 English</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ko"
+                                data-flag="🇰🇷"
+                            >🇰🇷 한국어</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ja"
+                                data-flag="🇯🇵"
+                            >🇯🇵 日本語</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="zh"
+                                data-flag="🇨🇳"
+                            >🇨🇳 中文</li>
+                        </ul>
+                    </div>
+                </nav>
             </div>
-            </nav>
-        </div>
         </header>
-
-
-    <!-- ===== PAGE HEADER ===== -->
-    <section class="page-head">
-      <div class="container">
-        <h1>
-          {% if meta.lang == 'ko' %}리워드 캠페인{% elif meta.lang == 'ja' %}リワードキャンペーン{% elif meta.lang == 'zh' %}奖励活动{% else %}Reward Campaigns{% endif %}
-        </h1>
-        <p class="sub">
-          {% if meta.lang == 'ko' %}
+        <!-- ===== PAGE HEADER ===== -->
+        <section class="page-head">
+            <div class="container">
+                <h1>
+                    {% if meta.lang == 'ko' %}리워드 캠페인{% elif meta.lang == 'ja' %}リワードキャンペーン{% elif meta.lang == 'zh' %}奖励活动{% else %}Reward Campaigns{% endif %}
+                </h1>
+                <p class="sub">
+                    {% if meta.lang == 'ko' %}
             화이트햇 활동으로 USDT를 적립하세요. 실시간 진행률과 투명한 규칙.
           {% elif meta.lang == 'ja' %}
             ホワイトハット活動でUSDTを獲得。進捗はリアルタイム、ルールは透明。
@@ -321,192 +366,221 @@
           {% else %}
             Earn USDT for white-hat contributions. Live progress and transparent rules.
           {% endif %}
-        </p>
-
-        <!-- Tabs + Custom Dropdown Filters -->
-        <div class="controls">
-          <div class="tabs" role="tablist" aria-label="Campaign tabs">
-            <button class="tab active" data-target="#live" role="tab" aria-selected="true" id="tab-live">
-              {% if meta.lang == 'ko' %}진행중{% elif meta.lang == 'ja' %}進行中{% elif meta.lang == 'zh' %}进行中{% else %}Live{% endif %}
-            </button>
-            <button class="tab" data-target="#past" role="tab" aria-selected="false" id="tab-past">
-              {% if meta.lang == 'ko' %}종료됨{% elif meta.lang == 'ja' %}終了{% elif meta.lang == 'zh' %}已结束{% else %}Past{% endif %}
-            </button>
-          </div>
-
-          <div class="filters">
-            <!-- Custom dropdown -->
-            <div class="dropdown" id="sortDropdown" data-value="ending">
-              <button class="dropdown-toggle" type="button" aria-haspopup="listbox" aria-expanded="false">
-                <span class="dropdown-label">
-                  {% if meta.lang == 'ko' %}마감 임박{% elif meta.lang == 'ja' %}まもなく終了{% elif meta.lang == 'zh' %}即将结束{% else %}Ending soon{% endif %}
-                </span>
-                <span class="caret">▾</span>
-              </button>
-              <ul class="dropdown-menu" role="listbox" aria-labelledby="sortDropdown">
-                <li role="option" data-value="ending" aria-selected="true">
-                  {% if meta.lang == 'ko' %}마감 임박{% elif meta.lang == 'ja' %}まもなく終了{% elif meta.lang == 'zh' %}即将结束{% else %}Ending soon{% endif %}
-                </li>
-                <li role="option" data-value="new">
-                  {% if meta.lang == 'ko' %}최신 시작{% elif meta.lang == 'ja' %}新着{% elif meta.lang == 'zh' %}最新上线{% else %}Newly launched{% endif %}
-                </li>
-                <li role="option" data-value="payout">
-                  {% if meta.lang == 'ko' %}개별 보상 큼{% elif meta.lang == 'ja' %}最大報酬{% elif meta.lang == 'zh' %}单次奖励最高{% else %}Biggest payout{% endif %}
-                </li>
-                <li role="option" data-value="pool">
-                  {% if meta.lang == 'ko' %}리워드 풀 큼{% elif meta.lang == 'ja' %}最大プール{% elif meta.lang == 'zh' %}奖励池最大{% else %}Largest pool{% endif %}
-                </li>
-                <li role="option" data-value="popular">
-                  {% if meta.lang == 'ko' %}인기 캠페인{% elif meta.lang == 'ja' %}人気順{% elif meta.lang == 'zh' %}最受欢迎{% else %}Most popular{% endif %}
-                </li>
-              </ul>
+                </p>
+                <!-- Tabs + Custom Dropdown Filters -->
+                <div class="controls">
+                    <div class="tabs" role="tablist" aria-label="Campaign tabs">
+                        <button
+                            class="tab active"
+                            data-target="#live"
+                            role="tab"
+                            aria-selected="true"
+                            id="tab-live"
+                        >
+                            {% if meta.lang == 'ko' %}진행중{% elif meta.lang == 'ja' %}進行中{% elif meta.lang == 'zh' %}进行中{% else %}Live{% endif %}
+                        </button>
+                        <button
+                            class="tab"
+                            data-target="#past"
+                            role="tab"
+                            aria-selected="false"
+                            id="tab-past"
+                        >
+                            {% if meta.lang == 'ko' %}종료됨{% elif meta.lang == 'ja' %}終了{% elif meta.lang == 'zh' %}已结束{% else %}Past{% endif %}
+                        </button>
+                    </div>
+                    <div class="filters">
+                        <!-- Custom dropdown -->
+                        <div class="dropdown" id="sortDropdown" data-value="ending">
+                            <button
+                                class="dropdown-toggle"
+                                type="button"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span class="dropdown-label">
+                                    {% if meta.lang == 'ko' %}마감 임박{% elif meta.lang == 'ja' %}まもなく終了{% elif meta.lang == 'zh' %}即将结束{% else %}Ending soon{% endif %}
+                                </span>
+                                <span class="caret">▾</span>
+                            </button>
+                            <ul class="dropdown-menu" role="listbox" aria-labelledby="sortDropdown">
+                                <li role="option" data-value="ending" aria-selected="true">
+                                    {% if meta.lang == 'ko' %}마감 임박{% elif meta.lang == 'ja' %}まもなく終了{% elif meta.lang == 'zh' %}即将结束{% else %}Ending soon{% endif %}
+                                </li>
+                                <li role="option" data-value="new">
+                                    {% if meta.lang == 'ko' %}최신 시작{% elif meta.lang == 'ja' %}新着{% elif meta.lang == 'zh' %}最新上线{% else %}Newly launched{% endif %}
+                                </li>
+                                <li role="option" data-value="payout">
+                                    {% if meta.lang == 'ko' %}개별 보상 큼{% elif meta.lang == 'ja' %}最大報酬{% elif meta.lang == 'zh' %}单次奖励最高{% else %}Biggest payout{% endif %}
+                                </li>
+                                <li role="option" data-value="pool">
+                                    {% if meta.lang == 'ko' %}리워드 풀 큼{% elif meta.lang == 'ja' %}最大プール{% elif meta.lang == 'zh' %}奖励池最大{% else %}Largest pool{% endif %}
+                                </li>
+                                <li role="option" data-value="popular">
+                                    {% if meta.lang == 'ko' %}인기 캠페인{% elif meta.lang == 'ja' %}人気順{% elif meta.lang == 'zh' %}最受欢迎{% else %}Most popular{% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== PANELS ===== -->
-    <main class="container" style="padding:24px 0 0">
-      <!-- LIVE -->
-      <section id="live" class="panel active" aria-labelledby="tab-live">
-        <div class="grid" id="liveGrid">
-          {% if projects %}
+        </section>
+        <!-- ===== PANELS ===== -->
+        <main class="container" style="padding:24px 0 0">
+            <!-- LIVE -->
+            <section id="live" class="panel active" aria-labelledby="tab-live">
+                <div class="grid" id="liveGrid">
+                    {% if projects %}
             {% for c in projects %}
-              <article
-                class="project-card"
-                data-start="{{ c.start|date:'Y-m-d' }}"
-                data-end="{{ c.end|date:'Y-m-d' }}"
-                data-pool="{{ c.pool_usdt|default:0 }}"
-                data-payout="{{ c.payout_usdt|default:0 }}"
-                data-pop="{{ c.participants|default:0 }}"
-              >
-                <div class="thumb">
-                  <img src="{{ c.image_url }}" alt="">
-                  <div class="task-badges">
-                    {% if c.has_visit %}<span class="task-badge visit">VISIT</span>{% endif %}
-                    {% if c.has_link %}<span class="task-badge link">LINK</span>{% endif %}
-                  </div>
-                </div>
-                <div class="body">
-                  <h3>{{ c.title }}</h3>
-                  <p>{{ c.summary }}</p>
-                  <div class="meta">
-                    <div class="pill">
-                      <strong>
-                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
-                      </strong>&nbsp; {{ c.pool_usdt }} USDT
-                    </div>
-                    <div class="pill">
-                      <strong>
-                        {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
-                      </strong>&nbsp; {{ c.participants }}
-                    </div>
-                  </div>
-                  <div class="progress">
-                    <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}"></div>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                    <span>{{ c.claimed_percent }}% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
-                    <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
-                  </div>
-                  <div class="foot">
-                    <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/" aria-label="View details for {{ c.title }}">
-                      {% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}
-                    </a>
-                  </div>
-                </div>
-              </article>
-            {% endfor %}
+                    <article
+                        class="project-card"
+                        data-start="{{ c.start|date:'Y-m-d' }}"
+                        data-end="{{ c.end|date:'Y-m-d' }}"
+                        data-pool="{{ c.pool_usdt|default:0 }}"
+                        data-payout="{{ c.payout_usdt|default:0 }}"
+                        data-pop="{{ c.participants|default:0 }}"
+                        data-href="/rewards/{{ c.slug }}-{{ c.id }}/"
+                    >
+                        <div class="thumb">
+                            <img src="{{ c.image_url }}" alt="">
+                            <div class="task-badges">
+                                {% if c.has_visit %}
+                                <span class="task-badge visit">VISIT</span>
+                                {% endif %}
+                    {% if c.has_link %}
+                                <span class="task-badge link">LINK</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>{{ c.title }}</h3>
+                            <p>{{ c.summary }}</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>
+                                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
+                                    </strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>
+                                        {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
+                                    </strong>
+                                    &nbsp; {{ c.participants }}
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <!-- INLINE WIDTH FALLBACK + data attribute for animation -->
+                                <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}" style="width: {{ c.claimed_percent|default:0 }}%"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>{{ c.claimed_percent }}% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                                <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/" aria-label="View details for {{ c.title }}">
+                                    {% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
           {% else %}
-            <div class="empty-state" style="grid-column:1/-1">
-              <h3>
-                {% if meta.lang == 'ko' %}진행중인 캠페인이 없습니다{% elif meta.lang == 'ja' %}進行中のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无进行中的活动{% else %}No live campaigns right now{% endif %}
-              </h3>
-              <p>
-                {% if meta.lang == 'ko' %}새 캠페인이 곧 공개됩니다. 잠시 후 다시 확인해주세요.{% elif meta.lang == 'ja' %}新しいキャンペーンは近日公開予定です。しばらくしてから再度ご確認ください。{% elif meta.lang == 'zh' %}新的活动即将上线，请稍后再查看。{% else %}New campaigns launch soon—check back later.{% endif %}
-              </p>
-            </div>
-          {% endif %}
-        </div>
-      </section>
-
-      <!-- PAST -->
-      <section id="past" class="panel" aria-labelledby="tab-past">
-        <div class="grid" id="pastGrid">
-          {% if past_projects %}
+                    <div class="empty-state" style="grid-column:1/-1">
+                        <h3>
+                            {% if meta.lang == 'ko' %}진행중인 캠페인이 없습니다{% elif meta.lang == 'ja' %}進行中のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无进行中的活动{% else %}No live campaigns right now{% endif %}
+                        </h3>
+                        <p>
+                            {% if meta.lang == 'ko' %}새 캠페인이 곧 공개됩니다. 잠시 후 다시 확인해주세요.{% elif meta.lang == 'ja' %}新しいキャンペーンは近日公開予定です。しばらくしてから再度ご確認ください。{% elif meta.lang == 'zh' %}新的活动即将上线，请稍后再查看。{% else %}New campaigns launch soon—check back later.{% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+            <!-- PAST -->
+            <section id="past" class="panel" aria-labelledby="tab-past">
+                <div class="grid" id="pastGrid">
+                    {% if past_projects %}
             {% for c in past_projects %}
-              <article
-                class="project-card"
-                data-start="{{ c.start|date:'Y-m-d' }}"
-                data-end="{{ c.end|date:'Y-m-d' }}"
-                data-pool="{{ c.pool_usdt|default:0 }}"
-                data-payout="{{ c.payout_usdt|default:0 }}"
-                data-pop="{{ c.participants|default:0 }}"
-              >
-                <div class="thumb">
-                  <img src="{{ c.image_url }}" alt="">
-                  <div class="task-badges">
-                    {% if c.has_visit %}<span class="task-badge visit">VISIT</span>{% endif %}
-                    {% if c.has_link %}<span class="task-badge link">LINK</span>{% endif %}
-                  </div>
-                </div>
-                <div class="body">
-                  <h3>{{ c.title }}</h3>
-                  <p>{{ c.summary }}</p>
-                  <div class="meta">
-                    <div class="pill">
-                      <strong>
-                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
-                      </strong>&nbsp; {{ c.pool_usdt }} USDT
-                    </div>
-                    <div class="pill">
-                      <strong>
-                        {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
-                      </strong>&nbsp; {{ c.participants }}
-                    </div>
-                  </div>
-                  <div class="progress">
-                    <div class="bar" data-pct="100"></div>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
-                    <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
-                    <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
-                  </div>
-                  <div class="foot">
-                    <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/">
-                      {% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}
-                    </a>
-                  </div>
-                </div>
-              </article>
-            {% endfor %}
+                    <article
+                        class="project-card"
+                        data-start="{{ c.start|date:'Y-m-d' }}"
+                        data-end="{{ c.end|date:'Y-m-d' }}"
+                        data-pool="{{ c.pool_usdt|default:0 }}"
+                        data-payout="{{ c.payout_usdt|default:0 }}"
+                        data-pop="{{ c.participants|default:0 }}"
+                        data-href="/rewards/{{ c.slug }}-{{ c.id }}/"
+                    >
+                        <div class="thumb">
+                            <img src="{{ c.image_url }}" alt="">
+                            <div class="task-badges">
+                                {% if c.has_visit %}
+                                <span class="task-badge visit">VISIT</span>
+                                {% endif %}
+                    {% if c.has_link %}
+                                <span class="task-badge link">LINK</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="body">
+                            <h3>{{ c.title }}</h3>
+                            <p>{{ c.summary }}</p>
+                            <div class="meta">
+                                <div class="pill">
+                                    <strong>
+                                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
+                                    </strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
+                                </div>
+                                <div class="pill">
+                                    <strong>
+                                        {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
+                                    </strong>
+                                    &nbsp; {{ c.participants }}
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <!-- Past campaigns are fully claimed in UI: still clamp & animate -->
+                                <div class="bar" data-pct="100" style="width: 100%"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                                <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
+                            </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/">
+                                    {% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
           {% else %}
-            <div class="empty-state" style="grid-column:1/-1">
-              <h3>
-                {% if meta.lang == 'ko' %}지난 캠페인이 없습니다{% elif meta.lang == 'ja' %}過去のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无历史活动{% else %}No past campaigns yet{% endif %}
-              </h3>
-              <p>
-                {% if meta.lang == 'ko' %}완료된 캠페인이 여기에 표시됩니다.{% elif meta.lang == 'ja' %}終了したキャンペーンはここに表示されます。{% elif meta.lang == 'zh' %}已结束的活动会显示在这里。{% else %}Completed campaigns will appear here.{% endif %}
-              </p>
+                    <div class="empty-state" style="grid-column:1/-1">
+                        <h3>
+                            {% if meta.lang == 'ko' %}지난 캠페인이 없습니다{% elif meta.lang == 'ja' %}過去のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无历史活动{% else %}No past campaigns yet{% endif %}
+                        </h3>
+                        <p>
+                            {% if meta.lang == 'ko' %}완료된 캠페인이 여기에 표시됩니다.{% elif meta.lang == 'ja' %}終了したキャンペーンはここに表示されます。{% elif meta.lang == 'zh' %}已结束的活动会显示在这里。{% else %}Completed campaigns will appear here.{% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">
+                    {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
+                </div>
             </div>
-          {% endif %}
-        </div>
-      </section>
-    </main>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-      <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-        <div>© <strong>LinkHash</strong></div>
-        <div style="opacity:.7">
-          {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
-        </div>
-      </div>
-    </footer>
-
-    <!-- ===== LIGHT INTERACTIONS (no ScrollTrigger) ===== -->
-    <script type="module">
+        </footer>
+        <!-- ===== LIGHT INTERACTIONS (no ScrollTrigger) ===== -->
+        <script type="module">
       import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
       import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
 
@@ -636,22 +710,49 @@
         entries.forEach(entry=>{
           if(entry.isIntersecting){
             const b = entry.target;
-            const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
+            // Robust target calc with clamp + string handling
+            let pct = parseFloat(b.dataset.pct);
+            if (isNaN(pct)) pct = 0;
+            pct = Math.max(0, Math.min(100, pct));
+            const target = pct + '%';
             gsap.fromTo(b, { width: "0%" }, { width: target, duration: 1.2, ease: "power2.out" });
             io.unobserve(b);
           }
         });
-      }, { root: null, rootMargin: "0px 0px -10% 0px", threshold: 0.1 });
+      }, { root: null, rootMargin: "0px", threshold: 0.01 });
 
       function animateBarsWhenVisible(){
         document.querySelectorAll('.panel.active .progress .bar').forEach(b=> io.observe(b));
       }
 
-      // Initial apply + animations
+      // ===== NEW: make whole card clickable without nesting anchors =====
+      function enableCardClicks(){
+        document.querySelectorAll('.project-card').forEach(card=>{
+          const href = card.getAttribute('data-href');
+          if(!href) return;
+          card.setAttribute('role','link');
+          card.setAttribute('tabindex','0');
+          card.addEventListener('click', (e)=>{
+            // Let inner <a> elements behave normally
+            if(e.target.closest('a')) return;
+            window.location.href = href;
+          });
+          card.addEventListener('keydown', (e)=>{
+            if(e.key === 'Enter' || e.key === ' '){
+              e.preventDefault();
+              // Trigger same navigation as click
+              window.location.href = href;
+            }
+          });
+        });
+      }
+
+      // Initial apply + animations + card click handlers
       applySort();
       revealCards();
       animateBarsWhenVisible();
-    </script>
+      enableCardClicks();
+        </script>
         <script>
     // --- CSRF helper ---
     function getCookie(name){
@@ -730,8 +831,8 @@
     // Expose to inline onclick handlers
     window.connectWallet = connectWallet;
     window.logoutWallet  = logoutWallet;
-    </script>
-    <script>
+        </script>
+        <script>
       (function(){
         const $wrap = document.getElementById('langSwitcher');
         if(!$wrap) return;
@@ -791,7 +892,6 @@
           });
         });
       })();
-    </script>
-
-  </body>
+        </script>
+    </body>
 </html>
