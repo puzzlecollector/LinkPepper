@@ -322,7 +322,7 @@
                 <rect x="10" y="25" width="20" height="8" rx="4" fill="#1d2836"/>
               </svg>
               <div class="handle">
-                <span class="addr">{{ r.masked }}</span>
+                <span class="addr">{{ r.address }}</span>
                 <span class="muted">
                   {% if meta.lang == 'ko' %}마인드셰어{% elif meta.lang == 'ja' %}マインドシェア{% elif meta.lang == 'zh' %}心智占有率{% else %}Mindshare{% endif %}
                   · {{ r.mindshare|floatformat:2 }}%

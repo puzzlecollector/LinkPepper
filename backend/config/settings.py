@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "csp",
+    # "csp",
     "ckeditor",
     "ckeditor_uploader",
     CORE_APP,  # core
@@ -65,7 +65,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "csp.middleware.CSPMiddleware",
+    # "csp.middleware.CSPMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -117,7 +117,7 @@ CONTENT_SECURITY_POLICY = {
 
     # If you want to start in report-only mode, set this to True
     # (content will NOT be blocked; only reported). For now keep False.
-    "REPORT_ONLY": False,
+    "REPORT_ONLY": True,
 }
 
 
