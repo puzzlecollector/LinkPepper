@@ -47,8 +47,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "csp",
-    "ckeditor",
-    "ckeditor_uploader",
     CORE_APP,  # core
 ]
 
@@ -70,56 +68,39 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
-# --- New django-csp 4.x format ---
-CONTENT_SECURITY_POLICY = {
-    "DIRECTIVES": {
-        "default-src": ("'self'",),
+# --- CSP baseline ---
+CSP_DEFAULT_SRC = ("'self'",)
 
-        # Inline <script> blocks exist in your pages => keep 'unsafe-inline' (dev-friendly)
-        "script-src": (
-            "'self'",
-            "'unsafe-inline'",
-            "https://cdn.jsdelivr.net",
-            "https://unpkg.com",
-            "https://cdn.walletconnect.com",
-        ),
+# Allow your CDNs for the WalletConnect UMD
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://cdn.walletconnect.com")
 
-        # Inline <style> blocks exist in your pages => add 'unsafe-inline'
-        "style-src": (
-            "'self'",
-            "'unsafe-inline'",
-            "https://fonts.googleapis.com",
-        ),
 
-        "img-src": (
-            "'self'",
-            "data:",
-            "blob:",                      # optional but handy for modern APIs
-            "https://cdn.jsdelivr.net",
-            "https://unpkg.com",
-            "https://cdn.walletconnect.com",
-        ),
+# WalletConnect uses HTTPS + WebSockets to *.walletconnect.com relays
+CSP_CONNECT_SRC = (
+    "'self'",
+    "https://*.walletconnect.com",
+    "wss://*.walletconnect.com",
+    # If your API endpoints are on a different origin, add them here:
+    # "https://api.yourdomain.com",
+)
 
-        "font-src": (
-            "'self'",
-            "data:",                      # in case you inline fonts later
-            "https://fonts.gstatic.com",
-        ),
+# The modal / assets may pull images/icons from your origin and allowed CDNs
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",                      # for base64 tiny images (safe)
+    "https://cdn.jsdelivr.net",
+    "https://unpkg.com",
+    "https://cdn.walletconnect.com",
+)
 
-        "connect-src": (
-            "'self'",
-            "https://*.walletconnect.com",
-            "wss://*.walletconnect.com",
-        ),
+# Fonts (if any)
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
 
-        "frame-src": ("'self'",),
-    },
+# Styles (if you have inline styles, prefer a nonce; avoid 'unsafe-inline' if you can)
+CSP_STYLE_SRC = ("'self'", "https://fonts.googleapis.com")
 
-    # If you want to start in report-only mode, set this to True
-    # (content will NOT be blocked; only reported). For now keep False.
-    "REPORT_ONLY": False,
-}
-
+# Frames (most WC v2 modals are in-page, but allow iframes just in case)
+CSP_FRAME_SRC = ("'self'",)
 
 # OPTIONAL hardening
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -185,51 +166,6 @@ USE_TZ = True
 # --------------------------------------------------------------------------------------
 # Static / Media
 # --------------------------------------------------------------------------------------
-# Where uploaded images go (under /media/)
-# Where uploaded images go (relative to MEDIA_ROOT).  NO date tokens here.
-CKEDITOR_UPLOAD_PATH = "campaigns/uploads/"
-
-CKEDITOR_IMAGE_BACKEND = "pillow"
-CKEDITOR_ALLOW_NONIMAGE_FILES = False
-
-CKEDITOR_CONFIGS = {
-    "default": {
-        "height": 380,
-        "width": "100%",
-        "toolbar": [
-            {"name": "styles", "items": ["Format", "Font", "FontSize"]},
-            {"name": "basicstyles", "items": ["Bold", "Italic", "Underline", "Strike", "-", "RemoveFormat"]},
-            {"name": "paragraph", "items": [
-                "NumberedList", "BulletedList", "-", "Outdent", "Indent", "-",
-                "Blockquote", "JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock"
-            ]},
-            {"name": "links", "items": ["Link", "Unlink"]},
-            # The Image button opens the dialog; with the uploader enabled, it shows an **Upload** tab.
-            {"name": "insert", "items": ["Image", "Table", "HorizontalRule"]},
-            {"name": "clipboard", "items": ["Undo", "Redo"]},
-            {"name": "document", "items": ["Source", "Maximize"]},
-        ],
-        # Drag-and-drop / paste upload support
-        "extraPlugins": ",".join([
-            "uploadimage",
-            "justify",
-            "font",
-            "colorbutton",
-        ]),
-        # DO NOT remove the 'image' plugin; it provides the Image button & upload tab.
-        # "removePlugins": "image",   # <-- remove this line entirely
-
-        # Uploader endpoints (served by django-ckeditor)
-        "filebrowserUploadUrl": "/ckeditor/upload/",
-        "filebrowserBrowseUrl": "/ckeditor/browse/",
-
-        # Allow the tags CKEditor will generate
-        "extraAllowedContent": "img[!src,alt,width,height]{*}(*);figure;figcaption",
-        "forcePasteAsPlainText": False,
-    }
-}
-
-
 # serve user uploads from /media/
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

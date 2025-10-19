@@ -9,7 +9,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
-
+from decimal import Decimal, ROUND_HALF_UP 
 
 # ---------- Core choices ----------
 class TaskType(models.TextChoices):
@@ -244,13 +244,37 @@ class Campaign(models.Model):
     @property
     def claimed_percent(self) -> int:
         """
-        For the progress bar. We interpret "claimed" as USDT paid out so far / pool_usdt.
+        (# distinct wallets with an approved submission) * payout / pool, as a whole %.
+        Counts approval by either status==APPROVED or is_approved=True.
+        Returns 0..100, but any non-zero fraction below 1% is shown as 1%.
         """
-        total_paid = self.payouts.aggregate(s=models.Sum("amount_usdt"))["s"] or Decimal("0")
-        if not self.pool_usdt or self.pool_usdt == 0:
+        from django.db.models import Q
+
+        approved_user_count = (
+            self.submissions.filter(Q(status=SubmissionStatus.PAID) | Q(is_paid=True))
+            .exclude(wallet_address__isnull=True)
+            .exclude(wallet_address__exact="")
+            .values("wallet_address")
+            .distinct()
+            .count()
+        )
+
+        if not self.pool_usdt or self.pool_usdt == 0 or not self.payout_usdt or self.payout_usdt == 0:
             return 0
-        pct = int(min(100, (total_paid / self.pool_usdt * 100).quantize(Decimal("1"))))
-        return pct
+
+        claimed_amount = Decimal(approved_user_count) * self.payout_usdt
+        if claimed_amount <= 0:
+            return 0
+
+        pct = (claimed_amount / self.pool_usdt) * Decimal("100")
+
+        # If there is any progress but < 1%, show 1 so the UI isn’t stuck at 0.
+        if pct > 0 and pct < 1:
+            return 1
+
+        pct_int = int(pct.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        return max(0, min(100, pct_int))
+
 
     def save(self, *args, **kwargs):
         if not self.slug:

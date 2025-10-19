@@ -166,6 +166,7 @@
       .scroller{max-height:240px; overflow:auto; padding-right:6px;}
       .example{border:1px dashed #243040; border-radius:12px; padding:10px; margin-bottom:8px; background:#0a1117;}
       .example .meta{display:flex; gap:8px; flex-wrap:wrap; font-size:12px; color:#8aa099;}
+      .example .meta .addr{ overflow-wrap:anywhere; word-break:break-word; }
             /* ===== MOBILE HEADER (namespaced .mnav) ===== */
 .mnav{position:sticky; top:0; z-index:80; padding-top:env(safe-area-inset-top);
   background:linear-gradient(180deg, rgba(15,17,21,.82), rgba(15,17,21,.52));
@@ -225,6 +226,22 @@
 @media (min-width:720px){
   .mnav-bar{height:60px}
 }
+
+/* Rich-text container */
+.rt{overflow-wrap:anywhere; word-break:break-word}
+
+/* Make editor images responsive even if CKEditor set inline sizes */
+.rt img{
+  max-width:100% !important;
+  height:auto !important;
+  display:block;
+}
+
+/* Safety for tables & embeds */
+.rt table{display:block; max-width:100%; overflow-x:auto; border-collapse:collapse}
+.rt iframe,.rt video{max-width:100%; height:auto}
+
+
       /* Footer */
       .footer{padding:18px 0 24px; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; font-size:12px; margin-top:18px}
         </style>
@@ -410,7 +427,17 @@
                         <img src="{{ campaign.image_url|default:'https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&h=800' }}" alt="">
                     </div>
                     <div class="hero-body">
-                        <p>{% firstof campaign.long_description campaign.summary "" %}</p>
+                        <div class="rt">
+                        {% if campaign.long_description %}
+                            {% if '<' in campaign.long_description %}
+                            {% autoescape off %}{{ campaign.long_description }}{% endautoescape %}
+                            {% else %}
+                            <p>{{ campaign.long_description|linebreaksbr }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p>{{ campaign.summary|default:"" }}</p>
+                        {% endif %}
+                        </div>
                         <div class="section">
                             <div class="tabs" role="tablist">
                                 <button
@@ -475,7 +502,20 @@
                                             {% endif %}
                                         </div>
                                         <div class="meta">
-                                            <span>👤 {% firstof s.user.display_name s.user.address s.user_address "Anon" %}</span>
+                                            <span class="addr">
+                                                👤
+                                                {% if s.user and s.user.display_name %}
+                                                    {{ s.user.display_name }}
+                                                {% elif s.user and s.user.address %}
+                                                    {{ s.user.address }}
+                                                {% elif s.wallet_address %}
+                                                    {{ s.wallet_address }}
+                                                {% elif s.user_address %}
+                                                    {{ s.user_address }}
+                                                {% else %}
+                                                    Anon
+                                                {% endif %}
+                                            </span>
                                             <span>·</span>
                                             <span>{% if s.created_at %}{{ s.created_at|date:"Y-m-d H:i" }}{% else %}-{% endif %}</span>
                                             {% if s.proof_score %}
@@ -578,8 +618,14 @@
                                         </strong>
                                         <div style="margin-top:6px">
                                             {% if campaign.code_instructions %}
-                            {{ campaign.code_instructions }}
-                          {% else %}
+                                            <div class="rt">
+                                                {% if '<' in campaign.code_instructions %}
+                                                {% autoescape off %}{{ campaign.code_instructions }}{% endautoescape %}
+                                                {% else %}
+                                                <p>{{ campaign.code_instructions|linebreaksbr }}</p>
+                                                {% endif %}
+                                            </div>
+                                            {% else %}
                             {% if meta.lang == 'ko' %}
                                             <ol style="margin:6px 0 0 18px; padding-left:4px;">
                                                 <li>

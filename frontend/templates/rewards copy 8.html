@@ -153,43 +153,23 @@
       .project-card{
         position:relative; width:100%; height:460px; display:flex; flex-direction:column; overflow:hidden;
         background:linear-gradient(180deg, #0d1217, #0b0f14);
-        border:1px solid rgba(255,255,255,.06); border-radius:18px;
-        /* keep a static, smaller shadow (no animated shadow) */
-        box-shadow:0 14px 34px rgba(0,0,0,.45);
-
-        /* initial reveal still uses opacity/translate (fast on GPU) */
-        opacity:0; transform:translateY(8px) translateZ(0);
-
-        /* transition ONLY transform/opacity/border-color (cheap) */
-        transition:
-          transform .14s cubic-bezier(.2,.8,.2,1),
-          opacity   .14s cubic-bezier(.2,.8,.2,1),
-          border-color .14s linear;
-
-        /* performance hints */
-        will-change: transform, opacity;
-        backface-visibility:hidden;
-        contain: paint;          /* isolates paints inside the card */
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
+        opacity:0; transform:translateY(8px); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        /* NEW: make the whole card feel clickable */
         cursor: pointer;
       }
-
-      /* lightweight glow: use a pseudo-element that only fades opacity */
+      /* radiant hover */
       .project-card::after{
-        content:""; position:absolute; inset:-12%;
-        pointer-events:none; opacity:0;
-        background:radial-gradient(60% 60% at 50% 10%, rgba(35,209,106,.18), transparent 60%);
-        transition: opacity .14s cubic-bezier(.2,.8,.2,1);
-        will-change: opacity;
+        content:""; position:absolute; inset:-20%; pointer-events:none; opacity:0;
+        background:radial-gradient(60% 60% at 50% 10%, rgba(35,209,106,.14), transparent 60%);
+        transition:opacity .2s ease;
       }
-
       .project-card:hover{
-        /* tiny movement + tiny scale to avoid large invalidation */
-        transform: translateY(-2px) scale(1.005) translateZ(0);
+        transform:translateY(-3px) scale(1.02);
         border-color:rgba(35,209,106,.35);
-        /* DO NOT animate box-shadow here */
+        box-shadow:0 40px 80px rgba(22,163,74,.18), var(--shadow-md);
       }
       .project-card:hover::after{ opacity:1; }
-
 
       .project-card .thumb{position:relative; height:190px; background:#0b1117; overflow:hidden;}
       .project-card .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.92; transform:scale(1.03)}

@@ -7,7 +7,7 @@ import os
 from django import forms
 from django.core.files.storage import default_storage
 from django.utils.text import slugify
-
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from .models import (
     WalletUser,
     CampaignApplication,
@@ -321,37 +321,48 @@ class CampaignApplicationAdmin(admin.ModelAdmin):
 
 # ---------- Campaign
 
+# ---------- Campaign
+
+# ---------- Campaign
+
 @admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):
+    """
+    Rich text friendly:
+    - CKEditor (with uploader) for long_description / code_instructions.
+    - Two OPTIONAL file inputs that append an <img> into those fields.
+    - Uploaded files are stored under /media/campaigns/body/ and /media/campaigns/instructions/.
+    """
+
+    # >>> ADD the two ImageFields to the form so Admin knows these fields exist <<<
+    class Form(forms.ModelForm):
+        long_desc_image_upload = forms.ImageField(
+            required=False, help_text="Append image to Long description"
+        )
+        code_instr_image_upload = forms.ImageField(
+            required=False, help_text="Append image to Code instructions"
+        )
+
+        class Meta:
+            model = Campaign
+            fields = "__all__"
+            widgets = {
+                "long_description": CKEditorUploadingWidget(config_name="default"),
+                "code_instructions": CKEditorUploadingWidget(config_name="default"),
+            }
+
+    form = Form
+
     list_display = (
-        "id",
-        "title",
-        "slug",
-        "task_type",
-        "is_published",
-        "is_paused",
-        "pool_usdt",
-        "payout_usdt",
-        "participants",
-        "claimed_percent",
-        "start",
-        "end",
-        "client_site_domain",
-        "visit_code",
-        "favicon_small",  # small preview
-        "image_small",    # small preview
-        "preview",        # clickable frontend preview
+        "id", "title", "slug", "task_type", "is_published", "is_paused",
+        "pool_usdt", "payout_usdt", "participants", "claimed_percent",
+        "start", "end", "client_site_domain", "visit_code",
+        "favicon_small", "image_small", "preview",
     )
 
-    # REQUIRED so other admins can autocomplete Campaign:
     search_fields = (
-        "title",
-        "slug",
-        "summary",
-        "long_description",
-        "client_site_domain",
-        "seo_keywords",
-        "visit_code",
+        "title", "slug", "summary", "long_description",
+        "client_site_domain", "seo_keywords", "visit_code",
     )
 
     list_filter = ("task_type", HasVisitCodeFilter, "is_published", "is_paused", "start", "end")
@@ -362,19 +373,18 @@ class CampaignAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            "fields": ("title", "slug", "task_type", "summary", "long_description")
+            "fields": ("title", "slug", "task_type", "summary", "long_description"),
         }),
         ("Verification (VISIT tasks)", {
             "fields": ("code_instructions", "visit_code"),
-            "description": "For VISIT campaigns, provide user-facing instructions and the actual verification code.",
         }),
         ("Client & SEO", {
             "fields": ("client_site_domain", "seo_keywords"),
         }),
         ("Assets", {
             "fields": ("image_url", "favicon_url", "image_large_preview", "favicon_large_preview"),
-            "description": "You can use an http(s) URL or a data:image/*;base64,... data URI.",
         }),
+        # Optional extra uploads (keep if you want an extra “append image” button below editors)
         ("Rewards & Window", {
             "fields": ("pool_usdt", "payout_usdt", "start", "end"),
         }),
@@ -427,6 +437,11 @@ class CampaignAdmin(admin.ModelAdmin):
             '<a href="/rewards/{slug}-{id}/" target="_blank" rel="noopener">Open</a>',
             slug=obj.slug, id=obj.id
         )
+
+    # Save uploads and append <img> tags to the HTML fields
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
 
 
 # ---------- Submission

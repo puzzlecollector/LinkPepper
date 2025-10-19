@@ -168,7 +168,7 @@
       .projects{padding:90px 0 110px; background:radial-gradient(90rem 50rem at -15% 10%, rgba(22,163,74,.10), transparent 60%), linear-gradient(180deg, #0a0d11, #0b0e12);}
       .projects h2{font-size:34px; margin:0 0 6px;}
       .projects .sub{color:#9fb0aa; margin:0 0 22px;}
-      .project-card{width:360px; height:460px; display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(180deg, #0d1217, #0b0f14); border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);}
+      .project-card{width:100%; height:460px; display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(180deg, #0d1217, #0b0f14); border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);}
       .project-card .thumb{position:relative; height:190px; background:#0b1117; overflow:hidden;}
       .project-card .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.92; transform:scale(1.03)}
       .task-badges{position:absolute; left:12px; bottom:12px; display:flex; gap:8px;}
@@ -185,7 +185,6 @@
       .project-card .foot{display:flex; justify-content:flex-end; margin-top:auto;}
       .project-card .foot .btn{padding:10px 12px;}
       .swiper{padding:8px}
-      .swiper-slide{width:auto}
 
       .section-head{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:8px;}
       .more-link{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-weight:700; border:1px solid rgba(255,255,255,.08); background:rgba(14,18,25,.6); color:#d9f6e6}
@@ -254,27 +253,6 @@
   }
   .empty-wrap .msg{font-size:14px}
   .empty-wrap .hint{opacity:.75; font-size:12px}
-
-
-  /* --- Swiper layout hardening: prevents vertical stacking if CSS gets overridden --- */
-#campaign-swiper,
-#past-swiper { position: relative; overflow: hidden; }
-
-#campaign-swiper .swiper-wrapper,
-#past-swiper .swiper-wrapper{
-  /* Swiper relies on this; if something overrides it, slides stack vertically */
-  display: flex !important;
-  box-sizing: content-box;
-  /* For 2-row grid mode Swiper internally switches to wrapped layout;
-     enforce wrap so rows are possible even if a global reset interferes. */
-  flex-wrap: wrap !important;
-}
-
-#campaign-swiper .swiper-slide,
-#past-swiper .swiper-slide{
-  /* Keep slides side-by-side and let Swiper control their width */
-  flex: 0 0 auto !important;
-}
         </style>
     </head>
     <body>

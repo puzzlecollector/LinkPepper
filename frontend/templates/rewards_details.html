@@ -1,5 +1,5 @@
 <!doctype html>
-{% load static %}
+{% load static richtext %}
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
         <meta charset="utf-8">
@@ -202,8 +202,18 @@
         box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
       }
       .links{ display:flex; gap:24px; align-items:center; }
+.rt{overflow-wrap:anywhere; word-break:break-word}
 
-      
+/* Make editor images responsive even if CKEditor set inline sizes */
+.rt img{
+  max-width:100% !important;
+  height:auto !important;
+  display:block;
+}
+
+/* Safety for tables & embeds */
+.rt table{display:block; max-width:100%; overflow-x:auto; border-collapse:collapse}
+.rt iframe,.rt video{max-width:100%; height:auto}
 
       /* Responsive */
       @media (max-width:1140px){ .container{width:1000px} }
@@ -333,17 +343,20 @@
                         <span class="fact">
                             <strong>
                                 {% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
-                            </strong>&nbsp; {{ campaign.pool_usdt|default:"0" }} USDT
+                            </strong>
+                            &nbsp; {{ campaign.pool_usdt|default:"0" }} USDT
                         </span>
                         <span class="fact">
                             <strong>
                                 {% if meta.lang == 'ko' %}개별 보상{% elif meta.lang == 'ja' %}個別報酬{% elif meta.lang == 'zh' %}单次奖励{% else %}Payout{% endif %}
-                            </strong>&nbsp; {{ campaign.payout_usdt|default:"-" }} USDT
+                            </strong>
+                            &nbsp; {{ campaign.payout_usdt|default:"-" }} USDT
                         </span>
                         <span class="fact">
                             <strong>
                                 {% if meta.lang == 'ko' %}기간{% elif meta.lang == 'ja' %}期間{% elif meta.lang == 'zh' %}周期{% else %}Dates{% endif %}
-                            </strong>&nbsp; {{ campaign.start|date:"Y-m-d" }} → {{ campaign.end|date:"Y-m-d" }}
+                            </strong>
+                            &nbsp; {{ campaign.start|date:"Y-m-d" }} → {{ campaign.end|date:"Y-m-d" }}
                         </span>
                         {% if campaign.is_open_now %}
                         <span class="fact status-open">● {% if meta.lang == 'ko' %}진행중{% elif meta.lang == 'ja' %}開催中{% elif meta.lang == 'zh' %}进行中{% else %}Live{% endif %}</span>
@@ -363,7 +376,9 @@
                         <img src="{{ campaign.image_url|default:'https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&h=800' }}" alt="">
                     </div>
                     <div class="hero-body">
-                        <p>{% firstof campaign.long_description campaign.summary "" %}</p>
+                        <div class="rt">
+                            {{ campaign.long_description|default:campaign.summary|richtext }}
+                        </div>
                         <div class="section">
                             <div class="tabs" role="tablist">
                                 <button
@@ -422,7 +437,20 @@
                                             {% endif %}
                                         </div>
                                         <div class="meta">
-                                            <span>👤 {% firstof s.user.display_name s.user.address s.user_address "Anon" %}</span>
+                                            <span>
+                                                👤
+                                            {% if s.user and s.user.display_name %}
+                                                {{ s.user.display_name }}
+                                            {% elif s.user and s.user.address %}
+                                                {{ s.user.address }}
+                                            {% elif s.wallet_address %}
+                                                {{ s.wallet_address }}
+                                            {% elif s.user_address %}
+                                                {{ s.user_address }}
+                                            {% else %}
+                                                Anon
+                                            {% endif %}
+                                            </span>
                                             <span>·</span>
                                             <span>{% if s.created_at %}{{ s.created_at|date:"Y-m-d H:i" }}{% else %}-{% endif %}</span>
                                             {% if s.proof_score %}
@@ -542,77 +570,115 @@
                                         </strong>
                                         <div style="margin-top:6px">
                                             {% if campaign.code_instructions %}
-                            {{ campaign.code_instructions }}
+                            {{ campaign.code_instructions|richtext }}
                             {% else %}
                             {% if meta.lang == 'ko' %}
                                             <ol style="margin:6px 0 0 18px; padding-left:4px;">
                                                 <li>
-                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a>에서
-                                                    <code>{{ keyword }}</code> 를 검색합니다.
+                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a>
+                                                    에서
+                                                    <code>{{ keyword }}</code>
+                                                    를 검색합니다.
                                                 </li>
-                                                <li>검색 결과 페이지
-                                                    <strong>{{ page_num }}</strong>로 이동합니다.
+                                                <li>
+                                                    검색 결과 페이지
+                                                    <strong>{{ page_num }}</strong>
+                                                    로 이동합니다.
                                                 </li>
-                                                <li>해당 페이지의
-                                                    <strong>{{ result_pos }}</strong>번째 결과에서
-                                                    <strong>{{ site }}</strong> 링크를 찾고 클릭합니다.
+                                                <li>
+                                                    해당 페이지의
+                                                    <strong>{{ result_pos }}</strong>
+                                                    번째 결과에서
+                                                    <strong>{{ site }}</strong>
+                                                    링크를 찾고 클릭합니다.
                                                 </li>
-                                                <li>랜딩한 페이지를 끝까지 스크롤하여 푸터(footer)에 있는
-                                                    <em>CODE: xxxxxx</em>를 확인합니다.
+                                                <li>
+                                                    랜딩한 페이지를 끝까지 스크롤하여 푸터(footer)에 있는
+                                                    <em>CODE: xxxxxx</em>
+                                                    를 확인합니다.
                                                 </li>
                                                 <li>아래 입력창에 코드를 그대로 입력하고 제출하면 됩니다.</li>
                                             </ol>
                                             {% elif meta.lang == 'ja' %}
                                             <ol style="margin:6px 0 0 18px; padding-left:4px;">
                                                 <li>
-                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a>で
-                                                    <code>{{ keyword }}</code> を検索します。
+                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a>
+                                                    で
+                                                    <code>{{ keyword }}</code>
+                                                    を検索します。
                                                 </li>
-                                                <li>検索結果の
-                                                    <strong>{{ page_num }}</strong>ページ目へ移動します。
+                                                <li>
+                                                    検索結果の
+                                                    <strong>{{ page_num }}</strong>
+                                                    ページ目へ移動します。
                                                 </li>
-                                                <li>そのページの
-                                                    <strong>{{ result_pos }}</strong>番目の結果から
-                                                    <strong>{{ site }}</strong> を見つけてクリックします。
+                                                <li>
+                                                    そのページの
+                                                    <strong>{{ result_pos }}</strong>
+                                                    番目の結果から
+                                                    <strong>{{ site }}</strong>
+                                                    を見つけてクリックします。
                                                 </li>
-                                                <li>遷移先ページを一番下までスクロールし、フッターにある
-                                                    <em>CODE: xxxxxx</em> を確認します。
+                                                <li>
+                                                    遷移先ページを一番下までスクロールし、フッターにある
+                                                    <em>CODE: xxxxxx</em>
+                                                    を確認します。
                                                 </li>
                                                 <li>そのコードを下の入力欄に入力して送信してください。</li>
                                             </ol>
                                             {% elif meta.lang == 'zh' %}
                                             <ol style="margin:6px 0 0 18px; padding-left:4px;">
-                                                <li>在
-                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a> 搜索
-                                                    <code>{{ keyword }}</code>。
+                                                <li>
+                                                    在
+                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a>
+                                                    搜索
+                                                    <code>{{ keyword }}</code>
+                                                    。
                                                 </li>
-                                                <li>跳转到搜索结果的第
-                                                    <strong>{{ page_num }}</strong>页。
+                                                <li>
+                                                    跳转到搜索结果的第
+                                                    <strong>{{ page_num }}</strong>
+                                                    页。
                                                 </li>
-                                                <li>在该页第
-                                                    <strong>{{ result_pos }}</strong>个结果中找到并点击
-                                                    <strong>{{ site }}</strong> 的链接。
+                                                <li>
+                                                    在该页第
+                                                    <strong>{{ result_pos }}</strong>
+                                                    个结果中找到并点击
+                                                    <strong>{{ site }}</strong>
+                                                    的链接。
                                                 </li>
-                                                <li>进入页面后滚动至页脚（footer），找到
-                                                    <em>CODE: xxxxxx</em>。
+                                                <li>
+                                                    进入页面后滚动至页脚（footer），找到
+                                                    <em>CODE: xxxxxx</em>
+                                                    。
                                                 </li>
                                                 <li>将该代码原样填入下面输入框并提交。</li>
                                             </ol>
                                             {% else %}
                                             <ol style="margin:6px 0 0 18px; padding-left:4px;">
-                                                <li>Go to
-                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a> and search for
-                                                    <code>{{ keyword }}</code>.
+                                                <li>
+                                                    Go to
+                                                    <a href="{{ search_url }}" target="_blank" rel="noopener">Google</a>
+                                                    and search for
+                                                    <code>{{ keyword }}</code>
+                                                    .
                                                 </li>
-                                                <li>Navigate to results page
-                                                    <strong>{{ page_num }}</strong>.
+                                                <li>
+                                                    Navigate to results page
+                                                    <strong>{{ page_num }}</strong>
+                                                    .
                                                 </li>
-                                                <li>Find the
-                                                    <strong>{{ result_pos }}</strong> result linking to
-                                                    <strong>{{ site }}</strong> and click it.
+                                                <li>
+                                                    Find the
+                                                    <strong>{{ result_pos }}</strong>
+                                                    result linking to
+                                                    <strong>{{ site }}</strong>
+                                                    and click it.
                                                 </li>
-                                                <li>Scroll to the bottom of the landing page and locate
-                                                    <em>CODE: xxxxxx</em> in the footer.
+                                                <li>
+                                                    Scroll to the bottom of the landing page and locate
+                                                    <em>CODE: xxxxxx</em>
+                                                    in the footer.
                                                 </li>
                                                 <li>Enter that code below exactly and submit.</li>
                                             </ol>
@@ -700,7 +766,7 @@
                         <span>{{ submitted }}/{{ quota_total }}</span>
                     </div>
                     <div class="progress" style="margin-top:4px">
-                        <div class="bar" data-pct="{{ claimed_percent }}"></div>
+                        <div class="bar" data-pct="{{ claimed_percent|default:0 }}" style="width: {{ claimed_percent|default:0 }}%"></div>
                     </div>
                     {% endif %}
                     <div class="cta">
@@ -714,7 +780,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">
@@ -887,6 +954,32 @@
           });
         });
       })();
+        </script>
+        <script type="module">
+  import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+
+  // Tabs (unchanged) …
+
+  // Safer progress animation
+  function targetPct(el){
+    let p = Number(el.dataset.pct);
+    if (!Number.isFinite(p)) p = 0;
+    if (p < 0) p = 0;
+    if (p > 100) p = 100;
+    return p + '%';
+  }
+
+  function animateBars(){
+    document.querySelectorAll('.progress .bar').forEach(b=>{
+      const to = targetPct(b);
+      // reset so inline fallback doesn’t “stick”
+      b.style.width = '0%';
+      gsap.to(b, { width: to, duration: 1.0, ease: 'power2.out' });
+    });
+  }
+  animateBars();
+
+  // re-run after tab switches (unchanged)
         </script>
     </body>
 </html>

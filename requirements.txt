@@ -4,3 +4,6 @@ eth-account==0.10.0
 psycopg2-binary==2.9.9    # keep if you're on Postgres; remove if you're NOT
 python-dotenv==1.0.1      # harmless helper if you use .env files
 django-csp==4.0.0
+Pillow==12.0.0
+django-ckeditor==6.7.3
+django-js-asset>=2.0   # dependency of django-ckeditor; leave unpinned or pin to your local version

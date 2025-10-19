@@ -473,7 +473,8 @@
                                 </div>
                             </div>
                             <div class="progress">
-                                <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}"></div>
+                                <!-- INLINE WIDTH FALLBACK + data attribute for animation -->
+                                <div class="bar" data-pct="{{ c.claimed_percent|default:0 }}" style="width: {{ c.claimed_percent|default:0 }}%"></div>
                             </div>
                             <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
                                 <span>{{ c.claimed_percent }}% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
@@ -573,7 +574,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">
@@ -583,171 +585,134 @@
         </footer>
         <!-- ===== LIGHT INTERACTIONS (no ScrollTrigger) ===== -->
         <script type="module">
-      import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
-      import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
+  import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
+  import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
 
-      // Smooth scroll (kept)
-      const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.8, smoothWheel: true, normalizeWheel: true });
-      function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
-      requestAnimationFrame(raf);
+  const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.8, smoothWheel: true, normalizeWheel: true });
+  function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
 
-      // Tabs
-      const tabs = document.querySelectorAll('.tab');
-      const panels = document.querySelectorAll('.panel');
-      tabs.forEach(tab=>{
-        tab.addEventListener('click', ()=>{
-          tabs.forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-          panels.forEach(p=>p.classList.remove('active'));
-          tab.classList.add('active'); tab.setAttribute('aria-selected','true');
-          const target = document.querySelector(tab.dataset.target);
-          if(target){ target.classList.add('active'); }
-          // re-trigger reveals + progress anim
-          revealCards();
-          animateBarsWhenVisible();
-        });
-      });
-
-      // ----- Custom dropdown (accessible-ish)
-      const dd = document.getElementById('sortDropdown');
-      const toggle = dd.querySelector('.dropdown-toggle');
-      const menu = dd.querySelector('.dropdown-menu');
-      const label = dd.querySelector('.dropdown-label');
-
-      function setDropdownValue(val, text){
-        dd.dataset.value = val;
-        label.textContent = text;
-        menu.querySelectorAll('[role="option"]').forEach(opt=>{
-          opt.setAttribute('aria-selected', String(opt.dataset.value === val));
-        });
-        applySort();
-        revealCards();
-        animateBarsWhenVisible();
-      }
-
-      toggle.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        const open = dd.classList.toggle('open');
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if(open){
-          const current = menu.querySelector('[aria-selected="true"]');
-          (current || menu.firstElementChild).focus?.();
-        }
-      });
-
-      menu.querySelectorAll('[role="option"]').forEach(opt=>{
-        opt.tabIndex = 0;
-        opt.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          setDropdownValue(opt.dataset.value, opt.textContent.trim());
-          dd.classList.remove('open');
-          toggle.setAttribute('aria-expanded','false');
-        });
-        opt.addEventListener('keydown', (e)=>{
-          if(e.key === 'Enter' || e.key === ' '){
-            e.preventDefault();
-            setDropdownValue(opt.dataset.value, opt.textContent.trim());
-            dd.classList.remove('open');
-            toggle.setAttribute('aria-expanded','false');
-            toggle.focus();
-          }
-          if(e.key === 'Escape'){
-            dd.classList.remove('open');
-            toggle.setAttribute('aria-expanded','false');
-            toggle.focus();
-          }
-        });
-      });
-
-      document.addEventListener('click', ()=>{
-        if(dd.classList.contains('open')){
-          dd.classList.remove('open');
-          toggle.setAttribute('aria-expanded','false');
-        }
-      });
-
-      // Sorting / Filters
-      function parseNum(el, attr){ return parseFloat(el.getAttribute(attr) || '0'); }
-      function parseDate(el, attr){
-        const v = el.getAttribute(attr);
-        return v ? new Date(v + 'T00:00:00Z') : new Date(0);
-      }
-      function sortGrid(gridEl, mode, isLive=true){
-        const cards = Array.from(gridEl.querySelectorAll('.project-card'));
-        let sorter;
-        if(mode === 'ending'){
-          sorter = (a,b)=> parseDate(a,'data-end') - parseDate(b,'data-end');
-          if(!isLive) sorter = (a,b)=> parseDate(b,'data-end') - parseDate(a,'data-end');
-        }else if(mode === 'new'){
-          sorter = (a,b)=> parseDate(b,'data-start') - parseDate(a,'data-start');
-        }else if(mode === 'payout'){
-          sorter = (a,b)=> parseNum(b,'data-payout') - parseNum(a,'data-payout');
-        }else if(mode === 'pool'){
-          sorter = (a,b)=> parseNum(b,'data-pool') - parseNum(a,'data-pool');
-        }else if(mode === 'popular'){
-          sorter = (a,b)=> parseNum(b,'data-pop') - parseNum(a,'data-pop');
-        }else{
-          sorter = ()=>0;
-        }
-        cards.sort(sorter).forEach(c=> gridEl.appendChild(c));
-      }
-
-      const liveGrid = document.getElementById('liveGrid');
-      const pastGrid = document.getElementById('pastGrid');
-      function applySort(){
-        const mode = dd.dataset.value || 'ending';
-        sortGrid(liveGrid, mode, true);
-        sortGrid(pastGrid, mode, false);
-      }
-
-      // Reveal animation for cards (no ScrollTrigger)
-      function revealCards(){
-        const cards = document.querySelectorAll('.panel.active .project-card');
-        cards.forEach((card, i)=>{
-          gsap.fromTo(card, {autoAlpha:0, y:8}, {autoAlpha:1, y:0, duration:.28, delay: i * 0.04, overwrite:true});
-        });
-      }
-
-      // Progress bars animate when they enter viewport using IntersectionObserver
-      const supportsIO = 'IntersectionObserver' in window;
-      const io = supportsIO ? new IntersectionObserver((entries)=>{
-        entries.forEach(entry=>{
-          if(entry.isIntersecting){
-            const b = entry.target;
-            const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
-            gsap.fromTo(b, { width: "0%" }, { width: target, duration: 1.2, ease: "power2.out" });
-            io.unobserve(b);
-          }
-        });
-      }, { root: null, rootMargin: "0px 0px -10% 0px", threshold: 0.1 }) : null;
-
-      function animateBarsWhenVisible(){
-        const bars = document.querySelectorAll('.panel.active .progress .bar');
-        if(!supportsIO){
-          // Fallback: animate immediately
-          bars.forEach(b=>{
-            const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
-            b.style.transition = 'width 1.2s cubic-bezier(.2,1,.22,1)';
-            requestAnimationFrame(()=> b.style.width = target);
-          });
-          return;
-        }
-        bars.forEach(b=> io.observe(b));
-        // Kickstart bars already in view so they don't wait for scroll
-        const vh = window.innerHeight || document.documentElement.clientHeight;
-        bars.forEach(b=>{
-          const r = b.getBoundingClientRect();
-          if(r.top >= 0 && r.top <= vh){
-            const target = (b.dataset.pct ? b.dataset.pct : '0') + '%';
-            gsap.fromTo(b, { width: "0%" }, { width: target, duration: 1.2, ease: "power2.out" });
-            io.unobserve(b);
-          }
-        });
-      }
-
-      // Initial apply + animations
-      applySort();
+  // Tabs (unchanged)
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      tabs.forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+      panels.forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+      const target = document.querySelector(tab.dataset.target);
+      if(target){ target.classList.add('active'); }
       revealCards();
       animateBarsWhenVisible();
+    });
+  });
+
+  // Dropdown (unchanged)
+  const dd = document.getElementById('sortDropdown');
+  const toggle = dd.querySelector('.dropdown-toggle');
+  const menu = dd.querySelector('.dropdown-menu');
+  const label = dd.querySelector('.dropdown-label');
+  function setDropdownValue(val, text){
+    dd.dataset.value = val;
+    label.textContent = text;
+    menu.querySelectorAll('[role="option"]').forEach(opt=>{
+      opt.setAttribute('aria-selected', String(opt.dataset.value === val));
+    });
+    applySort();
+    revealCards();
+    animateBarsWhenVisible();
+  }
+  toggle.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const open = dd.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if(open){
+      const current = menu.querySelector('[aria-selected="true"]');
+      (current || menu.firstElementChild).focus?.();
+    }
+  });
+  menu.querySelectorAll('[role="option"]').forEach(opt=>{
+    opt.tabIndex = 0;
+    opt.addEventListener('click', (e)=>{ e.stopPropagation(); setDropdownValue(opt.dataset.value, opt.textContent.trim()); dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); });
+    opt.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setDropdownValue(opt.dataset.value, opt.textContent.trim()); dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.focus(); }
+      if(e.key === 'Escape'){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.focus(); }
+    });
+  });
+  document.addEventListener('click', ()=>{ if(dd.classList.contains('open')){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); } });
+
+  // Sorting (unchanged)
+  function parseNum(el, attr){ return parseFloat(el.getAttribute(attr) || '0'); }
+  function parseDate(el, attr){ const v = el.getAttribute(attr); return v ? new Date(v + 'T00:00:00Z') : new Date(0); }
+  function sortGrid(gridEl, mode, isLive=true){
+    const cards = Array.from(gridEl.querySelectorAll('.project-card'));
+    let sorter;
+    if(mode === 'ending'){ sorter = (a,b)=> parseDate(a,'data-end') - parseDate(b,'data-end'); if(!isLive) sorter = (a,b)=> parseDate(b,'data-end') - parseDate(a,'data-end'); }
+    else if(mode === 'new'){ sorter = (a,b)=> parseDate(b,'data-start') - parseDate(a,'data-start'); }
+    else if(mode === 'payout'){ sorter = (a,b)=> parseNum(b,'data-payout') - parseNum(a,'data-payout'); }
+    else if(mode === 'pool'){ sorter = (a,b)=> parseNum(b,'data-pool') - parseNum(a,'data-pool'); }
+    else if(mode === 'popular'){ sorter = (a,b)=> parseNum(b,'data-pop') - parseNum(a,'data-pop'); }
+    else { sorter = ()=>0; }
+    cards.sort(sorter).forEach(c=> gridEl.appendChild(c));
+  }
+  const liveGrid = document.getElementById('liveGrid');
+  const pastGrid = document.getElementById('pastGrid');
+  function applySort(){ const mode = dd.dataset.value || 'ending'; sortGrid(liveGrid, mode, true); sortGrid(pastGrid, mode, false); }
+
+  // Reveal (unchanged)
+  function revealCards(){
+    const cards = document.querySelectorAll('.panel.active .project-card');
+    cards.forEach((card, i)=>{
+      gsap.fromTo(card, {autoAlpha:0, y:8}, {autoAlpha:1, y:0, duration:.28, delay: i * 0.04, overwrite:true});
+    });
+  }
+
+  // === Safer bar animation (clamped + NaN-proof, same behavior as desktop) ===
+  const supportsIO = 'IntersectionObserver' in window;
+  const io = supportsIO ? new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting) return;
+      animateOne(entry.target);
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.05 }) : null;
+
+  function animateOne(b){
+    // parse, clamp 0..100, coerce to % string
+    let pct = Number(b.dataset.pct);
+    if (!Number.isFinite(pct)) pct = 0;
+    if (pct < 0) pct = 0;
+    if (pct > 100) pct = 100;
+    const target = pct + '%';
+
+    // reset to 0% then animate so inline fallback doesn't “stick”
+    b.style.transition = 'none';
+    b.style.width = '0%';
+    requestAnimationFrame(()=>{
+      b.style.transition = 'width 900ms cubic-bezier(.2,1,.22,1)';
+      b.style.width = target;
+    });
+  }
+
+  function animateBarsWhenVisible(){
+    const bars = document.querySelectorAll('.panel.active .progress .bar');
+    if(!supportsIO){
+      bars.forEach(animateOne);
+      return;
+    }
+    bars.forEach(b=> io.observe(b));
+    // also trigger bars already in view
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    bars.forEach(b=>{
+      const r = b.getBoundingClientRect();
+      if(r.top >= 0 && r.top <= vh){ animateOne(b); io.unobserve(b); }
+    });
+  }
+
+  // Initial run
+  applySort();
+  revealCards();
+  animateBarsWhenVisible();
         </script>
         <script>
     // --- CSRF helper ---
