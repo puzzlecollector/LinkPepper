@@ -60,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "core.middleware.LanguageRoutingMiddleware",
     "core.middleware.WalletAuthMiddleware",
+    "core.middleware.MobileHostRedirectMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import Optional
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 
 from .models import WalletUser
@@ -170,4 +170,33 @@ class WalletAuthMiddleware:
                 request.wallet_user = WalletUser.objects.get(id=uid)
             except WalletUser.DoesNotExist:
                 request.session.pop("wallet_user_id", None)
+        return self.get_response(request)
+
+
+MOBILE_HOST = "m.link-hash.com"
+WWW_HOSTES = {"link-hash.com", "www.link-hash.com"}
+
+class MobileHostRedirectMiddleware:
+    """
+    If user is on www.* and detected/ preferred view is mobile,
+    move them to the m.* host. Respect explicit desktop choice.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = (request.get_host() or "").split(":")[0].lower()
+
+        # Respect explicit override to desktop
+        view = (request.GET.get("view") or "").lower()
+        cookie_pref = (request.COOKIES.get("pref_view") or "").lower()
+        forced_desktop = view in {"desktop", "d"} or cookie_pref in {"desktop", "d"}
+
+        if host in WWW_HOSTES and not forced_desktop:
+            # Reuse your view helpers by importing them
+            from core.views import _should_use_mobile
+            if _should_use_mobile(request):  # mobile preferred
+                target = f"https://{MOBILE_HOST}{request.get_full_path()}"
+                return HttpResponseRedirect(target)
+
         return self.get_response(request)

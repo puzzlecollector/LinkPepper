@@ -17,7 +17,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from eth_account.messages import encode_defunct
 from eth_account import Account
 from django.template.loader import select_template
-
 # IMPORTANT: import models from the rewards app
 from .models import (
     WalletUser,
@@ -33,68 +32,101 @@ from .models import (
 
 # ---------- helpers ----------
 # ---------- helpers ----------
+# ---------- helpers ----------
 def _base_url(request):
     return f"{request.scheme}://{request.get_host()}"
 
 def _is_mobile_host(request) -> bool:
     host = (request.get_host() or "").lower()
-    # treat m.link-hash.com as mobile
-    return host.startswith("m.")
-
-# ---------- helpers ----------
-def _is_mobile_host(request) -> bool:
-    host = (request.get_host() or "").lower()
-    return host.startswith("m.")
+    return host.startswith("m.")  # m.link-hash.com => mobile
 
 def _ua_is_mobile(request) -> bool:
     """
-    Extremely light UA sniffing — enough to catch iOS/Android phones.
-    We don't force mobile if a tablet/desktop; subdomain or query override wins.
+    Light UA sniff: catches iOS/Android phones.
+    Desktop-site toggles change UA, so this is only a fallback.
     """
     ua = (request.META.get("HTTP_USER_AGENT") or "").lower()
-    # Common mobile indicators; avoid 'ipad' to keep iPad as desktop-like
     mobile_hits = ("iphone", "ipod", "android", "mobile", "windows phone")
     return any(k in ua for k in mobile_hits)
+
+def _pref_from_cookie(request):
+    v = (request.COOKIES.get("pref_view") or "").lower()
+    if v in ("mobile", "m"):
+        return True
+    if v in ("desktop", "d"):
+        return False
+    return None
 
 def _query_overrides_mobile(request) -> bool | None:
     """
     Returns True/False when URL explicitly requests a view, else None.
-    Supported:
       - ?view=mobile / ?view=desktop
       - ?m=1 / ?m=0
     """
     q = request.GET
     view = (q.get("view") or "").strip().lower()
-    if view in ("mobile", "m"): return True
-    if view in ("desktop", "d"): return False
+    if view in ("mobile", "m"):
+        return True
+    if view in ("desktop", "d"):
+        return False
     mflag = q.get("m")
-    if mflag == "1": return True
-    if mflag == "0": return False
+    if mflag == "1":
+        return True
+    if mflag == "0":
+        return False
     return None
 
 def _should_use_mobile(request) -> bool:
     """
-    Priority: explicit URL override > m. host > mobile UA.
+    Decision order:
+      1) explicit URL override (?view=mobile/desktop or ?m=1/0)
+      2) persisted cookie preference (pref_view)
+      3) m.* host forces mobile
+      4) fallback UA sniff
     """
     override = _query_overrides_mobile(request)
     if override is not None:
         return override
+
+    pref = _pref_from_cookie(request)
+    if pref is not None:
+        return pref
+
     if _is_mobile_host(request):
         return True
+
     return _ua_is_mobile(request)
+
 
 def render_mobile_first(request, base_template_name: str, context: dict):
     """
     Try {base}_mobile.html first when mobile is preferred, then fallback.
-    Example: render_mobile_first(request, "rewards", ctx)
+    Also persists explicit choice into a cookie when present, and sets Vary
+    so caches don’t mix variants.
     """
     template_candidates = []
-    if _should_use_mobile(request):
+    use_mobile = _should_use_mobile(request)
+    if use_mobile:
         template_candidates.append(f"{base_template_name}_mobile.html")
     template_candidates.append(f"{base_template_name}.html")
-    t = select_template(template_candidates)
-    return render(request, t.template.name, context)
 
+    t = select_template(template_candidates)
+    resp = render(request, t.template.name, context)
+
+    # Persist explicit choice to a cookie (so it sticks across pages)
+    override = _query_overrides_mobile(request)
+    if override is not None:
+        resp.set_cookie(
+            "pref_view",
+            "mobile" if override else "desktop",
+            max_age=60 * 60 * 24 * 365,  # 1 year
+            samesite="Lax",
+        )
+
+    # Avoid cache/proxy mixing of variants
+    vary = resp.get("Vary")
+    resp["Vary"] = (vary + ", " if vary else "") + "Cookie, User-Agent, Host, Accept-Language"
+    return resp
 
 def _normalize_evm_address(addr: str | None) -> str | None:
     """
