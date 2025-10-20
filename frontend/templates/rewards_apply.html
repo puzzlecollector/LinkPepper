@@ -1,32 +1,41 @@
 <!doctype html>
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=1280, initial-scale=1">
-    <title>{{ meta.title|default:"LinkHash | Launch a Campaign" }}</title>
-    <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
-    <meta name="robots" content="index,follow">
-    <meta name="author" content="LinkHash">
-    <meta name="description" content="{{ meta.description|default:'Request a new LinkHash reward campaign.' }}">
-    <!-- OG/Twitter -->
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="LinkHash">
-    <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
-    <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
-    <meta property="og:url" content="{{ meta.url }}">
-    <meta property="og:image" content="{% static 'img/og-cover.png' %}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
-    <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
-    <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
-    <!-- Favicons -->
-    <link rel="icon" href="{% static 'img/favicon.ico' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
-
-    <style>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ meta.title|default:"LinkHash | Launch a Campaign" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'Request a new LinkHash reward campaign.' }}">
+        <!-- OG/Twitter -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{% static 'img/favicon-32x32.png' %}"
+        >
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="{% static 'img/favicon-16x16.png' %}"
+        >
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+        <style>
       :root{
         --bg:#0a0b0d; --bg-elev:#0f1115; --panel:#11141a; --panel-2:#0e1318; --grid:#0b0f13; --line:#1a212d;
         --text:#e6f1ee; --muted:#9fb0aa; --green:#16a34a; --green-2:#23d16a;
@@ -139,73 +148,113 @@
 
       @media (max-width:1140px){ .container{width:1000px} }
       @media (max-width:1000px){ .container{width:920px} .grid{grid-template-columns:1fr} }
-    </style>
-  </head>
-  <body>
-    <header class="nav">
-      <div class="container row">
-        <div class="brand"><span class="dot"></span><span>LinkHash</span></div>
-
-        <nav class="links">
-          <!-- Left: same 4 links + Apply -->
-          <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
-            {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
-          </a>
-          <a href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
-            {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
-          </a>
-          <a href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
-            {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
-          </a>
-          <a href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
-            {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
-          </a>
-
-          <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}" style="font-weight:700;color:#d8ffe7">
-            {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
-          </a>
-
-          {% if wallet_user %}
-            <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-            <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-              {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Logout{% endif %}
-            </a>
-          {% else %}
-            <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
-              {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
-            </a>
-          {% endif %}
-
-          <!-- Language dropdown -->
-          <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
-            <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
-              <span class="flag-emoji" aria-hidden="true"></span>
-              <span class="label">
-                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
-              </span>
-              <svg class="chev" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
-                <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
-              <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-              <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-              <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-              <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-    </header>
-
-    <!-- PAGE HEADER -->
-    <section class="page-head">
-      <div class="container">
-        <h1>
-          {% if meta.lang == 'ko' %}캠페인 런칭 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Request a New Campaign{% endif %}
-        </h1>
-        <p class="sub">
-          {% if meta.lang == 'ko' %}
+        </style>
+    </head>
+    <body>
+        <header class="nav">
+            <div class="container row">
+                <div class="brand">
+                    <span class="dot"></span>
+                    <span>LinkHash</span>
+                </div>
+                <nav class="links">
+                    <!-- Left: same 4 links + Apply -->
+                    <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+                        {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
+                    </a>
+                    <a href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
+                        {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
+                    </a>
+                    <a href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
+                        {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
+                    </a>
+                    <a href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
+                        {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+                    </a>
+                    <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}" style="font-weight:700;color:#d8ffe7">
+                        {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
+                    </a>
+                    {% if wallet_user %}
+                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                    <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+                        {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Logout{% endif %}
+                    </a>
+                    {% else %}
+                    <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+                        {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
+                    </a>
+                    {% endif %}
+                    <!-- Language dropdown -->
+                    <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+                        <button
+                            class="lang-btn"
+                            type="button"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                        >
+                            <span class="flag-emoji" aria-hidden="true"></span>
+                            <span class="label">
+                                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+                            </span>
+                            <svg
+                                class="chev"
+                                viewBox="0 0 20 20"
+                                width="16"
+                                height="16"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M5 7l5 6 5-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                />
+                            </svg>
+                        </button>
+                        <ul
+                            class="lang-menu"
+                            role="listbox"
+                            tabindex="-1"
+                            aria-label="Select language"
+                        >
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="en"
+                                data-flag="🇺🇸"
+                            >🇺🇸 English</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ko"
+                                data-flag="🇰🇷"
+                            >🇰🇷 한국어</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ja"
+                                data-flag="🇯🇵"
+                            >🇯🇵 日本語</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="zh"
+                                data-flag="🇨🇳"
+                            >🇨🇳 中文</li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <!-- PAGE HEADER -->
+        <section class="page-head">
+            <div class="container">
+                <h1>
+                    {% if meta.lang == 'ko' %}캠페인 런칭 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Request a New Campaign{% endif %}
+                </h1>
+                <p class="sub">
+                    {% if meta.lang == 'ko' %}
             이메일과 전화번호만 있으면 접수가 가능합니다. 나머지 정보는 선택 사항이며, 담당자가 후속 안내를 드립니다.
           {% elif meta.lang == 'ja' %}
             まずはメールと電話番号のみで申請できます。詳細は後ほど担当者がご案内します。
@@ -214,144 +263,201 @@
           {% else %}
             Only email and phone are required to get started. Everything else is optional—we’ll follow up for details.
           {% endif %}
-        </p>
-      </div>
-    </section>
-
-    <!-- FORM -->
-    <main class="container" id="apply" style="padding-bottom:20px">
-      <div class="grid">
-        <!-- Left: Application form -->
-        <section class="card" aria-labelledby="formTitle">
-          <div class="head">
-            <h2 id="formTitle" style="margin:0">
-              {% if meta.lang == 'ko' %}신청 정보{% elif meta.lang == 'ja' %}申請内容{% elif meta.lang == 'zh' %}申请信息{% else %}Application Details{% endif %}
-            </h2>
-            <div class="stack">
-              <span class="pill">Web3 · SEO · Rewards</span>
-              <span class="pill">{% if meta.lang == 'ko' %}화이트햇{% elif meta.lang == 'ja' %}ホワイトハット{% elif meta.lang == 'zh' %}白帽{% else %}White-hat{% endif %}</span>
+                </p>
             </div>
-          </div>
-
-          <!-- SUBMIT STATE / ERROR SLOT -->
-          <div id="submitAlert" class="alert" style="display:none"></div>
-
-          <form class="body" method="post" action="#" enctype="multipart/form-data" id="applyForm" novalidate>
-            {% csrf_token %}
-
-            <!-- Contact -->
-            <div class="row">
-              <div>
-                <label for="email">Email *</label>
-                <input id="email" name="email" type="email" required placeholder="name@example.com" autocomplete="email">
-                <div class="hint">
-                  {% if meta.lang == 'ko' %}필수{% elif meta.lang == 'ja' %}必須{% elif meta.lang == 'zh' %}必填{% else %}Required{% endif %}
-                </div>
-              </div>
-              <div>
-                <label for="phone">
-                  {% if meta.lang == 'ko' %}전화번호{% elif meta.lang == 'ja' %}電話番号{% elif meta.lang == 'zh' %}电话{% else %}Phone{% endif %} *
-                </label>
-                <input id="phone" name="phone" type="tel" required placeholder="+82 10 1234 1234" inputmode="tel" autocomplete="tel">
-                <div class="hint">
-                  {% if meta.lang == 'ko' %}국가코드 포함{% elif meta.lang == 'ja' %}国番号を含めてください{% elif meta.lang == 'zh' %}请包含国家区号{% else %}Include country code{% endif %}
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label for="country">
-                  {% if meta.lang == 'ko' %}국가{% elif meta.lang == 'ja' %}国{% elif meta.lang == 'zh' %}国家{% else %}Country{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <input id="country" name="country" type="text" placeholder="{% if meta.lang == 'ko' %}예: 대한민국{% elif meta.lang == 'ja' %}例: 日本{% elif meta.lang == 'zh' %}示例：中国{% else %}e.g. South Korea{% endif %}">
-              </div>
-              <div>
-                <label for="title">
-                  {% if meta.lang == 'ko' %}캠페인 제목{% elif meta.lang == 'ja' %}キャンペーン名{% elif meta.lang == 'zh' %}活动标题{% else %}Campaign Title{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <input id="title" name="campaign_title" type="text" placeholder="{% if meta.lang == 'ko' %}예: SimpleQuant 블로그 런칭{% elif meta.lang == 'ja' %}例: SimpleQuant ブログローンチ{% elif meta.lang == 'zh' %}示例：SimpleQuant 博客上线{% else %}e.g. SimpleQuant Blog Launch{% endif %}">
-              </div>
-            </div>
-
-            <!-- Website -->
-            <div class="row">
-              <div>
-                <label for="site_url">
-                  {% if meta.lang == 'ko' %}웹사이트 URL{% elif meta.lang == 'ja' %}WebサイトURL{% elif meta.lang == 'zh' %}网站链接{% else %}Website URL{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <input id="site_url" name="website_url" type="url" placeholder="https://example.com" inputmode="url" autocomplete="url">
-              </div>
-              <div>
-                <label for="thumbInput">
-                  {% if meta.lang == 'ko' %}썸네일 이미지{% elif meta.lang == 'ja' %}サムネイル画像{% elif meta.lang == 'zh' %}缩略图{% else %}Thumbnail Image{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <div class="file-wrap">
-                  <input id="thumbInput" class="file-hidden" name="thumbnail" type="file" accept="image/*">
-                  <label class="file-label" for="thumbInput">
-                    {% if meta.lang == 'ko' %}이미지 선택{% elif meta.lang == 'ja' %}画像を選択{% elif meta.lang == 'zh' %}选择图片{% else %}Choose image{% endif %}
-                  </label>
-                  <span class="file-name" id="thumbName">
-                    {% if meta.lang == 'ko' %}선택된 파일 없음{% elif meta.lang == 'ja' %}ファイル未選択{% elif meta.lang == 'zh' %}未选择文件{% else %}No file selected{% endif %}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Favicon upload -->
-            <div class="row">
-              <div>
-                <label for="faviInput">
-                  {% if meta.lang == 'ko' %}파비콘 이미지{% elif meta.lang == 'ja' %}ファビコン画像{% elif meta.lang == 'zh' %}网站图标（Favicon）{% else %}Favicon Image{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택 · 권장 32×32 PNG/ICO{% elif meta.lang == 'ja' %}任意・推奨 32×32 PNG/ICO{% elif meta.lang == 'zh' %}可选 · 推荐 32×32 PNG/ICO{% else %}optional · 32×32 PNG/ICO recommended{% endif %})</span>
-                </label>
-                <div class="file-wrap">
-                  <input id="faviInput" class="file-hidden" name="favicon" type="file" accept=".png,.ico,image/png,image/x-icon">
-                  <label class="file-label" for="faviInput">
-                    {% if meta.lang == 'ko' %}파비콘 선택{% elif meta.lang == 'ja' %}ファビコンを選択{% elif meta.lang == 'zh' %}选择图标{% else %}Choose favicon{% endif %}
-                  </label>
-                  <span class="file-name" id="faviName">
-                    {% if meta.lang == 'ko' %}선택된 파일 없음{% elif meta.lang == 'ja' %}ファイル未選択{% elif meta.lang == 'zh' %}未选择文件{% else %}No file selected{% endif %}
-                  </span>
-                  <span class="ico-preview" id="faviPrev" aria-hidden="true"><img alt=""></span>
-                </div>
-                <div class="hint">
-                  {% if meta.lang == 'ko' %}구글 검색 과제에서 식별 아이콘으로 사용됩니다.{% elif meta.lang == 'ja' %}Google検索タスクの識別アイコンとして使用します。{% elif meta.lang == 'zh' %}用于 Google 搜索任务中的识别图标。{% else %}Used as the identifying icon for Google-search tasks.{% endif %}
-                </div>
-              </div>
-              <div></div>
-            </div>
-
-            <div class="row full">
-              <div>
-                <label for="site_desc">
-                  {% if meta.lang == 'ko' %}웹사이트 설명{% elif meta.lang == 'ja' %}Webサイトの説明{% elif meta.lang == 'zh' %}网站描述{% else %}Website Description{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <textarea id="site_desc" name="website_description" placeholder="{% if meta.lang == 'ko' %}예: 퀀트 투자 튜토리얼과 도구 제공{% elif meta.lang == 'ja' %}例: クオンツ投資のチュートリアルとツール{% elif meta.lang == 'zh' %}示例：量化投资教程与工具{% else %}e.g. Tutorials and tools for quantitative investing{% endif %}"></textarea>
-              </div>
-            </div>
-
-            <!-- Task Types -->
-            <div class="row full">
-              <div>
-                <label>
-                  {% if meta.lang == 'ko' %}과제 유형 선택{% elif meta.lang == 'ja' %}タスク種類を選択{% elif meta.lang == 'zh' %}选择任务类型{% else %}Select Task Type(s){% endif %}
-                </label>
-                <div class="chips" role="group" aria-label="Task types">
-                  <label class="chip">
-                    <input type="checkbox" name="task_types" value="VISIT" id="t_visit"> VISIT
-                  </label>
-                  <label class="chip">
-                    <input type="checkbox" name="task_types" value="LINK" id="t_link" checked> LINK
-                  </label>
-                </div>
-                <div class="hint">
-                  {% if meta.lang == 'ko' %}
+        </section>
+        <!-- FORM -->
+        <main class="container" id="apply" style="padding-bottom:20px">
+            <div class="grid">
+                <!-- Left: Application form -->
+                <section class="card" aria-labelledby="formTitle">
+                    <div class="head">
+                        <h2 id="formTitle" style="margin:0">
+                            {% if meta.lang == 'ko' %}신청 정보{% elif meta.lang == 'ja' %}申請内容{% elif meta.lang == 'zh' %}申请信息{% else %}Application Details{% endif %}
+                        </h2>
+                        <div class="stack">
+                            <span class="pill">Web3 · SEO · Rewards</span>
+                            <span class="pill">{% if meta.lang == 'ko' %}화이트햇{% elif meta.lang == 'ja' %}ホワイトハット{% elif meta.lang == 'zh' %}白帽{% else %}White-hat{% endif %}</span>
+                        </div>
+                    </div>
+                    <!-- SUBMIT STATE / ERROR SLOT -->
+                    <div id="submitAlert" class="alert" style="display:none"></div>
+                    <form
+                        class="body"
+                        method="post"
+                        action="#"
+                        enctype="multipart/form-data"
+                        id="applyForm"
+                        novalidate
+                    >
+                        {% csrf_token %}
+                        <!-- Contact -->
+                        <div class="row">
+                            <div>
+                                <label for="email">Email *</label>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    required
+                                    placeholder="name@example.com"
+                                    autocomplete="email"
+                                >
+                                <div class="hint">
+                                    {% if meta.lang == 'ko' %}필수{% elif meta.lang == 'ja' %}必須{% elif meta.lang == 'zh' %}必填{% else %}Required{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <label for="phone">
+                                    {% if meta.lang == 'ko' %}전화번호{% elif meta.lang == 'ja' %}電話番号{% elif meta.lang == 'zh' %}电话{% else %}Phone{% endif %} *
+                                </label>
+                                <input
+                                    id="phone"
+                                    name="phone"
+                                    type="tel"
+                                    required
+                                    placeholder="+82 10 1234 1234"
+                                    inputmode="tel"
+                                    autocomplete="tel"
+                                >
+                                <div class="hint">
+                                    {% if meta.lang == 'ko' %}국가코드 포함{% elif meta.lang == 'ja' %}国番号を含めてください{% elif meta.lang == 'zh' %}请包含国家区号{% else %}Include country code{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div>
+                                <label for="country">
+                                    {% if meta.lang == 'ko' %}국가{% elif meta.lang == 'ja' %}国{% elif meta.lang == 'zh' %}国家{% else %}Country{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <input
+                                    id="country"
+                                    name="country"
+                                    type="text"
+                                    placeholder="{% if meta.lang == 'ko' %}예: 대한민국{% elif meta.lang == 'ja' %}例: 日本{% elif meta.lang == 'zh' %}示例：中国{% else %}e.g. South Korea{% endif %}"
+                                >
+                            </div>
+                            <div>
+                                <label for="title">
+                                    {% if meta.lang == 'ko' %}캠페인 제목{% elif meta.lang == 'ja' %}キャンペーン名{% elif meta.lang == 'zh' %}活动标题{% else %}Campaign Title{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <input
+                                    id="title"
+                                    name="campaign_title"
+                                    type="text"
+                                    placeholder="{% if meta.lang == 'ko' %}예: SimpleQuant 블로그 런칭{% elif meta.lang == 'ja' %}例: SimpleQuant ブログローンチ{% elif meta.lang == 'zh' %}示例：SimpleQuant 博客上线{% else %}e.g. SimpleQuant Blog Launch{% endif %}"
+                                >
+                            </div>
+                        </div>
+                        <!-- Website -->
+                        <div class="row">
+                            <div>
+                                <label for="site_url">
+                                    {% if meta.lang == 'ko' %}웹사이트 URL{% elif meta.lang == 'ja' %}WebサイトURL{% elif meta.lang == 'zh' %}网站链接{% else %}Website URL{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <input
+                                    id="site_url"
+                                    name="website_url"
+                                    type="url"
+                                    placeholder="https://example.com"
+                                    inputmode="url"
+                                    autocomplete="url"
+                                >
+                            </div>
+                            <div>
+                                <label for="thumbInput">
+                                    {% if meta.lang == 'ko' %}썸네일 이미지{% elif meta.lang == 'ja' %}サムネイル画像{% elif meta.lang == 'zh' %}缩略图{% else %}Thumbnail Image{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <div class="file-wrap">
+                                    <input
+                                        id="thumbInput"
+                                        class="file-hidden"
+                                        name="thumbnail"
+                                        type="file"
+                                        accept="image/*"
+                                    >
+                                    <label class="file-label" for="thumbInput">
+                                        {% if meta.lang == 'ko' %}이미지 선택{% elif meta.lang == 'ja' %}画像を選択{% elif meta.lang == 'zh' %}选择图片{% else %}Choose image{% endif %}
+                                    </label>
+                                    <span class="file-name" id="thumbName">
+                                        {% if meta.lang == 'ko' %}선택된 파일 없음{% elif meta.lang == 'ja' %}ファイル未選択{% elif meta.lang == 'zh' %}未选择文件{% else %}No file selected{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Favicon upload -->
+                        <div class="row">
+                            <div>
+                                <label for="faviInput">
+                                    {% if meta.lang == 'ko' %}파비콘 이미지{% elif meta.lang == 'ja' %}ファビコン画像{% elif meta.lang == 'zh' %}网站图标（Favicon）{% else %}Favicon Image{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택 · 권장 32×32 PNG/ICO{% elif meta.lang == 'ja' %}任意・推奨 32×32 PNG/ICO{% elif meta.lang == 'zh' %}可选 · 推荐 32×32 PNG/ICO{% else %}optional · 32×32 PNG/ICO recommended{% endif %})</span>
+                                </label>
+                                <div class="file-wrap">
+                                    <input
+                                        id="faviInput"
+                                        class="file-hidden"
+                                        name="favicon"
+                                        type="file"
+                                        accept=".png,.ico,image/png,image/x-icon"
+                                    >
+                                    <label class="file-label" for="faviInput">
+                                        {% if meta.lang == 'ko' %}파비콘 선택{% elif meta.lang == 'ja' %}ファビコンを選択{% elif meta.lang == 'zh' %}选择图标{% else %}Choose favicon{% endif %}
+                                    </label>
+                                    <span class="file-name" id="faviName">
+                                        {% if meta.lang == 'ko' %}선택된 파일 없음{% elif meta.lang == 'ja' %}ファイル未選択{% elif meta.lang == 'zh' %}未选择文件{% else %}No file selected{% endif %}
+                                    </span>
+                                    <span class="ico-preview" id="faviPrev" aria-hidden="true">
+                                        <img alt="">
+                                    </span>
+                                </div>
+                                <div class="hint">
+                                    {% if meta.lang == 'ko' %}구글 검색 과제에서 식별 아이콘으로 사용됩니다.{% elif meta.lang == 'ja' %}Google検索タスクの識別アイコンとして使用します。{% elif meta.lang == 'zh' %}用于 Google 搜索任务中的识别图标。{% else %}Used as the identifying icon for Google-search tasks.{% endif %}
+                                </div>
+                            </div>
+                            <div></div>
+                        </div>
+                        <div class="row full">
+                            <div>
+                                <label for="site_desc">
+                                    {% if meta.lang == 'ko' %}웹사이트 설명{% elif meta.lang == 'ja' %}Webサイトの説明{% elif meta.lang == 'zh' %}网站描述{% else %}Website Description{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <textarea id="site_desc" name="website_description" placeholder="{% if meta.lang == 'ko' %}예: 퀀트 투자 튜토리얼과 도구 제공{% elif meta.lang == 'ja' %}例: クオンツ投資のチュートリアルとツール{% elif meta.lang == 'zh' %}示例：量化投资教程与工具{% else %}e.g. Tutorials and tools for quantitative investing{% endif %}"></textarea>
+                            </div>
+                        </div>
+                        <!-- Task Types -->
+                        <div class="row full">
+                            <div>
+                                <label>
+                                    {% if meta.lang == 'ko' %}과제 유형 선택{% elif meta.lang == 'ja' %}タスク種類を選択{% elif meta.lang == 'zh' %}选择任务类型{% else %}Select Task Type(s){% endif %}
+                                </label>
+                                <div class="chips" role="group" aria-label="Task types">
+                                    <label class="chip">
+                                        <input
+                                            type="checkbox"
+                                            name="task_types"
+                                            value="VISIT"
+                                            id="t_visit"
+                                        >
+                                        VISIT
+                                    </label>
+                                    <label class="chip">
+                                        <input
+                                            type="checkbox"
+                                            name="task_types"
+                                            value="LINK"
+                                            id="t_link"
+                                            checked
+                                        >
+                                        LINK
+                                    </label>
+                                </div>
+                                <div class="hint">
+                                    {% if meta.lang == 'ko' %}
                     VISIT: 사이트에서 코드 찾기 · LINK: SNS·블로그에 리뷰+백링크
                   {% elif meta.lang == 'ja' %}
                     VISIT: サイト上でコードを見つける／LINK: ブログ等にレビュー＋被リンク
@@ -360,186 +466,278 @@
                   {% else %}
                     VISIT: find a code on your site · LINK: publish a review with a backlink
                   {% endif %}
-                </div>
-              </div>
-            </div>
-
-            <!-- VISIT settings -->
-            <div id="visitBlock" class="row full" style="display:none">
-              <div>
-                <label for="visit_code">
-                  {% if meta.lang == 'ko' %}검증 코드 (VISIT){% elif meta.lang == 'ja' %}検証コード（VISIT）{% elif meta.lang == 'zh' %}验证代码（VISIT）{% else %}Verification Code (VISIT){% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}참여자가 페이지에서 찾을 코드{% elif meta.lang == 'ja' %}参加者がページで見つけるコード{% elif meta.lang == 'zh' %}参与者需在页面上找到的代码{% else %}code participants must find on your page{% endif %})</span>
-                </label>
-                <input id="visit_code" name="visit_code" type="text" placeholder="e.g. CODE: X6K9Q2">
-                <div class="hint">
-                  {% if meta.lang == 'ko' %}예: 푸터에 ‘코드: X6K9Q2’ 표시{% elif meta.lang == 'ja' %}例: フッターに「Code: X6K9Q2」{% elif meta.lang == 'zh' %}示例：在页脚显示“Code: X6K9Q2”{% else %}Example: show “Code: X6K9Q2” in your footer{% endif %}
-                </div>
-              </div>
-            </div>
-
-            <!-- LINK settings (SEO inputs) -->
-            <div id="linkBlock" class="row">
-              <div>
-                <label for="expected_keywords">
-                  {% if meta.lang == 'ko' %}리뷰 예상 키워드 (LINK){% elif meta.lang == 'ja' %}レビュー想定キーワード（LINK）{% elif meta.lang == 'zh' %}评测关键词（LINK）{% else %}Expected Review Keywords (LINK){% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}쉼표로 구분{% elif meta.lang == 'ja' %}カンマ区切り{% elif meta.lang == 'zh' %}逗号分隔{% else %}comma-separated{% endif %})</span>
-                </label>
-                <input id="expected_keywords" name="expected_review_keywords" type="text" placeholder="e.g. quant, backtesting, crypto tools">
-              </div>
-              <div>
-                <label for="seo_keywords">
-                  {% if meta.lang == 'ko' %}현재 SEO 키워드 (사이트){% elif meta.lang == 'ja' %}現在のサイトSEOキーワード{% elif meta.lang == 'zh' %}站点现有SEO关键词{% else %}Current Site SEO Keywords{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <input id="seo_keywords" name="current_seo_keywords" type="text" placeholder="e.g. algorithmic trading, strategy builder">
-              </div>
-            </div>
-
-            <!-- Rewards -->
-            <div class="row">
-              <div>
-                <label for="pool">
-                  {% if meta.lang == 'ko' %}총 리워드 풀 (USDT){% elif meta.lang == 'ja' %}総リワードプール (USDT){% elif meta.lang == 'zh' %}总奖励池 (USDT){% else %}Total Reward Pool (USDT){% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <input id="pool" name="reward_pool_usdt" type="number" min="1" step="1" placeholder="e.g. 2500" inputmode="numeric" pattern="[0-9]*">
-              </div>
-              <div>
-                <label for="payout">
-                  {% if meta.lang == 'ko' %}건당 예상 보상 (USDT){% elif meta.lang == 'ja' %}タスク当たりの想定報酬 (USDT){% elif meta.lang == 'zh' %}单次任务奖励 (USDT){% else %}Expected Payout per Task (USDT){% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <input id="payout" name="payout_per_task_usdt" type="number" min="0" step="0.01" placeholder="e.g. 3.50" inputmode="decimal">
-              </div>
-            </div>
-
-            <!-- Dates -->
-            <div class="date-row">
-              <div>
-                <label>
-                  {% if meta.lang == 'ko' %}캠페인 시작일{% elif meta.lang == 'ja' %}開始日{% elif meta.lang == 'zh' %}开始日期{% else %}Start Date{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <div class="date-group" data-name="start_date">
-                  <select id="start_y" aria-label="Start year"></select>
-                  <select id="start_m" aria-label="Start month"></select>
-                  <select id="start_d" aria-label="Start day"></select>
-                </div>
-                <input type="hidden" id="start" name="start_date" value="">
-                <div class="hint">
-                  {% if meta.lang == 'ko' %}연/월/일 선택 시 자동으로 YYYY-MM-DD 형식으로 저장됩니다.{% elif meta.lang == 'ja' %}年・月・日を選ぶと YYYY-MM-DD 形式で自動入力されます。{% elif meta.lang == 'zh' %}选择年/月/日后会自动保存为 YYYY-MM-DD。{% else %}Picking year/month/day saves as YYYY-MM-DD automatically.{% endif %}
-                </div>
-              </div>
-              <div>
-                <label>
-                  {% if meta.lang == 'ko' %}캠페인 종료일{% elif meta.lang == 'ja' %}終了日{% elif meta.lang == 'zh' %}结束日期{% else %}End Date{% endif %}
-                  <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                </label>
-                <div class="date-group" data-name="end_date">
-                  <select id="end_y" aria-label="End year"></select>
-                  <select id="end_m" aria-label="End month"></select>
-                  <select id="end_d" aria-label="End day"></select>
-                </div>
-                <input type="hidden" id="end" name="end_date" value="">
-                <div class="hint">
-                  {% if meta.lang == 'ko' %}직접 입력 대신 선택만 가능하여 오타를 방지합니다.{% elif meta.lang == 'ja' %}直接入力ではなく選択式で、入力ミスを防ぎます。{% elif meta.lang == 'zh' %}通过选择而非手填，可避免格式错误。{% else %}Using selects prevents typos like “222220-02-04”.{% endif %}
-                </div>
-              </div>
-            </div>
-
-            <!-- Airdrop -->
-            <div class="row full">
-              <div>
-                <label for="airdrop_toggle">
-                  {% if meta.lang == 'ko' %}에어드롭 이벤트{% elif meta.lang == 'ja' %}エアドロップイベント{% elif meta.lang == 'zh' %}空投活动{% else %}Airdrop Event{% endif %}
-                </label>
-                <div class="chips">
-                  <label class="chip">
-                    <input id="airdrop_toggle" type="checkbox" name="airdrop_enabled" value="true">
-                    {% if meta.lang == 'ko' %}에어드롭 진행{% elif meta.lang == 'ja' %}有効化{% elif meta.lang == 'zh' %}启用空投{% else %}Enable Airdrop{% endif %}
-                  </label>
-                </div>
-                <div id="airdropBlock" style="display:none; margin-top:12px">
-                  <div class="row three">
-                    <div>
-                      <label for="airdrop_first_n">
-                        {% if meta.lang == 'ko' %}선착순 인원 (N){% elif meta.lang == 'ja' %}先着人数 (N){% elif meta.lang == 'zh' %}前N名{% else %}First N People{% endif %}
-                      </label>
-                      <input id="airdrop_first_n" name="airdrop_first_n" type="number" min="1" step="1" placeholder="e.g. 100" inputmode="numeric" pattern="[0-9]*">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- VISIT settings -->
+                        <div id="visitBlock" class="row full" style="display:none">
+                            <div>
+                                <label for="visit_code">
+                                    {% if meta.lang == 'ko' %}검증 코드 (VISIT){% elif meta.lang == 'ja' %}検証コード（VISIT）{% elif meta.lang == 'zh' %}验证代码（VISIT）{% else %}Verification Code (VISIT){% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}참여자가 페이지에서 찾을 코드{% elif meta.lang == 'ja' %}参加者がページで見つけるコード{% elif meta.lang == 'zh' %}参与者需在页面上找到的代码{% else %}code participants must find on your page{% endif %})</span>
+                                </label>
+                                <input
+                                    id="visit_code"
+                                    name="visit_code"
+                                    type="text"
+                                    placeholder="e.g. CODE: X6K9Q2"
+                                >
+                                <div class="hint">
+                                    {% if meta.lang == 'ko' %}예: 푸터에 ‘코드: X6K9Q2’ 표시{% elif meta.lang == 'ja' %}例: フッターに「Code: X6K9Q2」{% elif meta.lang == 'zh' %}示例：在页脚显示“Code: X6K9Q2”{% else %}Example: show “Code: X6K9Q2” in your footer{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- LINK settings (SEO inputs) -->
+                        <div id="linkBlock" class="row">
+                            <div>
+                                <label for="expected_keywords">
+                                    {% if meta.lang == 'ko' %}리뷰 예상 키워드 (LINK){% elif meta.lang == 'ja' %}レビュー想定キーワード（LINK）{% elif meta.lang == 'zh' %}评测关键词（LINK）{% else %}Expected Review Keywords (LINK){% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}쉼표로 구분{% elif meta.lang == 'ja' %}カンマ区切り{% elif meta.lang == 'zh' %}逗号分隔{% else %}comma-separated{% endif %})</span>
+                                </label>
+                                <input
+                                    id="expected_keywords"
+                                    name="expected_review_keywords"
+                                    type="text"
+                                    placeholder="e.g. quant, backtesting, crypto tools"
+                                >
+                            </div>
+                            <div>
+                                <label for="seo_keywords">
+                                    {% if meta.lang == 'ko' %}현재 SEO 키워드 (사이트){% elif meta.lang == 'ja' %}現在のサイトSEOキーワード{% elif meta.lang == 'zh' %}站点现有SEO关键词{% else %}Current Site SEO Keywords{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <input
+                                    id="seo_keywords"
+                                    name="current_seo_keywords"
+                                    type="text"
+                                    placeholder="e.g. algorithmic trading, strategy builder"
+                                >
+                            </div>
+                        </div>
+                        <!-- Rewards -->
+                        <div class="row">
+                            <div>
+                                <label for="pool">
+                                    {% if meta.lang == 'ko' %}총 리워드 풀 (USDT){% elif meta.lang == 'ja' %}総リワードプール (USDT){% elif meta.lang == 'zh' %}总奖励池 (USDT){% else %}Total Reward Pool (USDT){% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <input
+                                    id="pool"
+                                    name="reward_pool_usdt"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    placeholder="e.g. 2500"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
+                                >
+                            </div>
+                            <div>
+                                <label for="payout">
+                                    {% if meta.lang == 'ko' %}건당 예상 보상 (USDT){% elif meta.lang == 'ja' %}タスク当たりの想定報酬 (USDT){% elif meta.lang == 'zh' %}单次任务奖励 (USDT){% else %}Expected Payout per Task (USDT){% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <input
+                                    id="payout"
+                                    name="payout_per_task_usdt"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="e.g. 3.50"
+                                    inputmode="decimal"
+                                >
+                            </div>
+                        </div>
+                        <!-- Dates -->
+                        <div class="date-row">
+                            <div>
+                                <label>
+                                    {% if meta.lang == 'ko' %}캠페인 시작일{% elif meta.lang == 'ja' %}開始日{% elif meta.lang == 'zh' %}开始日期{% else %}Start Date{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <div class="date-group" data-name="start_date">
+                                    <select id="start_y" aria-label="Start year"></select>
+                                    <select id="start_m" aria-label="Start month"></select>
+                                    <select id="start_d" aria-label="Start day"></select>
+                                </div>
+                                <input
+                                    type="hidden"
+                                    id="start"
+                                    name="start_date"
+                                    value=""
+                                >
+                                <div class="hint">
+                                    {% if meta.lang == 'ko' %}연/월/일 선택 시 자동으로 YYYY-MM-DD 형식으로 저장됩니다.{% elif meta.lang == 'ja' %}年・月・日を選ぶと YYYY-MM-DD 形式で自動入力されます。{% elif meta.lang == 'zh' %}选择年/月/日后会自动保存为 YYYY-MM-DD。{% else %}Picking year/month/day saves as YYYY-MM-DD automatically.{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <label>
+                                    {% if meta.lang == 'ko' %}캠페인 종료일{% elif meta.lang == 'ja' %}終了日{% elif meta.lang == 'zh' %}结束日期{% else %}End Date{% endif %}
+                                    <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                </label>
+                                <div class="date-group" data-name="end_date">
+                                    <select id="end_y" aria-label="End year"></select>
+                                    <select id="end_m" aria-label="End month"></select>
+                                    <select id="end_d" aria-label="End day"></select>
+                                </div>
+                                <input
+                                    type="hidden"
+                                    id="end"
+                                    name="end_date"
+                                    value=""
+                                >
+                                <div class="hint">
+                                    {% if meta.lang == 'ko' %}직접 입력 대신 선택만 가능하여 오타를 방지합니다.{% elif meta.lang == 'ja' %}直接入力ではなく選択式で、入力ミスを防ぎます。{% elif meta.lang == 'zh' %}通过选择而非手填，可避免格式错误。{% else %}Using selects prevents typos like “222220-02-04”.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Airdrop -->
+                        <div class="row full">
+                            <div>
+                                <label for="airdrop_toggle">
+                                    {% if meta.lang == 'ko' %}에어드롭 이벤트{% elif meta.lang == 'ja' %}エアドロップイベント{% elif meta.lang == 'zh' %}空投活动{% else %}Airdrop Event{% endif %}
+                                </label>
+                                <div class="chips">
+                                    <label class="chip">
+                                        <input
+                                            id="airdrop_toggle"
+                                            type="checkbox"
+                                            name="airdrop_enabled"
+                                            value="true"
+                                        >
+                                        {% if meta.lang == 'ko' %}에어드롭 진행{% elif meta.lang == 'ja' %}有効化{% elif meta.lang == 'zh' %}启用空投{% else %}Enable Airdrop{% endif %}
+                                    </label>
+                                </div>
+                                <div id="airdropBlock" style="display:none; margin-top:12px">
+                                    <div class="row three">
+                                        <div>
+                                            <label for="airdrop_first_n">
+                                                {% if meta.lang == 'ko' %}선착순 인원 (N){% elif meta.lang == 'ja' %}先着人数 (N){% elif meta.lang == 'zh' %}前N名{% else %}First N People{% endif %}
+                                            </label>
+                                            <input
+                                                id="airdrop_first_n"
+                                                name="airdrop_first_n"
+                                                type="number"
+                                                min="1"
+                                                step="1"
+                                                placeholder="e.g. 100"
+                                                inputmode="numeric"
+                                                pattern="[0-9]*"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label for="airdrop_amount">
+                                                {% if meta.lang == 'ko' %}1인당 지급 (M){% elif meta.lang == 'ja' %}一人あたり (M){% elif meta.lang == 'zh' %}每人发放 (M){% else %}Amount per Person (M){% endif %}
+                                            </label>
+                                            <input
+                                                id="airdrop_amount"
+                                                name="airdrop_amount_per_user"
+                                                type="number"
+                                                min="0"
+                                                step="0.0001"
+                                                placeholder="e.g. 25"
+                                                inputmode="decimal"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label for="airdrop_symbol">
+                                                {% if meta.lang == 'ko' %}코인/토큰 심볼{% elif meta.lang == 'ja' %}トークンシンボル{% elif meta.lang == 'zh' %}代币符号{% else %}Token Symbol{% endif %}
+                                            </label>
+                                            <input
+                                                id="airdrop_symbol"
+                                                name="airdrop_token_symbol"
+                                                type="text"
+                                                placeholder="e.g. LKH"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div>
+                                            <label for="airdrop_chain">
+                                                {% if meta.lang == 'ko' %}체인/네트워크{% elif meta.lang == 'ja' %}チェーン/ネットワーク{% elif meta.lang == 'zh' %}链/网络{% else %}Chain / Network{% endif %}
+                                            </label>
+                                            <input
+                                                id="airdrop_chain"
+                                                name="airdrop_network"
+                                                type="text"
+                                                placeholder="e.g. Ethereum, Polygon"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label for="airdrop_note">
+                                                {% if meta.lang == 'ko' %}추가 조건{% elif meta.lang == 'ja' %}追加条件{% elif meta.lang == 'zh' %}附加条件{% else %}Additional Conditions{% endif %}
+                                                <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
+                                            </label>
+                                            <input
+                                                id="airdrop_note"
+                                                name="airdrop_note"
+                                                type="text"
+                                                placeholder="{% if meta.lang == 'ko' %}예: KYC 필요 없음{% elif meta.lang == 'ja' %}例: KYC不要{% elif meta.lang == 'zh' %}示例：无需KYC{% else %}e.g. no KYC required{% endif %}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Hidden fields that we programmatically set before submit -->
+                        <input
+                            type="hidden"
+                            name="wants_visit"
+                            id="wants_visit"
+                            value=""
+                        >
+                        <input
+                            type="hidden"
+                            name="wants_link"
+                            id="wants_link"
+                            value="true"
+                        >
+                        <input
+                            type="hidden"
+                            name="thumbnail_url"
+                            id="thumbnail_url"
+                            value=""
+                        >
+                        <input
+                            type="hidden"
+                            name="favicon_url"
+                            id="favicon_url"
+                            value=""
+                        >
+                        <div class="divider"></div>
+                        <!-- Submit -->
+                        <div class="foot-actions">
+                            <button class="btn-outline" type="reset" id="resetBtn">
+                                {% if meta.lang == 'ko' %}초기화{% elif meta.lang == 'ja' %}リセット{% elif meta.lang == 'zh' %}重置{% else %}Reset{% endif %}
+                            </button>
+                            <button class="btn" type="submit" id="submitBtn">
+                                {% if meta.lang == 'ko' %}신청 보내기{% elif meta.lang == 'ja' %}申請を送信{% elif meta.lang == 'zh' %}提交申请{% else %}Submit Application{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                    <!-- Success screen (hidden initially) -->
+                    <div id="successBlock" class="body" style="display:none">
+                        <div class="alert ok" id="okMsg" style="margin-top:0">
+                            {% if meta.lang == 'ko' %}신청이 접수되었습니다. 24시간 내 연락드리겠습니다.{% elif meta.lang == 'ja' %}申請を受け付けました。24時間以内にご連絡します。{% elif meta.lang == 'zh' %}申请已收到，我们会在24小时内联系你。{% else %}Your application is in. We’ll reach out within 24 hours.{% endif %}
+                        </div>
+                        <p style="color:#cfe7dd; margin-top:12px">
+                            <strong>ID:</strong>
+                            <span id="appId">—</span>
+                        </p>
+                        <div class="stack">
+                            <a class="btn-outline" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">← {% if meta.lang == 'ko' %}리워드 목록으로{% elif meta.lang == 'ja' %}リワード一覧へ{% elif meta.lang == 'zh' %}返回奖励页{% else %}Back to Rewards{% endif %}</a>
+                        </div>
                     </div>
-                    <div>
-                      <label for="airdrop_amount">
-                        {% if meta.lang == 'ko' %}1인당 지급 (M){% elif meta.lang == 'ja' %}一人あたり (M){% elif meta.lang == 'zh' %}每人发放 (M){% else %}Amount per Person (M){% endif %}
-                      </label>
-                      <input id="airdrop_amount" name="airdrop_amount_per_user" type="number" min="0" step="0.0001" placeholder="e.g. 25" inputmode="decimal">
-                    </div>
-                    <div>
-                      <label for="airdrop_symbol">
-                        {% if meta.lang == 'ko' %}코인/토큰 심볼{% elif meta.lang == 'ja' %}トークンシンボル{% elif meta.lang == 'zh' %}代币符号{% else %}Token Symbol{% endif %}
-                      </label>
-                      <input id="airdrop_symbol" name="airdrop_token_symbol" type="text" placeholder="e.g. LKH">
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div>
-                      <label for="airdrop_chain">
-                        {% if meta.lang == 'ko' %}체인/네트워크{% elif meta.lang == 'ja' %}チェーン/ネットワーク{% elif meta.lang == 'zh' %}链/网络{% else %}Chain / Network{% endif %}
-                      </label>
-                      <input id="airdrop_chain" name="airdrop_network" type="text" placeholder="e.g. Ethereum, Polygon">
-                    </div>
-                    <div>
-                      <label for="airdrop_note">
-                        {% if meta.lang == 'ko' %}추가 조건{% elif meta.lang == 'ja' %}追加条件{% elif meta.lang == 'zh' %}附加条件{% else %}Additional Conditions{% endif %}
-                        <span class="opt">({% if meta.lang == 'ko' %}선택{% elif meta.lang == 'ja' %}任意{% elif meta.lang == 'zh' %}可选{% else %}optional{% endif %})</span>
-                      </label>
-                      <input id="airdrop_note" name="airdrop_note" type="text" placeholder="{% if meta.lang == 'ko' %}예: KYC 필요 없음{% elif meta.lang == 'ja' %}例: KYC不要{% elif meta.lang == 'zh' %}示例：无需KYC{% else %}e.g. no KYC required{% endif %}">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hidden fields that we programmatically set before submit -->
-            <input type="hidden" name="wants_visit" id="wants_visit" value="">
-            <input type="hidden" name="wants_link" id="wants_link" value="true">
-            <input type="hidden" name="thumbnail_url" id="thumbnail_url" value="">
-            <input type="hidden" name="favicon_url" id="favicon_url" value="">
-
-            <div class="divider"></div>
-
-            <!-- Submit -->
-            <div class="foot-actions">
-              <button class="btn-outline" type="reset" id="resetBtn">
-                {% if meta.lang == 'ko' %}초기화{% elif meta.lang == 'ja' %}リセット{% elif meta.lang == 'zh' %}重置{% else %}Reset{% endif %}
-              </button>
-              <button class="btn" type="submit" id="submitBtn">
-                {% if meta.lang == 'ko' %}신청 보내기{% elif meta.lang == 'ja' %}申請を送信{% elif meta.lang == 'zh' %}提交申请{% else %}Submit Application{% endif %}
-              </button>
-            </div>
-          </form>
-
-          <!-- Success screen (hidden initially) -->
-          <div id="successBlock" class="body" style="display:none">
-            <div class="alert ok" id="okMsg" style="margin-top:0">
-              {% if meta.lang == 'ko' %}신청이 접수되었습니다. 24시간 내 연락드리겠습니다.{% elif meta.lang == 'ja' %}申請を受け付けました。24時間以内にご連絡します。{% elif meta.lang == 'zh' %}申请已收到，我们会在24小时内联系你。{% else %}Your application is in. We’ll reach out within 24 hours.{% endif %}
-            </div>
-            <p style="color:#cfe7dd; margin-top:12px">
-              <strong>ID:</strong> <span id="appId">—</span>
-            </p>
-            <div class="stack">
-              <a class="btn-outline" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">← {% if meta.lang == 'ko' %}리워드 목록으로{% elif meta.lang == 'ja' %}リワード一覧へ{% elif meta.lang == 'zh' %}返回奖励页{% else %}Back to Rewards{% endif %}</a>
-            </div>
-          </div>
-        </section>
-
-        <!-- Right: Tips / Summary -->
-        <aside class="side">
-          <section class="card">
-            <div class="head"><h3 style="margin:0">{% if meta.lang == 'ko' %}가이드{% elif meta.lang == 'ja' %}ガイド{% elif meta.lang == 'zh' %}指南{% else %}Guide{% endif %}</h3></div>
-            <div class="body">
-              <div class="note">
-                {% if meta.lang == 'ko' %}
+                </section>
+                <!-- Right: Tips / Summary -->
+                <aside class="side">
+                    <section class="card">
+                        <div class="head">
+                            <h3 style="margin:0">{% if meta.lang == 'ko' %}가이드{% elif meta.lang == 'ja' %}ガイド{% elif meta.lang == 'zh' %}指南{% else %}Guide{% endif %}</h3>
+                        </div>
+                        <div class="body">
+                            <div class="note">
+                                {% if meta.lang == 'ko' %}
                   기본 연락처(이메일·전화)가 확인되면 담당자가 24시간 내로 연락드립니다. 규칙·예산·기간은 이후 확정 가능합니다.
                 {% elif meta.lang == 'ja' %}
                   連絡先（メール・電話）確認後、24時間以内に担当よりご連絡します。ルール・予算・期間は後から確定できます。
@@ -548,26 +746,27 @@
                 {% else %}
                   Once we have your email and phone, our team will contact you within 24 hours. Rules, budget, and dates can be finalized later.
                 {% endif %}
-              </div>
-              <div style="height:8px"></div>
-              <div class="stack">
-                <span class="pill">{% if meta.lang == 'ko' %}화이트햇{% elif meta.lang == 'ja' %}ホワイトハット{% elif meta.lang == 'zh' %}白帽{% else %}White-hat{% endif %}</span>
-                <span class="pill">{% if meta.lang == 'ko' %}투명성{% elif meta.lang == 'ja' %}透明性{% elif meta.lang == 'zh' %}透明{% else %}Transparent{% endif %}</span>
-                <span class="pill">{% if meta.lang == 'ko' %}즉시 보상{% elif meta.lang == 'ja' %}即時リワード{% elif meta.lang == 'zh' %}即时奖励{% else %}Instant Rewards{% endif %}</span>
-              </div>
-            </div>
-          </section>
-
-          <section class="card">
-            <div class="head"><h3 style="margin:0">{% if meta.lang == 'ko' %}작동 방식{% elif meta.lang == 'ja' %}進め方{% elif meta.lang == 'zh' %}运作方式{% else %}How It Works{% endif %}</h3></div>
-            <div class="body">
-              <ol style="margin:0 0 10px 18px; color:#cde6da; line-height:1.5">
-                <li>{% if meta.lang == 'ko' %}보상 풀과 기간 설정{% elif meta.lang == 'ja' %}プールと期間を設定{% elif meta.lang == 'zh' %}设定奖励池与周期{% else %}Set pool & window{% endif %}</li>
-                <li>{% if meta.lang == 'ko' %}규칙 공개 (VISIT/LINK){% elif meta.lang == 'ja' %}ルール公開（VISIT/LINK）{% elif meta.lang == 'zh' %}发布任务规则（VISIT/LINK）{% else %}Publish task rules (VISIT/LINK){% endif %}</li>
-                <li>{% if meta.lang == 'ko' %}제출 검증 & 즉시 보상{% elif meta.lang == 'ja' %}提出を検証して即時支払い{% elif meta.lang == 'zh' %}验证提交并即时发放奖励{% else %}Verify submissions & pay instantly{% endif %}</li>
-              </ol>
-              <div class="note">
-                {% if meta.lang == 'ko' %}
+                            </div>
+                            <div style="height:8px"></div>
+                            <div class="stack">
+                                <span class="pill">{% if meta.lang == 'ko' %}화이트햇{% elif meta.lang == 'ja' %}ホワイトハット{% elif meta.lang == 'zh' %}白帽{% else %}White-hat{% endif %}</span>
+                                <span class="pill">{% if meta.lang == 'ko' %}투명성{% elif meta.lang == 'ja' %}透明性{% elif meta.lang == 'zh' %}透明{% else %}Transparent{% endif %}</span>
+                                <span class="pill">{% if meta.lang == 'ko' %}즉시 보상{% elif meta.lang == 'ja' %}即時リワード{% elif meta.lang == 'zh' %}即时奖励{% else %}Instant Rewards{% endif %}</span>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="card">
+                        <div class="head">
+                            <h3 style="margin:0">{% if meta.lang == 'ko' %}작동 방식{% elif meta.lang == 'ja' %}進め方{% elif meta.lang == 'zh' %}运作方式{% else %}How It Works{% endif %}</h3>
+                        </div>
+                        <div class="body">
+                            <ol style="margin:0 0 10px 18px; color:#cde6da; line-height:1.5">
+                                <li>{% if meta.lang == 'ko' %}보상 풀과 기간 설정{% elif meta.lang == 'ja' %}プールと期間を設定{% elif meta.lang == 'zh' %}设定奖励池与周期{% else %}Set pool & window{% endif %}</li>
+                                <li>{% if meta.lang == 'ko' %}규칙 공개 (VISIT/LINK){% elif meta.lang == 'ja' %}ルール公開（VISIT/LINK）{% elif meta.lang == 'zh' %}发布任务规则（VISIT/LINK）{% else %}Publish task rules (VISIT/LINK){% endif %}</li>
+                                <li>{% if meta.lang == 'ko' %}제출 검증 & 즉시 보상{% elif meta.lang == 'ja' %}提出を検証して即時支払い{% elif meta.lang == 'zh' %}验证提交并即时发放奖励{% else %}Verify submissions & pay instantly{% endif %}</li>
+                            </ol>
+                            <div class="note">
+                                {% if meta.lang == 'ko' %}
                   에어드롭을 활성화하면 선착순 N명에게 M개의 토큰을 자동 분배하는 보너스 이벤트를 추가할 수 있습니다.
                 {% elif meta.lang == 'ja' %}
                   エアドロップを有効にすると、先着N名にMトークンを自動配布するボーナスを追加できます。
@@ -576,25 +775,25 @@
                 {% else %}
                   With airdrops enabled, the first N participants can automatically receive M tokens as a bonus event.
                 {% endif %}
-              </div>
+                            </div>
+                        </div>
+                    </section>
+                </aside>
             </div>
-          </section>
-        </aside>
-      </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-        <div>© <strong>LinkHash</strong></div>
-        <div style="opacity:.7">
-          {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
-        </div>
-      </div>
-    </footer>
-
-    <!-- LIGHT INTERACTIONS -->
-    <script type="module">
+        </main>
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">
+                    {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
+                </div>
+            </div>
+        </footer>
+        <!-- LIGHT INTERACTIONS -->
+        <script type="module">
       // ---------- Language dropdown ----------
       (function(){
         const root = document.getElementById('langSwitcher');
@@ -838,10 +1037,9 @@
       // Keep initial state accurate
       updateBlocks();
       updateAirdrop();
-    </script>
-
-    <!-- Wallet auth helpers (unchanged) -->
-    <script>
+        </script>
+        <!-- Wallet auth helpers (unchanged) -->
+        <script>
       function getCookie(name){
         const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
         return m ? decodeURIComponent(m[2]) : null;
@@ -912,6 +1110,6 @@
 
       window.connectWallet = connectWallet;
       window.logoutWallet  = logoutWallet;
-    </script>
-  </body>
+        </script>
+    </body>
 </html>

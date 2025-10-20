@@ -3,7 +3,7 @@
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=1280, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ meta.title|default:"LinkHash | Rewards" }}</title>
         <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
         <meta name="robots" content="index,follow">
@@ -207,7 +207,7 @@
                     <span>LinkHash</span>
                 </div>
                 <nav class="links">
-                {% if meta.lang == "ko" %}
+                    {% if meta.lang == "ko" %}
                     {% url 'home_ko' as home_url %}
                     {% url 'events_ko' as events_url %}
                     {% url 'rewards_ko' as rewards_url %}
@@ -218,29 +218,25 @@
                     {% url 'rewards_en' as rewards_url %}
                     {% url 'rewards_apply_en' as apply_url %}
                 {% endif %}
-
-                <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
-                <a href="{{ rewards_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
-                <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
-                <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
-
-                <!-- NEW: Apply for campaign (locale-aware) -->
-                <a class="btn-outline" href="{{ apply_url }}">
-                    {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
-                </a>
-
-                {% if wallet_user %}
+                    <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                    <a href="{{ rewards_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                    <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                    <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+                    <!-- NEW: Apply for campaign (locale-aware) -->
+                    <a class="btn-outline" href="{{ apply_url }}">
+                        {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+                    </a>
+                    {% if wallet_user %}
                     <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
                     <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-                    {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+                        {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
                     </a>
-                {% else %}
+                    {% else %}
                     <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
-                    {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+                        {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
                     </a>
-                {% endif %}
+                    {% endif %}
                 </nav>
-
             </div>
         </header>
         <!-- ===== PAGE HEADER ===== -->
@@ -343,10 +339,12 @@
                             <p>{{ c.summary }}</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; {{ c.pool_usdt }} USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; {{ c.participants }}
+                                    <strong>People</strong>
+                                    &nbsp; {{ c.participants }}
                                 </div>
                             </div>
                             <div class="progress">
@@ -387,10 +385,12 @@
                             <p>Visit 3 pages, collect codes, then post a short review with insights.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 3,200 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 3,200 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 516
+                                    <strong>People</strong>
+                                    &nbsp; 516
                                 </div>
                             </div>
                             <div class="progress">
@@ -424,10 +424,12 @@
                             <p>Create a demo wallet, browse settings, submit the hidden FAQ code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,000 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,000 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 190
+                                    <strong>People</strong>
+                                    &nbsp; 190
                                 </div>
                             </div>
                             <div class="progress">
@@ -461,10 +463,12 @@
                             <p>Write a genuine Naver Blog review with a contextual dofollow link.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 5,000 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 5,000 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 412
+                                    <strong>People</strong>
+                                    &nbsp; 412
                                 </div>
                             </div>
                             <div class="progress">
@@ -498,10 +502,12 @@
                             <p>Scroll & interact; find the verification code at the bottom.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,500 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,500 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 230
+                                    <strong>People</strong>
+                                    &nbsp; 230
                                 </div>
                             </div>
                             <div class="progress">
@@ -535,10 +541,12 @@
                             <p>Publish a thoughtful beta review on your blog with a citation link.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 2,750 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 2,750 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 304
+                                    <strong>People</strong>
+                                    &nbsp; 304
                                 </div>
                             </div>
                             <div class="progress">
@@ -573,10 +581,12 @@
                             <p>Read the post, find the hidden code, submit & earn.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 2,000 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 2,000 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 842
+                                    <strong>People</strong>
+                                    &nbsp; 842
                                 </div>
                             </div>
                             <div class="progress">
@@ -617,10 +627,12 @@
                             <p>Publish a how-to article with screenshots and a dofollow citation.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 3,400 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 3,400 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 528
+                                    <strong>People</strong>
+                                    &nbsp; 528
                                 </div>
                             </div>
                             <div class="progress">
@@ -654,10 +666,12 @@
                             <p>Find 3 minor UX issues and submit the footer code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 900 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 900 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 167
+                                    <strong>People</strong>
+                                    &nbsp; 167
                                 </div>
                             </div>
                             <div class="progress">
@@ -692,10 +706,12 @@
                             <p>Interview a power user, publish highlights, verify unique code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,800 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,800 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 294
+                                    <strong>People</strong>
+                                    &nbsp; 294
                                 </div>
                             </div>
                             <div class="progress">
@@ -729,10 +745,12 @@
                             <p>Publish your team’s recap with links to demo and docs.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 2,200 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 2,200 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 351
+                                    <strong>People</strong>
+                                    &nbsp; 351
                                 </div>
                             </div>
                             <div class="progress">
@@ -766,10 +784,12 @@
                             <p>Walk through 5 docs pages and submit the breadcrumb code.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,200 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,200 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 205
+                                    <strong>People</strong>
+                                    &nbsp; 205
                                 </div>
                             </div>
                             <div class="progress">
@@ -803,10 +823,12 @@
                             <p>Publish a feature teardown with a contextual dofollow citation.</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <strong>Pool</strong>&nbsp; 1,950 USDT
+                                    <strong>Pool</strong>
+                                    &nbsp; 1,950 USDT
                                 </div>
                                 <div class="pill">
-                                    <strong>People</strong>&nbsp; 277
+                                    <strong>People</strong>
+                                    &nbsp; 277
                                 </div>
                             </div>
                             <div class="progress">
@@ -827,7 +849,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">White-hat backlinks · Transparent rewards</div>

@@ -3,7 +3,7 @@
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=1280, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- desktop-first -->
         <title>{{ meta.title|default:"LinkHash | Web3 SEO Rewards" }}</title>
         <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
@@ -193,7 +193,7 @@
                     <span>LinkHash</span>
                 </div>
                 <nav class="links">
-                {% if meta.lang == "ko" %}
+                    {% if meta.lang == "ko" %}
                 {% url 'home_ko' as home_url %}
                 {% url 'events_ko' as events_url %}
                 {% url 'rewards_ko' as rewards_url %}
@@ -204,28 +204,25 @@
                 {% url 'rewards_en' as rewards_url %}
                 {% url 'rewards_apply_en' as apply_url %}
                 {% endif %}
-
-                <a href="{{ home_url }}"   style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
-                <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
-                <a href="{{ events_url }}" >{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
-                <a href="/leaderboard/" >{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
-
-                <!-- NEW: Apply for campaign (locale-aware) -->
-                <a class="btn-outline" href="{{ apply_url }}">
-                {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
-                </a>
-
-                {% if wallet_user %}
-                <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-                <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-                    {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
-                </a>
-                {% else %}
-                <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
-                    {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
-                </a>
-                {% endif %}
-            </nav>
+                    <a href="{{ home_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                    <a href="{{ rewards_url }}">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                    <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                    <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+                    <!-- NEW: Apply for campaign (locale-aware) -->
+                    <a class="btn-outline" href="{{ apply_url }}">
+                        {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+                    </a>
+                    {% if wallet_user %}
+                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                    <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
+                        {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+                    </a>
+                    {% else %}
+                    <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
+                        {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+                    </a>
+                    {% endif %}
+                </nav>
             </div>
         </header>
         <!-- ===== HERO ===== -->

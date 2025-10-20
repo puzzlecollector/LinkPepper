@@ -3,7 +3,7 @@
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=1280, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ meta.title|default:"LinkHash | Campaign" }}</title>
         <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
         <meta name="robots" content="index,follow">
@@ -218,7 +218,7 @@
                     <span>LinkHash</span>
                 </div>
                 <nav class="links">
-                {% if meta.lang == "ko" %}
+                    {% if meta.lang == "ko" %}
                     {% url 'home_ko' as home_url %}
                     {% url 'events_ko' as events_url %}
                     {% url 'rewards_ko' as rewards_url %}
@@ -229,47 +229,84 @@
                     {% url 'rewards_en' as rewards_url %}
                     {% url 'rewards_apply_en' as apply_url %}
                 {% endif %}
-
-                <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
-                <a href="{{ rewards_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
-                <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
-                <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
-
-                <!-- NEW: Apply for campaign (locale-aware) -->
-                <a class="btn-outline" href="{{ apply_url }}">
-                    {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
-                </a>
-
-                {% if wallet_user %}
+                    <a href="{{ home_url }}">{% if meta.lang == 'ko' %}홈{% else %}Home{% endif %}</a>
+                    <a href="{{ rewards_url }}" style="font-weight:700;color:#d8ffe7">{% if meta.lang == 'ko' %}리워드{% else %}Rewards{% endif %}</a>
+                    <a href="{{ events_url }}">{% if meta.lang == 'ko' %}이벤트{% else %}Events{% endif %}</a>
+                    <a href="/leaderboard/">{% if meta.lang == 'ko' %}리더보드{% else %}Leaderboard{% endif %}</a>
+                    <!-- NEW: Apply for campaign (locale-aware) -->
+                    <a class="btn-outline" href="{{ apply_url }}">
+                        {% if meta.lang == 'ko' %}캠페인 신청{% else %}Apply for campaign{% endif %}
+                    </a>
+                    {% if wallet_user %}
                     <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
                     <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-                    {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
+                        {% if meta.lang == 'ko' %}대시보드{% else %}Dashboard{% endif %}
                     </a>
-                {% else %}
+                    {% else %}
                     <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
-                    {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
+                        {% if meta.lang == 'ko' %}지갑 연결{% else %}Connect Wallet{% endif %}
                     </a>
-                {% endif %}
-                <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
-                    <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
-                        <span class="flag-emoji" aria-hidden="true"></span>
-                        <span class="label">
-                        {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
-                        </span>
-                        <svg class="chev" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
-                        <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
-                        <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-                        <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-                        <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-                        <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
-                    </ul>
+                    {% endif %}
+                    <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+                        <button
+                            class="lang-btn"
+                            type="button"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                        >
+                            <span class="flag-emoji" aria-hidden="true"></span>
+                            <span class="label">
+                                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+                            </span>
+                            <svg
+                                class="chev"
+                                viewBox="0 0 20 20"
+                                width="16"
+                                height="16"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M5 7l5 6 5-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                />
+                            </svg>
+                        </button>
+                        <ul
+                            class="lang-menu"
+                            role="listbox"
+                            tabindex="-1"
+                            aria-label="Select language"
+                        >
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="en"
+                                data-flag="🇺🇸"
+                            >🇺🇸 English</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ko"
+                                data-flag="🇰🇷"
+                            >🇰🇷 한국어</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ja"
+                                data-flag="🇯🇵"
+                            >🇯🇵 日本語</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="zh"
+                                data-flag="🇨🇳"
+                            >🇨🇳 中文</li>
+                        </ul>
                     </div>
-
                 </nav>
-
             </div>
         </header>
         <!-- ===== PAGE HEADER ===== -->
@@ -613,7 +650,6 @@
                 });
             });
             })();
-            </script>
-
+        </script>
     </body>
 </html>
