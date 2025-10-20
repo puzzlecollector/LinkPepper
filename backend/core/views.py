@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from datetime import timedelta
 
 from django.db import IntegrityError
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q, Max
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -912,6 +912,28 @@ def rewards_detail(request, slug, pk):
 
 
 # ======== LEADERBOARD ========
+NETWORK_VERBOSE = {
+    "ETH": "Ethereum",
+    "SOL": "Solana",
+    "BNB": "BNB Chain",
+    "POL": "Polygon",
+}
+
+EXPLORER_BASE = {
+    "ETH": "https://etherscan.io/address/",
+    "POL": "https://polygonscan.com/address/",
+    "BNB": "https://bscscan.com/address/",
+    "SOL": "https://solscan.io/account/",
+}
+
+def _explorer_url(address: str, network: str | None) -> str | None:
+    if not address or not network:
+        return None
+    base = EXPLORER_BASE.get(network)
+    if not base:
+        return None
+    return f"{base}{address}"
+
 def _leaderboard_range(request):
     now = timezone.now()
     code = (request.GET.get("range") or "").lower()
@@ -922,12 +944,17 @@ def _leaderboard_range(request):
     return now - timedelta(days=days), label, norm_code
 
 def _mask_addr(addr: str) -> str:
+    """Show first 5 and last 5 characters, preserving 0x if present."""
     if not addr:
-        return "----....----"
+        return "-----...-----"
     a = addr.strip()
-    if a.startswith("0x") and len(a) >= 10:
-        return f"{a[:6]}...{a[-4:]}"
-    return f"{a[:4]}...{a[-4:]}"
+    # Normalize hex addresses to keep 0x then 5+...+5 after it
+    if a.startswith("0x") and len(a) > 12:
+        return f"{a[:7]}...{a[-5:]}"  # '0x' + 5 -> total 7 at the start
+    if len(a) > 10:
+        return f"{a[:5]}...{a[-5:]}"
+    return a
+
 
 def _score_points(links: int, visits: int, score: int) -> int:
     return 10 * links + 5 * visits + score
@@ -946,24 +973,24 @@ def _normalize_rows(rows):
 
 def _sample_leaderboard_rows():
     demo = [
-        {"address":"0x1a2b3c4d5e6f7890aBcD1234aBcD5678EFabC111", "links":42, "visits":310, "score":520},
-        {"address":"0x9f8e7d6c5b4a3210fedcBA98aa77665544332222", "links":37, "visits":280, "score":610},
-        {"address":"0x7777aAaA2222bBbB3333cCcC4444dDdD5555eeee", "links":29, "visits":260, "score":440},
-        {"address":"0xA1B2C3D4E5F607182736455463728190AbCdEf12", "links":21, "visits":198, "score":305},
-        {"address":"0xFfFf000011112222333344445555666677778888", "links":19, "visits":205, "score":250},
-        {"address":"0x1357ace02468bdf91357ACE02468BDF91357aCe0", "links":18, "visits":172, "score":240},
-        {"address":"0xDEADbeefDEADbeefDEADbeefDEADbeef00001234", "links":14, "visits":160, "score":210},
-        {"address":"0x0a0A0b0B0c0C0d0D0e0E1234567890abcdefABCD", "links":12, "visits":141, "score":160},
-        {"address":"0x2222333344445555666677778888999900001111", "links":11, "visits":120, "score":155},
-        {"address":"0x8888777766665555444433332222111100009999", "links":10, "visits":118, "score":130},
-        {"address":"0x1234abcd5678efab1234abcd5678efab1234abcd", "links":9,  "visits":102, "score":120},
-        {"address":"0xabcd0000abcd0000abcd0000abcd0000abcd9999", "links":8,  "visits":95,  "score":95},
+        {"address":"0x1a2b3c4d5e6f7890aBcD1234aBcD5678EFabC111", "links":42, "visits":310, "score":520, "network":"ETH"},
+        {"address":"0x9f8e7d6c5b4a3210fedcBA98aa77665544332222", "links":37, "visits":280, "score":610, "network":"POL"},
+        {"address":"0x7777aAaA2222bBbB3333cCcC4444dDdD5555eeee", "links":29, "visits":260, "score":440, "network":"BNB"},
+        # If you want a Solana example, use a real-looking base58 (not 0x) address:
+        {"address":"9xQeWvG816bUx9EPjHmaTjAaZ4K4fS5zVPa6G5x6QQ3F",  "links":24, "visits":190, "score":300, "network":"SOL"},
     ]
     rows = []
     for d in demo:
         points = _score_points(d["links"], d["visits"], d["score"])
-        rows.append({**d, "points": points})
+        net = d.get("network")
+        rows.append({
+            **d,
+            "points": points,
+            "network_verbose": NETWORK_VERBOSE.get(net) if net else None,
+            "explorer_url": _explorer_url(d["address"], net),
+        })
     return _normalize_rows(rows)
+
 
 def _leaderboard_from_db(since_dt):
     qs = Submission.objects.filter(created_at__gte=since_dt)
@@ -976,6 +1003,7 @@ def _leaderboard_from_db(since_dt):
               links=Count("id", filter=Q(post_url__isnull=False) & ~Q(post_url="")),
               visits=Count("id", filter=Q(visited_url__isnull=False) & ~Q(visited_url="")),
               score=Sum("proof_score"),
+              network=Max("network"),  # <-- pick any non-null network seen for this wallet
           )
     )
     rows = []
@@ -985,14 +1013,20 @@ def _leaderboard_from_db(since_dt):
         score = int(a.get("score") or 0)
         points = _score_points(links, visits, score)
         display_addr = a.get("user__address") or a.get("wallet_address") or ""
+        net = a.get("network") or None  # 'ETH','SOL','BNB','POL' or None
+
         rows.append({
             "address": display_addr,
             "links": links,
             "visits": visits,
             "score": score,
             "points": points,
+            "network": net,
+            "network_verbose": NETWORK_VERBOSE.get(net) if net else None,
+            "explorer_url": _explorer_url(display_addr, net),
         })
     return _normalize_rows(rows)
+
 
 def leaderboard_en(request):
     lang = _lang_from_request(request)
