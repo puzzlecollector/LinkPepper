@@ -456,12 +456,14 @@
                                 <div class="pill">
                                     <strong>
                                         {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
-                                    </strong>&nbsp; {{ c.pool_usdt }} USDT
+                                    </strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
                                 </div>
                                 <div class="pill">
                                     <strong>
                                         {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
-                                    </strong>&nbsp; {{ c.participants }}
+                                    </strong>
+                                    &nbsp; {{ c.participants }}
                                 </div>
                             </div>
                             <div class="progress">
@@ -470,11 +472,6 @@
                             <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa; margin-top:4px;">
                                 <span>{{ c.claimed_percent|default:0 }}% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
                                 <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
-                            </div>
-                            <div class="foot">
-                                <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/" aria-label="View details for {{ c.title }}">
-                                    {% if meta.lang == 'ko' %}자세히 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}
-                                </a>
                             </div>
                         </div>
                     </article>
@@ -523,12 +520,14 @@
                                 <div class="pill">
                                     <strong>
                                         {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
-                                    </strong>&nbsp; {{ c.pool_usdt }} USDT
+                                    </strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
                                 </div>
                                 <div class="pill">
                                     <strong>
                                         {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
-                                    </strong>&nbsp; {{ c.participants }}
+                                    </strong>
+                                    &nbsp; {{ c.participants }}
                                 </div>
                             </div>
                             <div class="progress">
@@ -562,7 +561,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">
