@@ -215,6 +215,17 @@
       .empty-state h3{ margin:0 0 8px; font-size:16px; }
       .empty-state p{ margin:0; color:#9fb0aa; font-size:14px; }
 
+      /* Participants: single-line value like "3명" (no wrap) */
+      .pill-val.inline {
+        flex-direction: row;              /* horizontal instead of vertical */
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;              /* <-- keeps "3명" on one line */
+      }
+      .pill-val.inline .amount { font-weight: 900; font-size: 14px; line-height: 1; }
+      .pill-val.inline .unit   { font-size: 12px; color: var(--muted); line-height: 1; }
+
+
       /* FOOTER */
       .footer{padding:18px 0 24px; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; font-size:12px; margin-top:18px}
         </style>
@@ -471,7 +482,7 @@
                                     <span class="pill-label">
                                         {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
                                     </span>
-                                    <span class="pill-val" aria-label="{{ c.participants }}">
+                                    <span class="pill-val inline" aria-label="{{ c.participants }}">
                                         <span class="amount">{{ c.participants }}</span>
                                         <span class="unit">{% if meta.lang == 'ko' %}명{% elif meta.lang == 'ja' %}人{% elif meta.lang == 'zh' %}人{% else %}users{% endif %}</span>
                                     </span>
@@ -542,7 +553,7 @@
                                     <span class="pill-label">
                                         {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
                                     </span>
-                                    <span class="pill-val" aria-label="{{ c.participants }}">
+                                    <span class="pill-val inline" aria-label="{{ c.participants }}">
                                         <span class="amount">{{ c.participants }}</span>
                                         <span class="unit">{% if meta.lang == 'ko' %}명{% elif meta.lang == 'ja' %}人{% elif meta.lang == 'zh' %}人{% else %}users{% endif %}</span>
                                     </span>
@@ -575,7 +586,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">
