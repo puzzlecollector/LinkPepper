@@ -51,22 +51,27 @@
       a{color:inherit;text-decoration:none}
       .container{width:var(--container); margin:0 auto; padding:0 10px;}
 
-      /* ===== MOBILE HEADER (same as leaderboard) ===== */
+      /* ===== MOBILE HEADER (copied method: .mnav) ===== */
       .mnav{position:sticky; top:0; z-index:80; padding-top:env(safe-area-inset-top);
         background:linear-gradient(180deg, rgba(15,17,21,.82), rgba(15,17,21,.52));
         backdrop-filter: blur(12px); border-bottom:1px solid rgba(255,255,255,.06);}
       .mnav-bar{display:flex; align-items:center; justify-content:space-between; height:56px; gap:8px;}
+
       .mnav-brand{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#d8ffe7; text-shadow:0 0 14px rgba(35,209,106,.22);}
       .mnav-brand .dot{width:8px;height:8px;border-radius:999px;background:#16a34a;box-shadow:0 0 16px rgba(22,163,74,.42)}
       .mnav-brand .name{font-size:16px; letter-spacing:.2px}
+
       .mnav-actions{display:flex; align-items:center; gap:8px;}
       .mnav .btn{display:inline-flex; align-items:center; gap:6px; padding:8px 10px; font-weight:800; border-radius:10px; border:1px solid #2fe07a;
         background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:0 0 22px rgba(22,163,74,.25);}
       .mnav .pill-addr{max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #2a333f; background:#0b1117;
         color:#d9f6e6; border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700;}
+
       .mnav-toggle{display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px;
         border:1px solid #2a333f; background:#0b1117; color:#e6f1ee;}
       .mnav-toggle:active{transform:scale(.98)}
+
+      /* Sheet */
       .mnav-sheet{position:relative; background:linear-gradient(180deg,#0f1419,#0c1116);
         border-top:1px solid rgba(255,255,255,.06); box-shadow:0 30px 60px rgba(0,0,0,.5);
         padding:12px 12px calc(12px + env(safe-area-inset-bottom));}
@@ -77,6 +82,8 @@
       .mnav-list .item:hover{border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18)}
       .mnav-list .item.active{color:#05160c; border-color:#2fe07a; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:0 0 22px rgba(22,163,74,.25)}
       .mnav-list .item.outline{background:#0b1117}
+
+      /* Language (same pattern) */
       .mnav-lang{margin:2px 0 10px; position:relative;}
       .mnav .lang-btn{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; font-weight:800; border-radius:12px; border:1px solid #2a333f; background:#0b1117; color:#cfe7dd}
       .mnav .flag-emoji{display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; line-height:18px; font-size:14px; border-radius:3px;
@@ -87,10 +94,18 @@
       @keyframes mnavMenuIn{from{transform:translateY(-6px);opacity:0} to{transform:translateY(0);opacity:1}}
       .mnav .lang-item{display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; color:#cfe7dd; font-weight:700;}
       .mnav .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
+
       .mnav .danger{width:100%; margin-top:6px; padding:11px 12px; border-radius:12px; border:1px solid #3b2020;
         background:linear-gradient(180deg,#6e2c2c,#5a2222); color:#ffeaea; font-weight:800}
-      @media (max-width:360px){ .mnav .pill-addr{max-width:98px} .mnav-bar{height:52px} .mnav-brand .name{font-size:15px} }
-      @media (min-width:720px){ .mnav-bar{height:60px} }
+
+      @media (max-width:360px){
+        .mnav .pill-addr{max-width:98px}
+        .mnav-bar{height:52px}
+        .mnav-brand .name{font-size:15px}
+      }
+      @media (min-width:720px){
+        .mnav-bar{height:60px}
+      }
 
       /* ===== PAGE HEADER ===== */
       .page-head{
@@ -103,7 +118,7 @@
 
       /* ===== CONTROLS (sticky under header) ===== */
       .controls-wrap{
-        position:sticky; top:56px; z-index:70;
+        position:sticky; top:56px; z-index:70; /* sits under .mnav */
         background:linear-gradient(180deg, rgba(12,16,20,.9), rgba(10,12,16,.7));
         backdrop-filter: blur(8px);
         border-bottom:1px solid rgba(255,255,255,.06);
@@ -120,6 +135,7 @@
       }
       .tab:active{ transform:scale(.98) }
       .tab.active{ border-color:#2fe07a; color:#05160c; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:var(--glow); }
+
       .filters{display:flex; gap:8px; align-items:center;}
       .dropdown{position:relative;}
       .dropdown-toggle{
@@ -137,13 +153,11 @@
         display:none; z-index:20;
       }
       .dropdown.open .dropdown-menu{ display:block; }
-      .dropdown-menu [role="option"]{ padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700; color:#cfe7dd; }
+      .dropdown-menu [role="option"]{
+        padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700; color:#cfe7dd;
+      }
       .dropdown-menu [role="option"]:hover{ background:rgba(22,163,74,.12); color:#eafff4; }
       .dropdown-menu [aria-selected="true"]{ background:rgba(22,163,74,.18); color:#eafff4; border:1px solid rgba(35,209,106,.35); }
-
-      /* ===== SHOW/HIDE PANELS (Fix #1 & #2) ===== */
-      .panel{display:none;}
-      .panel.active{display:block;}
 
       /* ===== GRID & CARDS ===== */
       .section{padding:12px 0 20px;}
@@ -175,42 +189,25 @@
       .project-card .body{ flex:1; padding:14px; display:flex; flex-direction:column; gap:8px; }
       .project-card h3{ font-size:16px; margin:0; line-height:1.35 }
       .project-card p{ color:#b7c8c1; font-size:14px; margin:0 0 6px; line-height:1.55 }
-
-      /* ===== META PILLS (Fix #3) ===== */
-      .meta{
-        display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px;
-      }
-      .pill{
-        display:flex; align-items:stretch; justify-content:space-between; gap:8px;
-        background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px;
-        color:#cde6da; font-size:12px;
-      }
-      .pill-label{
-        font-weight:900; white-space:nowrap; align-self:center;
-      }
-      .pill-val{
-        display:flex; flex-direction:column; align-items:flex-end; line-height:1.1;
-      }
-      .pill-val .amount{
-        font-weight:900; font-size:14px;
-      }
-      .pill-val .unit{
-        font-size:11px; color:#9fb0aa; letter-spacing:.2px;
-      }
+      .meta{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px; }
+      .meta .pill{ background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:6px; }
 
       .progress{ height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:4px; }
       .progress .bar{ height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow) }
 
-      .card-link{ position:absolute; inset:0; z-index:5; }
-      .card-link:focus{ outline:2px solid #2fe07a; outline-offset:-2px; border-radius:18px }
+      .project-card .foot{ display:flex; gap:8px; justify-content:flex-end; margin-top:auto; }
+      .project-card .foot .btn{ padding:10px 12px; position:relative; z-index:6; }
 
-      /* Empty state (used for each tab) */
+      .project-card .card-link{ position:absolute; inset:0; z-index:5; }
+      .project-card .card-link:focus{ outline:2px solid #2fe07a; outline-offset:-2px; border-radius:18px }
+
+      /* Empty state */
       .empty-state{
         border:1px solid rgba(255,255,255,.08);
         background:linear-gradient(180deg,#0f1419,#0c1116);
         border-radius:18px;
         box-shadow:var(--shadow-md);
-        padding:24px; color:#cfe7dd; text-align:center;
+        padding:24px; color:#cfe7dd;
       }
       .empty-state h3{ margin:0 0 8px; font-size:16px; }
       .empty-state p{ margin:0; color:#9fb0aa; font-size:14px; }
@@ -220,7 +217,7 @@
         </style>
     </head>
     <body>
-        <!-- ===== MOBILE HEADER ===== -->
+        <!-- ===== MOBILE HEADER (exact method as leaderboard) ===== -->
         <header class="mnav" role="banner">
             <div class="container mnav-bar">
                 <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}" class="mnav-brand" aria-label="LinkHash Home">
@@ -279,7 +276,7 @@
                         📝 {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
                     </a>
                 </nav>
-                <!-- Language -->
+                <!-- Language switcher -->
                 <div class="mnav-lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
                     <button
                         class="lang-btn"
@@ -456,25 +453,17 @@
                             <h3>{{ c.title }}</h3>
                             <p>{{ c.summary }}</p>
                             <div class="meta">
-                                <!-- Reward pool pill (single-line label + right-aligned two-line value) -->
                                 <div class="pill">
-                                    <span class="pill-label">
-                                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Reward pool{% endif %}
-                                    </span>
-                                    <span class="pill-val" aria-label="{{ c.pool_usdt }} USDT">
-                                        <span class="amount">{{ c.pool_usdt }}</span>
-                                        <span class="unit">USDT</span>
-                                    </span>
+                                    <strong>
+                                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
+                                    </strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
                                 </div>
-                                <!-- Participants pill -->
                                 <div class="pill">
-                                    <span class="pill-label">
+                                    <strong>
                                         {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
-                                    </span>
-                                    <span class="pill-val" aria-label="{{ c.participants }}">
-                                        <span class="amount">{{ c.participants }}</span>
-                                        <span class="unit">{% if meta.lang == 'ko' %}명{% elif meta.lang == 'ja' %}人{% elif meta.lang == 'zh' %}人{% else %}users{% endif %}</span>
-                                    </span>
+                                    </strong>
+                                    &nbsp; {{ c.participants }}
                                 </div>
                             </div>
                             <div class="progress">
@@ -488,7 +477,6 @@
                     </article>
                     {% endfor %}
           {% else %}
-                    <!-- Graceful, beautiful empty for LIVE only -->
                     <div class="empty-state" style="grid-column:1/-1">
                         <h3>
                             {% if meta.lang == 'ko' %}진행중인 캠페인이 없습니다{% elif meta.lang == 'ja' %}進行中のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无进行中的活动{% else %}No live campaigns right now{% endif %}
@@ -530,22 +518,16 @@
                             <p>{{ c.summary }}</p>
                             <div class="meta">
                                 <div class="pill">
-                                    <span class="pill-label">
-                                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Reward pool{% endif %}
-                                    </span>
-                                    <span class="pill-val" aria-label="{{ c.pool_usdt }} USDT">
-                                        <span class="amount">{{ c.pool_usdt }}</span>
-                                        <span class="unit">USDT</span>
-                                    </span>
+                                    <strong>
+                                        {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
+                                    </strong>
+                                    &nbsp; {{ c.pool_usdt }} USDT
                                 </div>
                                 <div class="pill">
-                                    <span class="pill-label">
+                                    <strong>
                                         {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与人数{% else %}People{% endif %}
-                                    </span>
-                                    <span class="pill-val" aria-label="{{ c.participants }}">
-                                        <span class="amount">{{ c.participants }}</span>
-                                        <span class="unit">{% if meta.lang == 'ko' %}명{% elif meta.lang == 'ja' %}人{% elif meta.lang == 'zh' %}人{% else %}users{% endif %}</span>
-                                    </span>
+                                    </strong>
+                                    &nbsp; {{ c.participants }}
                                 </div>
                             </div>
                             <div class="progress">
@@ -555,11 +537,15 @@
                                 <span>100% {% if meta.lang == 'ko' %}수령{% elif meta.lang == 'ja' %}受領済{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
                                 <span>{{ c.start|date:"Y-m-d" }} → {{ c.end|date:"Y-m-d" }}</span>
                             </div>
+                            <div class="foot">
+                                <a class="btn" href="/rewards/{{ c.slug }}-{{ c.id }}/">
+                                    {% if meta.lang == 'ko' %}요약 보기{% elif meta.lang == 'ja' %}サマリーを見る{% elif meta.lang == 'zh' %}查看摘要{% else %}See summary{% endif %}
+                                </a>
+                            </div>
                         </div>
                     </article>
                     {% endfor %}
           {% else %}
-                    <!-- Graceful empty for PAST only (Fix #1/#2: won’t bleed into Live due to .panel rules) -->
                     <div class="empty-state" style="grid-column:1/-1">
                         <h3>
                             {% if meta.lang == 'ko' %}지난 캠페인이 없습니다{% elif meta.lang == 'ja' %}過去のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无历史活动{% else %}No past campaigns yet{% endif %}
@@ -575,7 +561,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">
@@ -736,6 +723,7 @@
             return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
           }
 
+          // Other pages: keep path, toggle ?lang=
           const params = new URLSearchParams(loc.search);
           params.set('lang', lang);
           return path + (params.toString() ? `?${params.toString()}` : '');
@@ -755,7 +743,7 @@
         });
       })();
         </script>
-        <!-- CSRF + Wallet helpers (same as leaderboard) -->
+        <!-- CSRF + Wallet helpers (deep-link aware, same as leaderboard) -->
         <script>
       function getCookie(name){
         const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
@@ -824,7 +812,7 @@
       window.connectWallet = connectWallet;
       window.logoutWallet  = logoutWallet;
         </script>
-        <!-- Sheet toggle -->
+        <!-- Sheet toggle (exact behavior) -->
         <script>
       (function(){
         const $toggle = document.getElementById('mnavToggle');
