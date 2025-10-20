@@ -77,24 +77,21 @@ def _query_overrides_mobile(request) -> bool | None:
     return None
 
 def _should_use_mobile(request) -> bool:
-    """
-    Decision order:
-      1) explicit URL override (?view=mobile/desktop or ?m=1/0)
-      2) persisted cookie preference (pref_view)
-      3) m.* host forces mobile
-      4) fallback UA sniff
-    """
+    # 1) explicit URL override wins
     override = _query_overrides_mobile(request)
     if override is not None:
         return override
 
+    # 2) m.* host forces mobile
+    if _is_mobile_host(request):
+        return True
+
+    # 3) persisted cookie preference
     pref = _pref_from_cookie(request)
     if pref is not None:
         return pref
 
-    if _is_mobile_host(request):
-        return True
-
+    # 4) fallback UA sniff
     return _ua_is_mobile(request)
 
 
@@ -516,7 +513,8 @@ def rewards_apply_ko(request):
         "canonical": f"{base}/rewards/apply/ko/",
         "url": f"{base}/rewards/apply/ko/",
     }
-    return render(request, "rewards_apply.html", {"meta": meta, "wallet_user": get_wallet_user(request)})
+    ctx = {"meta": meta, "wallet_user": get_wallet_user(request)}
+    return render_mobile_first(request, "rewards_apply", ctx)
 
 def rewards_apply_ja(request):
     base = _base_url(request)
@@ -529,7 +527,8 @@ def rewards_apply_ja(request):
         "canonical": f"{base}/rewards/apply/ja/",
         "url": f"{base}/rewards/apply/ja/",
     }
-    return render(request, "rewards_apply.html", {"meta": meta, "wallet_user": get_wallet_user(request)})
+    ctx = {"meta": meta, "wallet_user": get_wallet_user(request)}
+    return render_mobile_first(request, "rewards_apply", ctx)
 
 def rewards_apply_zh(request):
     base = _base_url(request)
@@ -542,7 +541,8 @@ def rewards_apply_zh(request):
         "canonical": f"{base}/rewards/apply/zh/",
         "url": f"{base}/rewards/apply/zh/",
     }
-    return render(request, "rewards_apply.html", {"meta": meta, "wallet_user": get_wallet_user(request)})
+    ctx = {"meta": meta, "wallet_user": get_wallet_user(request)}
+    return render_mobile_first(request, "rewards_apply", ctx)
 
 # ---- Client Application submit API ----
 @require_POST
