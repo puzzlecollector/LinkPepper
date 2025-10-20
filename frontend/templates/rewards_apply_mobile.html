@@ -247,7 +247,7 @@
                     <a class="item" href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
                         🏆 {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
                     </a>
-                    <a class="item active outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
+                    <a class="item active" aria-current="page" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
                         📝 {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
                     </a>
                 </nav>
