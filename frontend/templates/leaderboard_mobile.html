@@ -1,31 +1,28 @@
 <!doctype html>
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>{{ meta.title|default:"LinkHash | Leaderboard" }}</title>
-    <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
-    <meta name="robots" content="index,follow">
-    <meta name="author" content="LinkHash">
-    <meta name="description" content="{{ meta.description|default:'Top contributors ranked by campaign participation.' }}">
-
-    <!-- OG/Twitter -->
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="LinkHash">
-    <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
-    <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
-    <meta property="og:url" content="{{ meta.url }}">
-    <meta property="og:image" content="{% static 'img/og-cover.png' %}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
-    <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
-    <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
-
-    <!-- Favicons -->
-    <link rel="icon" href="{% static 'img/favicon.ico' %}">
-
-    <style>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>{{ meta.title|default:"LinkHash | Leaderboard" }}</title>
+        <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
+        <meta name="robots" content="index,follow">
+        <meta name="author" content="LinkHash">
+        <meta name="description" content="{{ meta.description|default:'Top contributors ranked by campaign participation.' }}">
+        <!-- OG/Twitter -->
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="LinkHash">
+        <meta property="og:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta property="og:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta property="og:url" content="{{ meta.url }}">
+        <meta property="og:image" content="{% static 'img/og-cover.png' %}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ meta.og_title|default:meta.title }}">
+        <meta name="twitter:description" content="{{ meta.og_description|default:meta.description }}">
+        <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
+        <!-- Favicons -->
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <style>
       :root{
         --bg:#0a0b0d; --bg-elev:#0f1115; --panel:#11141a; --panel-2:#0e1318; --grid:#0b0f13; --line:#1a212d;
         --text:#e6f1ee; --muted:#9fb0aa; --green:#16a34a; --green-2:#23d16a;
@@ -91,14 +88,8 @@
       .mnav .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
       .mnav .danger{width:100%; margin-top:6px; padding:11px 12px; border-radius:12px; border:1px solid #3b2020;
         background:linear-gradient(180deg,#6e2c2c,#5a2222); color:#ffeaea; font-weight:800}
-      @media (max-width:360px){
-        .mnav .pill-addr{max-width:98px}
-        .mnav-bar{height:52px}
-        .mnav-brand .name{font-size:15px}
-      }
-      @media (min-width:720px){
-        .mnav-bar{height:60px}
-      }
+      @media (max-width:360px){ .mnav .pill-addr{max-width:98px} .mnav-bar{height:52px} .mnav-brand .name{font-size:15px} }
+      @media (min-width:720px){ .mnav-bar{height:60px} }
 
       /* HEADER */
       .page-head{
@@ -108,7 +99,6 @@
       }
       .page-head h1{margin:0 0 6px; font-size:24px;}
       .page-head .sub{color:var(--muted); margin:0; font-size:14px}
-
       .range{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px;}
       .chip{padding:8px 12px; border-radius:999px; border:1px solid #2a333f; background:#0b1117; color:#cfe7dd; font-weight:800; font-size:12px;}
       .chip.active{border-color:#2fe07a; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow)}
@@ -117,31 +107,42 @@
       .section{padding:12px 0 20px;}
       .card{background:linear-gradient(180deg, #0f1419, #0c1116); border:1px solid rgba(255,255,255,.06); border-radius:16px; box-shadow:var(--shadow-md); padding:12px; margin-top:12px}
 
+      /* Clickable row */
       .row-item{
         position:relative;
-        display:grid; grid-template-columns:auto 1fr auto; gap:12px;
-        border:1px solid rgba(255,255,255,.06); border-radius:14px; padding:12px;
+        display:grid;
+        grid-template-columns: auto 1fr auto auto; /* rank | handle | net | points */
+        gap:12px;
+        border:1px solid rgba(255,255,255,.06);
+        border-radius:14px;
+        padding:12px;
         background:linear-gradient(180deg, #0d1217, #0b0f14);
-        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+        cursor:pointer;
       }
-      .row-item:hover{ transform:translateY(-2px) scale(1.01); border-color:rgba(35,209,106,.35); box-shadow:0 30px 60px rgba(22,163,74,.18), var(--shadow-md); }
-      .row-item:focus-within{ border-color:#2fe07a; box-shadow:var(--glow); }
+      .row-item:hover,
+      .row-item:focus-visible{
+        transform:translateY(-2px) scale(1.01);
+        border-color:#2fe07a;
+        box-shadow:0 30px 60px rgba(22,163,74,.18), var(--shadow-md);
+        outline:none;
+      }
 
-      /* Make whole row clickable */
-      .row-link{ position:absolute; inset:0; z-index:5; }
-      .row-link:focus{ outline:2px solid #2fe07a; outline-offset:-2px; border-radius:14px; }
+      .rank-badge{min-width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:900; border-radius:10px; background:#0b1117; border:1px solid #1d2836;}
 
-      .rank-badge{min-width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:900; border-radius:10px; background:#0b1117; border:1px solid #1d2836; z-index:6;}
-      .user{display:flex; gap:10px; align-items:center; z-index:6;}
-      .avatar{width:36px; height:36px; border-radius:999px; overflow:hidden; border:1px solid #1d2836; background:#0b1117; flex:0 0 36px;}
-      .handle{display:flex; flex-direction:column; gap:2px;}
-      .addr{font-weight:800;}
-
+      .handle{display:flex; flex-direction:column; gap:4px; min-width:0;}
+      .addr{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
       .muted{color:#9fb0aa; font-size:12px;}
-      .points{display:flex; align-items:center; gap:6px; font-weight:900; z-index:6;}
+
+      /* Network block sits to the RIGHT of address; logo on top, name text under */
+      .net{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-width:58px;}
+      .net img{width:24px; height:24px; display:block; filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));}
+      .net-name{font-size:11px; color:#cfe7dd; text-align:center; line-height:1.1; white-space:nowrap; max-width:80px; overflow:hidden; text-overflow:ellipsis;}
+
+      .points{display:flex; align-items:center; gap:6px; font-weight:900; justify-self:end;}
       .points .val{font-size:16px;}
 
-      .split{margin-top:10px}
+      .split{margin-top:10px; grid-column: 1 / -1;}
       .bar-split{
         height:10px;
         border:1px solid #1d2836;
@@ -155,107 +156,150 @@
           );
         border-radius:999px;
         overflow:hidden;
-        z-index:6;
       }
       .split-meta{display:flex; justify-content:space-between; margin-top:6px; font-size:12px; color:#9fb0aa}
 
       .empty{padding:20px; text-align:center; color:#a8bab2; border:1px dashed #243040; border-radius:14px; background:#0a1117; }
 
-      /* Network badge */
-      .net-badge{
-        display:inline-flex; align-items:center; gap:6px;
-        padding:4px 8px; border-radius:999px;
-        background:#0b1218; border:1px solid #1d2836; color:#cde6da; font-size:12px; font-weight:800;
-        margin-top:2px; width:max-content;
-      }
-      .net-badge img{ width:14px; height:14px; display:block; }
-
-      /* Visually hidden (for a11y if we hide network text) */
-      .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-    </style>
-  </head>
-  <body>
-    <!-- ===== MOBILE HEADER ===== -->
-    <header class="mnav" role="banner">
-      <div class="container mnav-bar">
-        <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}"
-           class="mnav-brand" aria-label="LinkHash Home">
-          <span class="dot" aria-hidden="true"></span>
-          <span class="name">LinkHash</span>
-        </a>
-
-        <div class="mnav-actions">
-          {% if wallet_user %}
-            <span class="pill-addr" title="{{ wallet_user.address }}">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-          {% else %}
-            <button class="btn" type="button" onclick="(window.connectWallet||(()=>alert('Wallet script missing')))()">
-              {% if meta.lang == 'ko' %}지갑{% elif meta.lang == 'ja' %}ウォレット{% elif meta.lang == 'zh' %}钱包{% else %}Wallet{% endif %}
-            </button>
-          {% endif %}
-
-          <button class="mnav-toggle" id="mnavToggle" type="button" aria-controls="mnavSheet" aria-expanded="false" aria-label="Menu">
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-              <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Slide-down sheet -->
-      <div class="mnav-sheet" id="mnavSheet" hidden>
-        <nav class="mnav-list" aria-label="Primary">
-          <a class="item" href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
-            🏠 {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
-          </a>
-          <a class="item" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
-            🎁 {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
-          </a>
-          <a class="item" href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
-            📣 {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
-          </a>
-          <a class="item active" href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
-            🏆 {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
-          </a>
-          <a class="item outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
-            📝 {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
-          </a>
-        </nav>
-
-        <!-- Language switcher -->
-        <div class="mnav-lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
-          <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
-            <span class="flag-emoji" aria-hidden="true"></span>
-            <span class="label">
-              {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
-            </span>
-            <svg class="chev" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true">
-              <path d="M5 7l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-          <ul class="lang-menu" role="listbox" tabindex="-1" aria-label="Select language">
-            <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-            <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-            <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-            <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
-          </ul>
-        </div>
-
-        {% if wallet_user %}
-          <button class="danger" type="button" onclick="(window.logoutWallet||(()=>alert('Wallet script missing')))()">
-            {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ログアウト{% elif meta.lang == 'zh' %}退出{% else %}Logout{% endif %}
-          </button>
-        {% endif %}
-      </div>
-    </header>
-
-    <!-- HEADER -->
-    <section class="page-head">
-      <div class="container">
-        <h1>
-          {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
-        </h1>
-        <p class="sub">
-          {% if meta.lang == 'ko' %}
+      /* FOOTER */
+      .footer{padding:18px 0 24px; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; font-size:12px; margin-top:18px}
+        </style>
+    </head>
+    <body>
+        <!-- ===== MOBILE HEADER ===== -->
+        <header class="mnav" role="banner">
+            <div class="container mnav-bar">
+                <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}" class="mnav-brand" aria-label="LinkHash Home">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span class="name">LinkHash</span>
+                </a>
+                <div class="mnav-actions">
+                    {% if wallet_user %}
+                    <span class="pill-addr" title="{{ wallet_user.address }}">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
+                    {% else %}
+                    <button class="btn" type="button" onclick="(window.connectWallet||(()=>alert('Wallet script missing')))()">
+                        {% if meta.lang == 'ko' %}지갑{% elif meta.lang == 'ja' %}ウォレット{% elif meta.lang == 'zh' %}钱包{% else %}Wallet{% endif %}
+                    </button>
+                    {% endif %}
+                    <button
+                        class="mnav-toggle"
+                        id="mnavToggle"
+                        type="button"
+                        aria-controls="mnavSheet"
+                        aria-expanded="false"
+                        aria-label="Menu"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="22"
+                            height="22"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M4 6h16M4 12h16M4 18h16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Slide-down sheet -->
+            <div class="mnav-sheet" id="mnavSheet" hidden>
+                <nav class="mnav-list" aria-label="Primary">
+                    <a class="item" href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+                        🏠 {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
+                    </a>
+                    <a class="item" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
+                        🎁 {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
+                    </a>
+                    <a class="item" href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
+                        📣 {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
+                    </a>
+                    <a class="item active" href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
+                        🏆 {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+                    </a>
+                    <a class="item outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
+                        📝 {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
+                    </a>
+                </nav>
+                <!-- Language switcher -->
+                <div class="mnav-lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+                    <button
+                        class="lang-btn"
+                        type="button"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                    >
+                        <span class="flag-emoji" aria-hidden="true"></span>
+                        <span class="label">
+                            {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+                        </span>
+                        <svg
+                            class="chev"
+                            viewBox="0 0 20 20"
+                            width="14"
+                            height="14"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M5 7l5 6 5-6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </button>
+                    <ul
+                        class="lang-menu"
+                        role="listbox"
+                        tabindex="-1"
+                        aria-label="Select language"
+                    >
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="en"
+                            data-flag="🇺🇸"
+                        >🇺🇸 English</li>
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="ko"
+                            data-flag="🇰🇷"
+                        >🇰🇷 한국어</li>
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="ja"
+                            data-flag="🇯🇵"
+                        >🇯🇵 日本語</li>
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="zh"
+                            data-flag="🇨🇳"
+                        >🇨🇳 中文</li>
+                    </ul>
+                </div>
+                {% if wallet_user %}
+                <button class="danger" type="button" onclick="(window.logoutWallet||(()=>alert('Wallet script missing')))()">
+                    {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ログアウト{% elif meta.lang == 'zh' %}退出{% else %}Logout{% endif %}
+                </button>
+                {% endif %}
+            </div>
+        </header>
+        <!-- HEADER -->
+        <section class="page-head">
+            <div class="container">
+                <h1>
+                    {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+                </h1>
+                <p class="sub">
+                    {% if meta.lang == 'ko' %}
             캠페인 기여도 기반 순위 (링크·방문·점수).
           {% elif meta.lang == 'ja' %}
             キャンペーン貢献度に基づく順位（リンク・訪問・スコア）。
@@ -264,96 +308,93 @@
           {% else %}
             Ranked by campaign contributions (links, visits, score).
           {% endif %}
-          {% if using_sample %}<span class="muted"> · UI preview data</span>{% endif %}
-        </p>
-
-        <div class="range">
-          <span class="muted">
-            {% if meta.lang == 'ko' %}기간{% elif meta.lang == 'ja' %}期間{% elif meta.lang == 'zh' %}时间范围{% else %}Range{% endif %}:
-          </span>
-          <a class="chip {% if range_code == '7d' %}active{% endif %}"  href="?range=7d">7D</a>
-          <a class="chip {% if range_code == '30d' %}active{% endif %}" href="?range=30d">30D</a>
-          <a class="chip {% if range_code == '3m' %}active{% endif %}"  href="?range=3m">3M</a>
-          <a class="chip {% if range_code == '6m' %}active{% endif %}"  href="?range=6m">6M</a>
-          <a class="chip {% if range_code == '12m' %}active{% endif %}" href="?range=12m">12M</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- LIST -->
-    <main class="container section">
-      {% if rows %}
-        {% for r in rows %}
-          <article class="row-item" {% if not forloop.first %}style="margin-top:12px"{% endif %}>
-            {% if r.explorer_url %}
-              <a class="row-link" href="{{ r.explorer_url }}" target="_blank" rel="noopener" aria-label="Open {{ r.masked }} on explorer"></a>
-            {% endif %}
-
-            <div class="rank-badge">{{ r.rank }}</div>
-
-            <div class="user">
-              <!-- simple gradient avatar -->
-              <svg class="avatar" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-                <defs>
-                  <linearGradient id="g{{ forloop.counter }}" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#19b357"/>
-                    <stop offset="1" stop-color="#23d16a"/>
-                  </linearGradient>
-                </defs>
-                <rect x="0.5" y="0.5" width="39" height="39" rx="19.5" fill="#0b1117" stroke="#1d2836"/>
-                <circle cx="20" cy="15" r="7" fill="url(#g{{ forloop.counter }})"/>
-                <rect x="10" y="25" width="20" height="8" rx="4" fill="#1d2836"/>
-              </svg>
-              <div class="handle">
-                <span class="addr">{{ r.masked }}</span>
-                {% if r.network %}
-                  <span class="net-badge" title="{{ r.network_verbose }}">
-                    {% if r.network == 'ETH' %}
-                      <img src="{% static 'img/networks/eth.svg' %}" alt="Ethereum">
-                      <span class="sr-only">Ethereum</span>
-                    {% elif r.network == 'POL' %}
-                      <img src="{% static 'img/networks/polygon.svg' %}" alt="Polygon">
-                      <span class="sr-only">Polygon</span>
-                    {% elif r.network == 'BNB' %}
-                      <img src="{% static 'img/networks/bnb.svg' %}" alt="BNB Chain">
-                      <span class="sr-only">BNB Chain</span>
-                    {% elif r.network == 'SOL' %}
-                      <img src="{% static 'img/networks/solana.svg' %}" alt="Solana">
-                      <span class="sr-only">Solana</span>
+          {% if using_sample %}
+                    <span class="muted"> · UI preview data</span>
                     {% endif %}
-                    <!-- If you prefer visible text, replace sr-only span with plain text -->
-                  </span>
-                {% endif %}
-                <span class="muted">
-                  {% if meta.lang == 'ko' %}마인드셰어{% elif meta.lang == 'ja' %}マインドシェア{% elif meta.lang == 'zh' %}心智占有率{% else %}Mindshare{% endif %}
-                  · {{ r.mindshare|floatformat:2 }}%
-                </span>
-              </div>
+                </p>
+                <div class="range">
+                    <span class="muted">
+                        {% if meta.lang == 'ko' %}기간{% elif meta.lang == 'ja' %}期間{% elif meta.lang == 'zh' %}时间范围{% else %}Range{% endif %}:
+                    </span>
+                    <a class="chip {% if range_code == '7d' %}active{% endif %}" href="?range=7d">7D</a>
+                    <a class="chip {% if range_code == '30d' %}active{% endif %}" href="?range=30d">30D</a>
+                    <a class="chip {% if range_code == '3m' %}active{% endif %}" href="?range=3m">3M</a>
+                    <a class="chip {% if range_code == '6m' %}active{% endif %}" href="?range=6m">6M</a>
+                    <a class="chip {% if range_code == '12m' %}active{% endif %}" href="?range=12m">12M</a>
+                </div>
             </div>
-
-            <div class="points">
-              <span class="muted">{% if meta.lang == 'ko' %}포인트{% elif meta.lang == 'ja' %}ポイント{% elif meta.lang == 'zh' %}积分{% else %}Points{% endif %}</span>
-              <span class="val">{{ r.points }}</span>
-            </div>
-
-            <div class="split" style="grid-column: 1 / -1;">
-              <div class="bar-split" style="--links: {{ r.ratio_links|floatformat:'2' }}%;" aria-label="Links {{ r.links }}, Visits {{ r.visits }}"></div>
-              <div class="split-meta">
-                <span>
-                  {% if meta.lang == 'ko' %}링크{% elif meta.lang == 'ja' %}リンク{% elif meta.lang == 'zh' %}外链{% else %}Links{% endif %}
+        </section>
+        <!-- LIST -->
+        <main class="container section">
+            {% if rows %}
+        {% for r in rows %}
+          {% if r.explorer_url %}
+            <a
+                class="row-item"
+                href="{{ r.explorer_url }}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Open explorer for {{ r.masked }}"
+            >
+                {% else %}
+                <div class="row-item" role="group" aria-label="{{ r.masked }}">
+                    {% endif %}
+                    <div class="rank-badge">{{ r.rank }}</div>
+                    <!-- Left: Address + Mindshare -->
+                    <div class="handle">
+                        <span class="addr">{{ r.masked }}</span>
+                        <span class="muted">
+                            {% if meta.lang == 'ko' %}마인드셰어{% elif meta.lang == 'ja' %}マインドシェア{% elif meta.lang == 'zh' %}心智占有率{% else %}Mindshare{% endif %}
+                · {{ r.mindshare|floatformat:2 }}%
+                        </span>
+                    </div>
+                    <!-- Middle-right: Network (logo on top, label underneath) -->
+                    <div class="net">
+                        {% if r.network == 'ETH' %}
+                        <img src="{% static 'img/networks/eth.svg' %}" alt="Ethereum">
+                        <span class="net-name">{% if meta.lang == 'ko' %}이더리움{% else %}Ethereum{% endif %}</span>
+                        {% elif r.network == 'POL' %}
+                        <img src="{% static 'img/networks/polygon.svg' %}" alt="Polygon">
+                        <span class="net-name">{% if meta.lang == 'ko' %}폴리곤{% else %}Polygon{% endif %}</span>
+                        {% elif r.network == 'BNB' %}
+                        <img src="{% static 'img/networks/bnb.svg' %}" alt="BNB Chain">
+                        <span class="net-name">{% if meta.lang == 'ko' %}BNB 체인{% else %}BNB Chain{% endif %}</span>
+                        {% elif r.network == 'SOL' %}
+                        <img src="{% static 'img/networks/solana.svg' %}" alt="Solana">
+                        <span class="net-name">{% if meta.lang == 'ko' %}솔라나{% else %}Solana{% endif %}</span>
+                        {% else %}
+                        <!-- No network -->
+                        <span class="net-name" style="opacity:.6">—</span>
+                        {% endif %}
+                    </div>
+                    <!-- Right: Points -->
+                    <div class="points">
+                        <span class="muted">{% if meta.lang == 'ko' %}포인트{% elif meta.lang == 'ja' %}ポイント{% elif meta.lang == 'zh' %}积分{% else %}Points{% endif %}</span>
+                        <span class="val">{{ r.points }}</span>
+                    </div>
+                    <!-- Split bar (full width) -->
+                    <div class="split">
+                        <div class="bar-split" style="--links: {{ r.ratio_links|floatformat:'2' }}%;" aria-label="Links {{ r.links }}, Visits {{ r.visits }}"></div>
+                        <div class="split-meta">
+                            <span>
+                                {% if meta.lang == 'ko' %}링크{% elif meta.lang == 'ja' %}リンク{% elif meta.lang == 'zh' %}外链{% else %}Links{% endif %}
                   · {{ r.links }}
-                </span>
-                <span>
-                  {% if meta.lang == 'ko' %}방문{% elif meta.lang == 'ja' %}訪問{% elif meta.lang == 'zh' %}访问{% else %}Visits{% endif %}
+                            </span>
+                            <span>
+                                {% if meta.lang == 'ko' %}방문{% elif meta.lang == 'ja' %}訪問{% elif meta.lang == 'zh' %}访问{% else %}Visits{% endif %}
                   · {{ r.visits }}
-                </span>
-              </div>
+                            </span>
+                        </div>
+                    </div>
+                    {% if r.explorer_url %}
+                </a>
+                {% else %}
             </div>
-          </article>
+            {% endif %}
         {% endfor %}
       {% else %}
-        <div class="empty">
-          {% if meta.lang == 'ko' %}
+            <div class="empty">
+                {% if meta.lang == 'ko' %}
             아직 데이터가 없습니다. 과제에 참여하면 순위가 표시됩니다.
           {% elif meta.lang == 'ja' %}
             まだデータがありません。タスクに参加すると表示されます。
@@ -362,22 +403,22 @@
           {% else %}
             No data yet. Participate in campaigns to appear here.
           {% endif %}
-        </div>
-      {% endif %}
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-        <div>© <strong>LinkHash</strong></div>
-        <div style="opacity:.7">
-          {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
-        </div>
-      </div>
-    </footer>
-
-    <!-- Language switcher -->
-    <script>
+            </div>
+            {% endif %}
+        </main>
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <div>©
+                    <strong>LinkHash</strong>
+                </div>
+                <div style="opacity:.7">
+                    {% if meta.lang == 'ko' %}화이트햇 백링크 · 투명한 리워드{% elif meta.lang == 'ja' %}ホワイトハット被リンク・透明な報酬{% elif meta.lang == 'zh' %}白帽外链 · 透明奖励{% else %}White-hat backlinks · Transparent rewards{% endif %}
+                </div>
+            </div>
+        </footer>
+        <!-- Language switcher -->
+        <script>
       (function(){
         const $wrap = document.getElementById('langSwitcher');
         if(!$wrap) return;
@@ -435,10 +476,9 @@
           });
         });
       })();
-    </script>
-
-    <!-- CSRF + Wallet helpers (same pattern as your other pages) -->
-    <script>
+        </script>
+        <!-- CSRF + Wallet helpers (same pattern as other pages) -->
+        <script>
   function getCookie(name){
     const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
     return m ? decodeURIComponent(m[2]) : null;
@@ -461,6 +501,7 @@
     }
     return r.json();
   }
+
   function pickEthereumProvider(){
     const eth = window.ethereum;
     if(!eth) return null;
@@ -479,8 +520,9 @@
     try{
       const provider = pickEthereumProvider();
       if(!provider){
-        if(isMobile()){ window.location.href = buildMetaMaskDeepLink(); return; }
-        else { alert('MetaMask not detected. Please install MetaMask and refresh.'); return; }
+        if(isMobile()) window.location.href = buildMetaMaskDeepLink();
+        else alert('MetaMask not detected. Please install MetaMask and refresh.');
+        return;
       }
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       const address = (accounts && accounts[0]) ? accounts[0] : null;
@@ -490,9 +532,11 @@
       const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
       const signature = await provider.request({ method: 'personal_sign', params: [ message, address ] });
       const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
-      if(verifyRes && verifyRes.ok){ window.location.reload(); } else { alert('Login failed.'); }
+      if(verifyRes && verifyRes.ok) window.location.reload();
+      else alert('Login failed.');
     }catch(err){
-      console.error(err); alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+      console.error(err);
+      alert('Wallet login failed: ' + (err && err.message ? err.message : err));
     }
   }
   async function logoutWallet(){
@@ -501,9 +545,8 @@
   }
   window.connectWallet = connectWallet;
   window.logoutWallet  = logoutWallet;
-    </script>
-
-    <script>
+        </script>
+        <script>
 (function(){
   const $toggle = document.getElementById('mnavToggle');
   const $sheet  = document.getElementById('mnavSheet');
@@ -518,61 +561,7 @@
       if(!within) close();
     });
   }
-
-  // Language switcher (same routing rules)
-  const $wrap = document.getElementById('langSwitcher');
-  if($wrap){
-    const $btn  = $wrap.querySelector('.lang-btn');
-    const $menu = $wrap.querySelector('.lang-menu');
-    const current = ($wrap.dataset.current || 'en').toLowerCase();
-    const flagEl = $btn.querySelector('.flag-emoji');
-    const labelEl= $btn.querySelector('.label');
-    const flagMap= { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
-    flagEl.textContent = flagMap[current] || '🇺🇸';
-
-    function closeMenu(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
-    function openMenu(){  $wrap.classList.add('open');    $btn.setAttribute('aria-expanded','true');  }
-
-    $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.contains('open') ? closeMenu() : openMenu(); });
-    document.addEventListener('click', closeMenu);
-    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
-
-    function pathFor(lang){
-      const loc = window.location;
-      const path = loc.pathname;
-      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
-      const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
-      const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
-      if(isApply){
-        if(lang === 'en') return '/rewards/apply/?lang=en';
-        return `/rewards/apply/${lang}/`;
-      }
-      if(baseMap[clean]){
-        if(lang === 'en'){
-          const q = new URLSearchParams(loc.search);
-          q.set('lang','en');
-          return clean + (q.toString() ? `?${q.toString()}` : '');
-        }
-        return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
-      }
-      const params = new URLSearchParams(loc.search);
-      params.set('lang', lang);
-      return path + (params.toString() ? `?${params.toString()}` : '');
-    }
-
-    $menu.querySelectorAll('.lang-item').forEach(li=>{
-      li.addEventListener('click', ()=>{
-        const lang  = li.getAttribute('data-lang');
-        const emoji = li.getAttribute('data-flag') || '';
-        flagEl.textContent = emoji;
-        labelEl.textContent = lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
-        closeMenu();
-        const target = pathFor(lang);
-        if(target) window.location.href = target;
-      });
-    });
-  }
 })();
-    </script>
-  </body>
+        </script>
+    </body>
 </html>
