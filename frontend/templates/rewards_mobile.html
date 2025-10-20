@@ -3,7 +3,7 @@
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <title>{{ meta.title|default:"LinkHash | Rewards" }}</title>
         <link rel="canonical" href="{{ meta.canonical|default:meta.url }}">
         <meta name="robots" content="index,follow">
@@ -22,333 +22,325 @@
         <meta name="twitter:image" content="{% static 'img/twitter-card.png' %}">
         <!-- Favicons -->
         <link rel="icon" href="{% static 'img/favicon.ico' %}">
-        <link
-            rel="icon"
-            type="image/png"
-            sizes="32x32"
-            href="{% static 'img/favicon-32x32.png' %}"
-        >
-        <link
-            rel="icon"
-            type="image/png"
-            sizes="16x16"
-            href="{% static 'img/favicon-16x16.png' %}"
-        >
-        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
         <style>
-    /* ======= THEME ======= */
-    :root{
-      --bg:#0a0b0d;
-      --bg-elev:#0f1115;
-      --panel:#11141a;
-      --panel-2:#0e1318;
-      --grid:#0b0f13;
-      --line:#1a212d;
-      --text:#e6f1ee;
-      --muted:#9fb0aa;
-      --green:#16a34a;
-      --green-2:#23d16a;
-      --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
-      --radius:16px;
-      --shadow-lg:0 40px 80px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
-      --shadow-md:0 16px 40px rgba(0,0,0,.45);
-      --noise:transparent url('data:image/svg+xml;utf8,\
-        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">\
-          <filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/></filter>\
-          <rect width="120" height="120" filter="url(%23n)" opacity=".04"/></svg>') repeat;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--text);
-      background:
-        radial-gradient(80rem 60rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
-        radial-gradient(60rem 40rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
-        linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
-      font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", Arial, sans-serif;
-      letter-spacing:.2px;
-      background-attachment: fixed;
-      -webkit-tap-highlight-color: transparent;
-    }
-    a{color:inherit;text-decoration:none}
+      :root{
+        --bg:#0a0b0d; --bg-elev:#0f1115; --panel:#11141a; --panel-2:#0e1318; --grid:#0b0f13; --line:#1a212d;
+        --text:#e6f1ee; --muted:#9fb0aa; --green:#16a34a; --green-2:#23d16a;
+        --glow:0 0 22px rgba(22,163,74,.35), 0 0 48px rgba(22,163,74,.15);
+        --radius:16px; --shadow-lg:0 30px 60px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.03);
+        --shadow-md:0 14px 34px rgba(0,0,0,.45);
+        --noise:transparent url('data:image/svg+xml;utf8,\
+          <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">\
+            <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter>\
+            <rect width="120" height="120" filter="url(%23n)" opacity=".04"/></svg>') repeat;
+        --container:clamp(320px, 92vw, 860px);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--text);
+        background:
+          radial-gradient(40rem 30rem at 90% -10%, rgba(22,163,74,.12), transparent 60%),
+          radial-gradient(30rem 20rem at -20% 20%, rgba(35,209,106,.08), transparent 60%),
+          linear-gradient(180deg, #08090b, #0a0b0d 20%, #090c10);
+        font-family: ui-sans-serif, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                     "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", Arial, sans-serif;
+        letter-spacing:.2px; background-attachment:fixed;
+        -webkit-tap-highlight-color:transparent;
+      }
+      a{color:inherit;text-decoration:none}
+      .container{width:var(--container); margin:0 auto; padding:0 10px;}
 
-    /* ===== MOBILE-FIRST LAYOUT ===== */
-    .container{
-      width:100%;
-      max-width:720px;
-      margin:0 auto;
-      padding:0 14px;
-    }
-    @media (min-width:480px){ .container{ max-width:640px; } }
-    @media (min-width:900px){ .container{ max-width:880px; } }
+      /* ===== MOBILE HEADER (copied method: .mnav) ===== */
+      .mnav{position:sticky; top:0; z-index:80; padding-top:env(safe-area-inset-top);
+        background:linear-gradient(180deg, rgba(15,17,21,.82), rgba(15,17,21,.52));
+        backdrop-filter: blur(12px); border-bottom:1px solid rgba(255,255,255,.06);}
+      .mnav-bar{display:flex; align-items:center; justify-content:space-between; height:56px; gap:8px;}
 
-    /* ===== NAV ===== */
-    .nav{
-      position:sticky; top:0; z-index:60;
-      backdrop-filter: blur(10px);
-      background:linear-gradient(180deg, rgba(15,17,21,.75), rgba(15,17,21,.45));
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .nav .row{display:flex; align-items:center; justify-content:space-between; gap:10px; height:60px;}
-    .brand{
-      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px;
-      color:#d8ffe7; text-shadow:0 0 18px rgba(35,209,106,.24);
-    }
-    .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
-    .links{
-      display:flex; align-items:center; gap:12px;
-      overflow:auto hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    }
-    .links::-webkit-scrollbar{ display:none; }
-    .links a{color:#cfe7dd; opacity:.95; white-space:nowrap; font-weight:700; padding:6px 8px; border-radius:10px;}
-    .links a[aria-current="page"]{ color:#05160c; background:linear-gradient(180deg,#19b357,#119e49); border:1px solid #2fe07a; box-shadow:var(--glow); }
-    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; font-weight:800; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
-    .btn-outline{padding:8px 12px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6; font-weight:700;}
+      .mnav-brand{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#d8ffe7; text-shadow:0 0 14px rgba(35,209,106,.22);}
+      .mnav-brand .dot{width:8px;height:8px;border-radius:999px;background:#16a34a;box-shadow:0 0 16px rgba(22,163,74,.42)}
+      .mnav-brand .name{font-size:16px; letter-spacing:.2px}
 
-    /* ===== PAGE HEADER ===== */
-    .page-head{
-      padding:24px 0 8px;
-      background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)), var(--noise);
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .page-head h1{margin:0 0 8px; font-size:24px; letter-spacing:.3px;}
-    .page-head .sub{color:var(--muted); margin:0; font-size:14px; line-height:1.5}
+      .mnav-actions{display:flex; align-items:center; gap:8px;}
+      .mnav .btn{display:inline-flex; align-items:center; gap:6px; padding:8px 10px; font-weight:800; border-radius:10px; border:1px solid #2fe07a;
+        background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:0 0 22px rgba(22,163,74,.25);}
+      .mnav .pill-addr{max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border:1px solid #2a333f; background:#0b1117;
+        color:#d9f6e6; border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700;}
 
-    /* ===== STICKY CONTROLS ===== */
-    .controls-wrap{
-      position:sticky; top:60px; z-index:50; /* below nav */
-      background:linear-gradient(180deg, rgba(12,16,20,.9), rgba(10,12,16,.7));
-      backdrop-filter: blur(8px);
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .controls{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:10px 0 12px;
-    }
-    .tabs{display:flex; gap:8px; flex:1}
-    .tab{
-      flex:1; display:inline-flex; justify-content:center; align-items:center; gap:8px;
-      padding:12px; border-radius:999px; border:1px solid #2a333f;
-      background:linear-gradient(180deg, rgba(14,18,25,.85), rgba(14,18,25,.55));
-      color:#cfe7dd; font-weight:900; cursor:pointer; letter-spacing:.3px; font-size:14px;
-      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
-    }
-    .tab:active{ transform:scale(.98) }
-    .tab.active{
-      border-color:#2fe07a; color:#05160c; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:var(--glow);
-    }
+      .mnav-toggle{display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px;
+        border:1px solid #2a333f; background:#0b1117; color:#e6f1ee;}
+      .mnav-toggle:active{transform:scale(.98)}
 
-    /* ===== Dropdown (Sort) ===== */
-    .filters{display:flex; gap:8px; align-items:center;}
-    .dropdown{position:relative;}
-    .dropdown-toggle{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 12px; border-radius:12px; border:1px solid #2a333f;
-      background:#0b1117; color:#d9f6e6; font-weight:800; cursor:pointer;
-      transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
-      min-width:44px; min-height:44px; /* touch target */
-    }
-    .dropdown-toggle .caret{ font-size:12px; opacity:.8 }
-    .dropdown-menu{
-      position:absolute; top:110%; right:0; min-width:220px; padding:8px;
-      background:linear-gradient(180deg, #0f1419, #0c1116);
-      border:1px solid rgba(255,255,255,.08); border-radius:14px; box-shadow:var(--shadow-md);
-      display:none; z-index:20;
-    }
-    .dropdown.open .dropdown-menu{ display:block; }
-    .dropdown-menu [role="option"]{
-      padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700; color:#cfe7dd;
-    }
-    .dropdown-menu [role="option"]:hover{ background:rgba(22,163,74,.12); color:#eafff4; }
-    .dropdown-menu [aria-selected="true"]{ background:rgba(22,163,74,.18); color:#eafff4; border:1px solid rgba(35,209,106,.35); }
+      /* Sheet */
+      .mnav-sheet{position:relative; background:linear-gradient(180deg,#0f1419,#0c1116);
+        border-top:1px solid rgba(255,255,255,.06); box-shadow:0 30px 60px rgba(0,0,0,.5);
+        padding:12px 12px calc(12px + env(safe-area-inset-bottom));}
+      .mnav-sheet[hidden]{display:none;}
+      .mnav-list{display:grid; gap:8px; margin:4px 0 10px;}
+      .mnav-list .item{display:flex; align-items:center; gap:8px; padding:12px 12px; border-radius:12px; font-weight:800;
+        border:1px solid #263040; background:rgba(14,18,25,.65); color:#cfe7dd;}
+      .mnav-list .item:hover{border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18)}
+      .mnav-list .item.active{color:#05160c; border-color:#2fe07a; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:0 0 22px rgba(22,163,74,.25)}
+      .mnav-list .item.outline{background:#0b1117}
 
-    /* ===== GRID & CARDS ===== */
-    .grid{ display:grid; grid-template-columns:1fr; gap:12px; }
-    @media (min-width:480px){ .grid{ grid-template-columns:repeat(2,1fr); gap:14px; } }
-    @media (min-width:900px){ .grid{ grid-template-columns:repeat(3,1fr); gap:18px; } }
+      /* Language (same pattern) */
+      .mnav-lang{margin:2px 0 10px; position:relative;}
+      .mnav .lang-btn{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; font-weight:800; border-radius:12px; border:1px solid #2a333f; background:#0b1117; color:#cfe7dd}
+      .mnav .flag-emoji{display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; line-height:18px; font-size:14px; border-radius:3px;
+        background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
+      .mnav .lang-menu{position:absolute; top:110%; left:0; min-width:200px; padding:6px; margin:0; list-style:none; display:none; z-index:90;
+        background:linear-gradient(180deg,#0f1419,#0c1116); border:1px solid rgba(255,255,255,.08); border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45)}
+      .mnav .lang.open .lang-menu{display:block; animation:mnavMenuIn .14s ease-out}
+      @keyframes mnavMenuIn{from{transform:translateY(-6px);opacity:0} to{transform:translateY(0);opacity:1}}
+      .mnav .lang-item{display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; color:#cfe7dd; font-weight:700;}
+      .mnav .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
 
-    .project-card{
-      position:relative; width:100%; display:flex; flex-direction:column; overflow:hidden;
-      background:linear-gradient(180deg, #0d1217, #0b0f14);
-      border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
-      opacity:0; transform:translateY(8px); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    }
-    .project-card::after{
-      content:""; position:absolute; inset:-20%; pointer-events:none; opacity:0;
-      background:radial-gradient(60% 60% at 50% 10%, rgba(35,209,106,.14), transparent 60%);
-      transition:opacity .2s ease;
-    }
-    .project-card:hover{ transform:translateY(-2px); border-color:rgba(35,209,106,.35); box-shadow:0 40px 80px rgba(22,163,74,.18), var(--shadow-md); }
-    .project-card:hover::after{ opacity:1; }
+      .mnav .danger{width:100%; margin-top:6px; padding:11px 12px; border-radius:12px; border:1px solid #3b2020;
+        background:linear-gradient(180deg,#6e2c2c,#5a2222); color:#ffeaea; font-weight:800}
 
-    .project-card .thumb{ position:relative; aspect-ratio: 16/9; background:#0b1117; overflow:hidden; }
-    .project-card .thumb img{ width:100%; height:100%; object-fit:cover; display:block; opacity:.95; transform:scale(1.02) }
-    .task-badges{ position:absolute; left:10px; bottom:10px; display:flex; gap:6px; }
-    .task-badge{ padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800; background:rgba(14,18,25,.8); border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(2px); }
-    .task-badge.visit{ color:#a0f2bd; border-color:#2a6f47 }
-    .task-badge.link{ color:#b2f5ff; border-color:#2a455e }
+      @media (max-width:360px){
+        .mnav .pill-addr{max-width:98px}
+        .mnav-bar{height:52px}
+        .mnav-brand .name{font-size:15px}
+      }
+      @media (min-width:720px){
+        .mnav-bar{height:60px}
+      }
 
-    .project-card .body{ flex:1; padding:14px; display:flex; flex-direction:column; gap:8px; }
-    .project-card h3{ font-size:16px; margin:0; line-height:1.35 }
-    .project-card p{ color:#b7c8c1; font-size:14px; margin:0 0 6px; line-height:1.55 }
-    .meta{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px; }
-    .meta .pill{ background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:6px; }
+      /* ===== PAGE HEADER ===== */
+      .page-head{
+        padding:28px 0 10px;
+        background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.35)), var(--noise);
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      .page-head h1{margin:0 0 6px; font-size:24px;}
+      .page-head .sub{color:var(--muted); margin:0; font-size:14px; line-height:1.55}
 
-    .progress{ height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:4px; }
-    .progress .bar{ height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow) }
+      /* ===== CONTROLS (sticky under header) ===== */
+      .controls-wrap{
+        position:sticky; top:56px; z-index:70; /* sits under .mnav */
+        background:linear-gradient(180deg, rgba(12,16,20,.9), rgba(10,12,16,.7));
+        backdrop-filter: blur(8px);
+        border-bottom:1px solid rgba(255,255,255,.06);
+      }
+      @media (min-width:720px){ .controls-wrap{ top:60px; } }
+      .controls{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0 12px;}
+      .tabs{display:flex; gap:8px; flex:1}
+      .tab{
+        flex:1; display:inline-flex; justify-content:center; align-items:center; gap:8px;
+        padding:10px 12px; border-radius:999px; border:1px solid #2a333f;
+        background:linear-gradient(180deg, rgba(14,18,25,.85), rgba(14,18,25,.55));
+        color:#cfe7dd; font-weight:900; cursor:pointer; letter-spacing:.3px; font-size:14px;
+        transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      }
+      .tab:active{ transform:scale(.98) }
+      .tab.active{ border-color:#2fe07a; color:#05160c; background:linear-gradient(180deg,#19b357,#119e49); box-shadow:var(--glow); }
 
-    .project-card .foot{ display:flex; gap:8px; justify-content:flex-end; margin-top:auto; }
-    .project-card .foot .btn{ padding:10px 12px; position:relative; z-index:6; }
+      .filters{display:flex; gap:8px; align-items:center;}
+      .dropdown{position:relative;}
+      .dropdown-toggle{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:10px 12px; border-radius:12px; border:1px solid #2a333f;
+        background:#0b1117; color:#d9f6e6; font-weight:800; cursor:pointer;
+        transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+        min-width:44px; min-height:44px;
+      }
+      .dropdown-toggle .caret{ font-size:12px; opacity:.8 }
+      .dropdown-menu{
+        position:absolute; top:110%; right:0; min-width:220px; padding:8px;
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.08); border-radius:14px; box-shadow:var(--shadow-md);
+        display:none; z-index:20;
+      }
+      .dropdown.open .dropdown-menu{ display:block; }
+      .dropdown-menu [role="option"]{
+        padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700; color:#cfe7dd;
+      }
+      .dropdown-menu [role="option"]:hover{ background:rgba(22,163,74,.12); color:#eafff4; }
+      .dropdown-menu [aria-selected="true"]{ background:rgba(22,163,74,.18); color:#eafff4; border:1px solid rgba(35,209,106,.35); }
 
-    /* Whole card clickable while preserving buttons */
-    .project-card .card-link{ position:absolute; inset:0; z-index:5; }
-    .project-card .card-link:focus{ outline:2px solid #2fe07a; outline-offset:-2px; border-radius:18px }
+      /* ===== GRID & CARDS ===== */
+      .section{padding:12px 0 20px;}
+      .grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+      @media (min-width:520px){ .grid{ grid-template-columns:repeat(2,1fr); gap:14px; } }
+      @media (min-width:880px){ .grid{ grid-template-columns:repeat(3,1fr); gap:18px; } }
 
-    /* PANELS */
-    .panel{ display:none; padding:14px 0 0; }
-    .panel.active{ display:block; }
+      .project-card{
+        position:relative; width:100%; display:flex; flex-direction:column; overflow:hidden;
+        background:linear-gradient(180deg, #0d1217, #0b0f14);
+        border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);
+        opacity:0; transform:translateY(8px); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      }
+      .project-card::after{
+        content:""; position:absolute; inset:-20%; pointer-events:none; opacity:0;
+        background:radial-gradient(60% 60% at 50% 10%, rgba(35,209,106,.14), transparent 60%);
+        transition:opacity .2s ease;
+      }
+      .project-card:hover{ transform:translateY(-2px); border-color:rgba(35,209,106,.35); box-shadow:0 40px 80px rgba(22,163,74,.18), var(--shadow-md); }
+      .project-card:hover::after{ opacity:1; }
 
-    /* Empty state */
-    .empty-state{
-      border:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg,#0f1419,#0c1116);
-      border-radius:18px;
-      box-shadow:var(--shadow-md);
-      padding:24px;
-      color:#cfe7dd;
-    }
-    .empty-state h3{ margin:0 0 8px; font-size:16px; }
-    .empty-state p{ margin:0; color:#9fb0aa; font-size:14px; }
+      .project-card .thumb{ position:relative; aspect-ratio: 16/9; background:#0b1117; overflow:hidden; }
+      .project-card .thumb img{ width:100%; height:100%; object-fit:cover; display:block; opacity:.95; transform:scale(1.02) }
+      .task-badges{ position:absolute; left:10px; bottom:10px; display:flex; gap:6px; }
+      .task-badge{ padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800; background:rgba(14,18,25,.8); border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(2px); }
+      .task-badge.visit{ color:#a0f2bd; border-color:#2a6f47 }
+      .task-badge.link{ color:#b2f5ff; border-color:#2a455e }
 
-    /* Lang switcher */
-    .lang{ position:relative; }
-    .lang-btn{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 10px; font-weight:800; border-radius:12px;
-      border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6;
-      cursor:pointer; min-height:36px;
-    }
-    .lang .chev{ opacity:.8 }
-    .lang-menu{
-      position:absolute; top:110%; right:0; width:210px;
-      background:linear-gradient(180deg, #0f1419, #0c1116);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45);
-      padding:6px; display:none; z-index:70;
-    }
-    .lang.open .lang-menu{ display:block; animation:menuIn .14s ease-out }
-    @keyframes menuIn{ from{ transform:translateY(-6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
-    .lang-item{
-      display:flex; align-items:center; gap:10px; padding:10px 10px; border-radius:10px;
-      cursor:pointer; color:#cfe7dd; font-weight:800;
-    }
-    .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
-    .flag-emoji{
-      display:inline-flex; align-items:center; justify-content:center;
-      width:18px; height:18px; line-height:18px;
-      font-size:14px; border-radius:3px;
-      background:rgba(255,255,255,.06);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-    }
+      .project-card .body{ flex:1; padding:14px; display:flex; flex-direction:column; gap:8px; }
+      .project-card h3{ font-size:16px; margin:0; line-height:1.35 }
+      .project-card p{ color:#b7c8c1; font-size:14px; margin:0 0 6px; line-height:1.55 }
+      .meta{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px; }
+      .meta .pill{ background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:6px; }
 
-    /* Footer */
-    .footer{ padding:24px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; margin-top:40px; font-size:13px; }
+      .progress{ height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:4px; }
+      .progress .bar{ height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow) }
+
+      .project-card .foot{ display:flex; gap:8px; justify-content:flex-end; margin-top:auto; }
+      .project-card .foot .btn{ padding:10px 12px; position:relative; z-index:6; }
+
+      .project-card .card-link{ position:absolute; inset:0; z-index:5; }
+      .project-card .card-link:focus{ outline:2px solid #2fe07a; outline-offset:-2px; border-radius:18px }
+
+      /* Empty state */
+      .empty-state{
+        border:1px solid rgba(255,255,255,.08);
+        background:linear-gradient(180deg,#0f1419,#0c1116);
+        border-radius:18px;
+        box-shadow:var(--shadow-md);
+        padding:24px; color:#cfe7dd;
+      }
+      .empty-state h3{ margin:0 0 8px; font-size:16px; }
+      .empty-state p{ margin:0; color:#9fb0aa; font-size:14px; }
+
+      /* FOOTER */
+      .footer{padding:18px 0 24px; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10; font-size:12px; margin-top:18px}
         </style>
     </head>
     <body>
-        <!-- ===== NAV ===== -->
-        <header class="nav">
-            <div class="container row">
-                <div class="brand">
-                    <span class="dot"></span>
-                    <span>LinkHash</span>
-                </div>
-                <nav class="links" aria-label="Primary">
-                    <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
-                        {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
-                    </a>
-                    <a aria-current="page" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
-                        {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
-                    </a>
-                    <a href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
-                        {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
-                    </a>
-                    <a href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
-                        {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
-                    </a>
-                    <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
-                        {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply{% endif %}
-                    </a>
+        <!-- ===== MOBILE HEADER (exact method as leaderboard) ===== -->
+        <header class="mnav" role="banner">
+            <div class="container mnav-bar">
+                <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}" class="mnav-brand" aria-label="LinkHash Home">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span class="name">LinkHash</span>
+                </a>
+                <div class="mnav-actions">
                     {% if wallet_user %}
-                    <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-                    <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-                        {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ログアウト{% elif meta.lang == 'zh' %}退出{% else %}Logout{% endif %}
-                    </a>
+                    <span class="pill-addr" title="{{ wallet_user.address }}">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
                     {% else %}
-                    <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
-                        {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
-                    </a>
+                    <button class="btn" type="button" onclick="(window.connectWallet||(()=>alert('Wallet script missing')))()">
+                        {% if meta.lang == 'ko' %}지갑{% elif meta.lang == 'ja' %}ウォレット{% elif meta.lang == 'zh' %}钱包{% else %}Wallet{% endif %}
+                    </button>
                     {% endif %}
-                    <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
-                        <button
-                            class="lang-btn"
-                            type="button"
-                            aria-haspopup="listbox"
-                            aria-expanded="false"
+                    <button
+                        class="mnav-toggle"
+                        id="mnavToggle"
+                        type="button"
+                        aria-controls="mnavSheet"
+                        aria-expanded="false"
+                        aria-label="Menu"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="22"
+                            height="22"
+                            aria-hidden="true"
                         >
-                            <span class="flag-emoji" aria-hidden="true"></span>
-                            <span class="label">
-                                {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
-                            </span>
-                            <svg
-                                class="chev"
-                                viewBox="0 0 20 20"
-                                width="16"
-                                height="16"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    d="M5 7l5 6 5-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                />
-                            </svg>
-                        </button>
-                        <ul
-                            class="lang-menu"
-                            role="listbox"
-                            tabindex="-1"
-                            aria-label="Select language"
-                        >
-                            <li
-                                class="lang-item"
-                                role="option"
-                                data-lang="en"
-                                data-flag="🇺🇸"
-                            >🇺🇸 English</li>
-                            <li
-                                class="lang-item"
-                                role="option"
-                                data-lang="ko"
-                                data-flag="🇰🇷"
-                            >🇰🇷 한국어</li>
-                            <li
-                                class="lang-item"
-                                role="option"
-                                data-lang="ja"
-                                data-flag="🇯🇵"
-                            >🇯🇵 日本語</li>
-                            <li
-                                class="lang-item"
-                                role="option"
-                                data-lang="zh"
-                                data-flag="🇨🇳"
-                            >🇨🇳 中文</li>
-                        </ul>
-                    </div>
+                            <path
+                                d="M4 6h16M4 12h16M4 18h16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Slide-down sheet -->
+            <div class="mnav-sheet" id="mnavSheet" hidden>
+                <nav class="mnav-list" aria-label="Primary">
+                    <a class="item" href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+                        🏠 {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
+                    </a>
+                    <a class="item active" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
+                        🎁 {% if meta.lang == 'ko' %}리워드{% elif meta.lang == 'ja' %}リワード{% elif meta.lang == 'zh' %}奖励{% else %}Rewards{% endif %}
+                    </a>
+                    <a class="item" href="{% if meta.lang == 'ko' %}/ko/events/{% elif meta.lang == 'ja' %}/ja/events/{% elif meta.lang == 'zh' %}/zh/events/{% else %}/events/{% endif %}">
+                        📣 {% if meta.lang == 'ko' %}이벤트{% elif meta.lang == 'ja' %}イベント{% elif meta.lang == 'zh' %}活动{% else %}Events{% endif %}
+                    </a>
+                    <a class="item" href="{% if meta.lang == 'ko' %}/ko/leaderboard/{% elif meta.lang == 'ja' %}/ja/leaderboard/{% elif meta.lang == 'zh' %}/zh/leaderboard/{% else %}/leaderboard/{% endif %}">
+                        🏆 {% if meta.lang == 'ko' %}리더보드{% elif meta.lang == 'ja' %}リーダーボード{% elif meta.lang == 'zh' %}排行榜{% else %}Leaderboard{% endif %}
+                    </a>
+                    <a class="item outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
+                        📝 {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
+                    </a>
                 </nav>
+                <!-- Language switcher -->
+                <div class="mnav-lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
+                    <button
+                        class="lang-btn"
+                        type="button"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                    >
+                        <span class="flag-emoji" aria-hidden="true"></span>
+                        <span class="label">
+                            {% if meta.lang == 'ko' %}한국어{% elif meta.lang == 'ja' %}日本語{% elif meta.lang == 'zh' %}中文{% else %}English{% endif %}
+                        </span>
+                        <svg
+                            class="chev"
+                            viewBox="0 0 20 20"
+                            width="14"
+                            height="14"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M5 7l5 6 5-6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+                    </button>
+                    <ul
+                        class="lang-menu"
+                        role="listbox"
+                        tabindex="-1"
+                        aria-label="Select language"
+                    >
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="en"
+                            data-flag="🇺🇸"
+                        >🇺🇸 English</li>
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="ko"
+                            data-flag="🇰🇷"
+                        >🇰🇷 한국어</li>
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="ja"
+                            data-flag="🇯🇵"
+                        >🇯🇵 日本語</li>
+                        <li
+                            class="lang-item"
+                            role="option"
+                            data-lang="zh"
+                            data-flag="🇨🇳"
+                        >🇨🇳 中文</li>
+                    </ul>
+                </div>
+                {% if wallet_user %}
+                <button class="danger" type="button" onclick="(window.logoutWallet||(()=>alert('Wallet script missing')))()">
+                    {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ログアウト{% elif meta.lang == 'zh' %}退出{% else %}Logout{% endif %}
+                </button>
+                {% endif %}
             </div>
         </header>
         <!-- ===== PAGE HEADER ===== -->
@@ -359,18 +351,18 @@
                 </h1>
                 <p class="sub">
                     {% if meta.lang == 'ko' %}
-          화이트햇 활동으로 USDT를 적립하세요. 실시간 진행률과 투명한 규칙.
-        {% elif meta.lang == 'ja' %}
-          ホワイトハット活動でUSDTを獲得。進捗はリアルタイム、ルールは透明。
-        {% elif meta.lang == 'zh' %}
-          通过白帽贡献赚取USDT。实时进度，规则透明。
-        {% else %}
-          Earn USDT for white-hat contributions. Live progress and transparent rules.
-        {% endif %}
+            화이트햇 활동으로 USDT를 적립하세요. 실시간 진행률과 투명한 규칙.
+          {% elif meta.lang == 'ja' %}
+            ホワイトハット活動でUSDTを獲得。進捗はリアルタイム、ルールは透明。
+          {% elif meta.lang == 'zh' %}
+            通过白帽贡献赚取USDT。实时进度，规则透明。
+          {% else %}
+            Earn USDT for white-hat contributions. Live progress and transparent rules.
+          {% endif %}
                 </p>
             </div>
         </section>
-        <!-- ===== CONTROLS (sticky) ===== -->
+        <!-- ===== CONTROLS ===== -->
         <div class="controls-wrap">
             <div class="container">
                 <div class="controls">
@@ -430,13 +422,13 @@
                 <!-- /controls -->
             </div>
         </div>
-        <!-- ===== PANELS ===== -->
-        <main class="container">
+        <!-- ===== LISTS ===== -->
+        <main class="container section">
             <!-- LIVE -->
             <section id="live" class="panel active" aria-labelledby="tab-live">
                 <div class="grid" id="liveGrid">
                     {% if projects %}
-          {% for c in projects %}
+            {% for c in projects %}
                     <article
                         class="project-card"
                         data-start="{{ c.start|date:'Y-m-d' }}"
@@ -452,7 +444,7 @@
                                 {% if c.has_visit %}
                                 <span class="task-badge visit">VISIT</span>
                                 {% endif %}
-                {% if c.has_link %}
+                  {% if c.has_link %}
                                 <span class="task-badge link">LINK</span>
                                 {% endif %}
                             </div>
@@ -487,7 +479,7 @@
                         </div>
                     </article>
                     {% endfor %}
-        {% else %}
+          {% else %}
                     <div class="empty-state" style="grid-column:1/-1">
                         <h3>
                             {% if meta.lang == 'ko' %}진행중인 캠페인이 없습니다{% elif meta.lang == 'ja' %}進行中のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无进行中的活动{% else %}No live campaigns right now{% endif %}
@@ -503,7 +495,7 @@
             <section id="past" class="panel" aria-labelledby="tab-past">
                 <div class="grid" id="pastGrid">
                     {% if past_projects %}
-          {% for c in past_projects %}
+            {% for c in past_projects %}
                     <article
                         class="project-card"
                         data-start="{{ c.start|date:'Y-m-d' }}"
@@ -519,7 +511,7 @@
                                 {% if c.has_visit %}
                                 <span class="task-badge visit">VISIT</span>
                                 {% endif %}
-                {% if c.has_link %}
+                  {% if c.has_link %}
                                 <span class="task-badge link">LINK</span>
                                 {% endif %}
                             </div>
@@ -554,7 +546,7 @@
                         </div>
                     </article>
                     {% endfor %}
-        {% else %}
+          {% else %}
                     <div class="empty-state" style="grid-column:1/-1">
                         <h3>
                             {% if meta.lang == 'ko' %}지난 캠페인이 없습니다{% elif meta.lang == 'ja' %}過去のキャンペーンはありません{% elif meta.lang == 'zh' %}暂无历史活动{% else %}No past campaigns yet{% endif %}
@@ -578,239 +570,265 @@
                 </div>
             </div>
         </footer>
-        <!-- ===== LIGHT INTERACTIONS ===== -->
+        <!-- ===== Interactions (animations + sorting) ===== -->
         <script type="module">
-    import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
-    import Lenis from 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.37/dist/lenis.min.mjs';
+      import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js';
 
-    const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.8, smoothWheel: true, normalizeWheel: true });
-    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf);
+      // Tabs
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.panel');
+      tabs.forEach(tab=>{
+        tab.addEventListener('click', ()=>{
+          tabs.forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+          panels.forEach(p=>p.classList.remove('active'));
+          tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+          const target = document.querySelector(tab.dataset.target);
+          if(target){ target.classList.add('active'); }
+          revealCards();
+          animateBarsWhenVisible();
+        });
+      });
 
-    // Tabs
-    const tabs = document.querySelectorAll('.tab');
-    const panels = document.querySelectorAll('.panel');
-    tabs.forEach(tab=>{
-      tab.addEventListener('click', ()=>{
-        tabs.forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-        panels.forEach(p=>p.classList.remove('active'));
-        tab.classList.add('active'); tab.setAttribute('aria-selected','true');
-        const target = document.querySelector(tab.dataset.target);
-        if(target){ target.classList.add('active'); }
+      // Dropdown
+      const dd = document.getElementById('sortDropdown');
+      const toggle = dd.querySelector('.dropdown-toggle');
+      const menu = dd.querySelector('.dropdown-menu');
+      const label = dd.querySelector('.dropdown-label');
+      function setDropdownValue(val, text){
+        dd.dataset.value = val;
+        label.textContent = text;
+        menu.querySelectorAll('[role="option"]').forEach(opt=>{
+          opt.setAttribute('aria-selected', String(opt.dataset.value === val));
+        });
+        applySort();
         revealCards();
         animateBarsWhenVisible();
+      }
+      toggle.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const open = dd.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-    });
-
-    // Dropdown
-    const dd = document.getElementById('sortDropdown');
-    const toggle = dd.querySelector('.dropdown-toggle');
-    const menu = dd.querySelector('.dropdown-menu');
-    const label = dd.querySelector('.dropdown-label');
-    function setDropdownValue(val, text){
-      dd.dataset.value = val;
-      label.textContent = text;
       menu.querySelectorAll('[role="option"]').forEach(opt=>{
-        opt.setAttribute('aria-selected', String(opt.dataset.value === val));
+        opt.tabIndex = 0;
+        opt.addEventListener('click', (e)=>{ e.stopPropagation(); setDropdownValue(opt.dataset.value, opt.textContent.trim()); dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); });
+        opt.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setDropdownValue(opt.dataset.value, opt.textContent.trim()); dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.focus(); }
+          if(e.key === 'Escape'){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.focus(); }
+        });
       });
+      document.addEventListener('click', ()=>{ if(dd.classList.contains('open')){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); } });
+
+      // Sorting
+      function parseNum(el, attr){ return parseFloat(el.getAttribute(attr) || '0'); }
+      function parseDate(el, attr){ const v = el.getAttribute(attr); return v ? new Date(v + 'T00:00:00Z') : new Date(0); }
+      function sortGrid(gridEl, mode, isLive=true){
+        const cards = Array.from(gridEl.querySelectorAll('.project-card'));
+        let sorter;
+        if(mode === 'ending'){ sorter = (a,b)=> parseDate(a,'data-end') - parseDate(b,'data-end'); if(!isLive) sorter = (a,b)=> parseDate(b,'data-end') - parseDate(a,'data-end'); }
+        else if(mode === 'new'){ sorter = (a,b)=> parseDate(b,'data-start') - parseDate(a,'data-start'); }
+        else if(mode === 'payout'){ sorter = (a,b)=> parseNum(b,'data-payout') - parseNum(a,'data-payout'); }
+        else if(mode === 'pool'){ sorter = (a,b)=> parseNum(b,'data-pool') - parseNum(a,'data-pool'); }
+        else if(mode === 'popular'){ sorter = (a,b)=> parseNum(b,'data-pop') - parseNum(a,'data-pop'); }
+        else { sorter = ()=>0; }
+        cards.sort(sorter).forEach(c=> gridEl.appendChild(c));
+      }
+      const liveGrid = document.getElementById('liveGrid');
+      const pastGrid = document.getElementById('pastGrid');
+      function applySort(){ const mode = dd.dataset.value || 'ending'; sortGrid(liveGrid, mode, true); sortGrid(pastGrid, mode, false); }
+
+      // Reveal
+      function revealCards(){
+        const cards = document.querySelectorAll('.panel.active .project-card');
+        cards.forEach((card, i)=>{
+          gsap.fromTo(card, {autoAlpha:0, y:8}, {autoAlpha:1, y:0, duration:.28, delay: i * 0.04, overwrite:true});
+        });
+      }
+
+      // Progress bars
+      const supportsIO = 'IntersectionObserver' in window;
+      const io = supportsIO ? new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+          if(!entry.isIntersecting) return;
+          animateOne(entry.target);
+          io.unobserve(entry.target);
+        });
+      }, { threshold: 0.05 }) : null;
+
+      function animateOne(b){
+        let pct = Number(b.dataset.pct);
+        if (!Number.isFinite(pct)) pct = 0;
+        pct = Math.max(0, Math.min(100, pct));
+        const target = pct + '%';
+        b.style.transition = 'none';
+        b.style.width = '0%';
+        requestAnimationFrame(()=>{
+          b.style.transition = 'width 900ms cubic-bezier(.2,1,.22,1)';
+          b.style.width = target;
+        });
+      }
+      function animateBarsWhenVisible(){
+        const bars = document.querySelectorAll('.panel.active .progress .bar');
+        if(!supportsIO){ bars.forEach(animateOne); return; }
+        bars.forEach(b=> io.observe(b));
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        bars.forEach(b=>{
+          const r = b.getBoundingClientRect();
+          if(r.top >= 0 && r.top <= vh){ animateOne(b); io.unobserve(b); }
+        });
+      }
+
+      // Initial
       applySort();
       revealCards();
       animateBarsWhenVisible();
-    }
-    toggle.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      const open = dd.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if(open){
-        const current = menu.querySelector('[aria-selected="true"]');
-        (current || menu.firstElementChild).focus?.();
-      }
-    });
-    menu.querySelectorAll('[role="option"]').forEach(opt=>{
-      opt.tabIndex = 0;
-      opt.addEventListener('click', (e)=>{ e.stopPropagation(); setDropdownValue(opt.dataset.value, opt.textContent.trim()); dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); });
-      opt.addEventListener('keydown', (e)=>{
-        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setDropdownValue(opt.dataset.value, opt.textContent.trim()); dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.focus(); }
-        if(e.key === 'Escape'){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.focus(); }
-      });
-    });
-    document.addEventListener('click', ()=>{ if(dd.classList.contains('open')){ dd.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); } });
-
-    // Sorting
-    function parseNum(el, attr){ return parseFloat(el.getAttribute(attr) || '0'); }
-    function parseDate(el, attr){ const v = el.getAttribute(attr); return v ? new Date(v + 'T00:00:00Z') : new Date(0); }
-    function sortGrid(gridEl, mode, isLive=true){
-      const cards = Array.from(gridEl.querySelectorAll('.project-card'));
-      let sorter;
-      if(mode === 'ending'){ sorter = (a,b)=> parseDate(a,'data-end') - parseDate(b,'data-end'); if(!isLive) sorter = (a,b)=> parseDate(b,'data-end') - parseDate(a,'data-end'); }
-      else if(mode === 'new'){ sorter = (a,b)=> parseDate(b,'data-start') - parseDate(a,'data-start'); }
-      else if(mode === 'payout'){ sorter = (a,b)=> parseNum(b,'data-payout') - parseNum(a,'data-payout'); }
-      else if(mode === 'pool'){ sorter = (a,b)=> parseNum(b,'data-pool') - parseNum(a,'data-pool'); }
-      else if(mode === 'popular'){ sorter = (a,b)=> parseNum(b,'data-pop') - parseNum(a,'data-pop'); }
-      else { sorter = ()=>0; }
-      cards.sort(sorter).forEach(c=> gridEl.appendChild(c));
-    }
-    const liveGrid = document.getElementById('liveGrid');
-    const pastGrid = document.getElementById('pastGrid');
-    function applySort(){ const mode = dd.dataset.value || 'ending'; sortGrid(liveGrid, mode, true); sortGrid(pastGrid, mode, false); }
-
-    // Reveal
-    function revealCards(){
-      const cards = document.querySelectorAll('.panel.active .project-card');
-      cards.forEach((card, i)=>{
-        gsap.fromTo(card, {autoAlpha:0, y:8}, {autoAlpha:1, y:0, duration:.28, delay: i * 0.04, overwrite:true});
-      });
-    }
-
-    // Progress bars (intersection-aware)
-    const supportsIO = 'IntersectionObserver' in window;
-    const io = supportsIO ? new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{
-        if(!entry.isIntersecting) return;
-        animateOne(entry.target);
-        io.unobserve(entry.target);
-      });
-    }, { threshold: 0.05 }) : null;
-
-    function animateOne(b){
-      let pct = Number(b.dataset.pct);
-      if (!Number.isFinite(pct)) pct = 0;
-      pct = Math.max(0, Math.min(100, pct));
-      const target = pct + '%';
-      b.style.transition = 'none';
-      b.style.width = '0%';
-      requestAnimationFrame(()=>{
-        b.style.transition = 'width 900ms cubic-bezier(.2,1,.22,1)';
-        b.style.width = target;
-      });
-    }
-    function animateBarsWhenVisible(){
-      const bars = document.querySelectorAll('.panel.active .progress .bar');
-      if(!supportsIO){ bars.forEach(animateOne); return; }
-      bars.forEach(b=> io.observe(b));
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      bars.forEach(b=>{
-        const r = b.getBoundingClientRect();
-        if(r.top >= 0 && r.top <= vh){ animateOne(b); io.unobserve(b); }
-      });
-    }
-
-    // Initial run
-    applySort();
-    revealCards();
-    animateBarsWhenVisible();
         </script>
+        <!-- Language switcher (same routing rules as leaderboard) -->
         <script>
-    // CSRF
-    function getCookie(name){
-      const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
-      return m ? decodeURIComponent(m[2]) : null;
-    }
-    async function apiGet(url){
-      const r = await fetch(url, { credentials: 'same-origin' });
-      if(!r.ok) throw new Error((await r.text()) || ('GET ' + url + ' failed'));
-      return r.json();
-    }
-    async function apiPost(url, json){
-      const r = await fetch(url, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || '' },
-        body: JSON.stringify(json || {})
-      });
-      if(!r.ok){
-        let msg; try{ msg = (await r.json()).error }catch(e){ msg = await r.text(); }
-        throw new Error(msg || ('POST ' + url + ' failed'));
-      }
-      return r.json();
-    }
+      (function(){
+        const $wrap = document.getElementById('langSwitcher');
+        if(!$wrap) return;
+        const $btn  = $wrap.querySelector('.lang-btn');
+        const $menu = $wrap.querySelector('.lang-menu');
+        const current = ($wrap.dataset.current || 'en').toLowerCase();
 
-    // Wallet login
-    async function connectWallet(){
-      try{
-        if(!window.ethereum){ alert('MetaMask not detected. Please install MetaMask.'); return; }
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const address = (accounts && accounts[0]) ? accounts[0] : null;
-        if(!address){ alert('No account selected.'); return; }
+        const flagEl = $btn.querySelector('.flag-emoji');
+        const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
+        flagEl.textContent = flagMap[current] || '🇺🇸';
 
-        const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
-        if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
-        const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
+        function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
+        $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
+        document.addEventListener('click', ()=> close());
+        document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
 
-        const signature = await window.ethereum.request({ method: 'personal_sign', params: [ message, address ] });
-        const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
-        if(verifyRes && verifyRes.ok){ window.location.reload(); } else { alert('Login failed.'); }
-      }catch(err){
-        console.error(err); alert('Wallet login failed: ' + (err && err.message ? err.message : err));
-      }
-    }
-    async function logoutWallet(){
-      try{ await apiPost('/api/auth/logout', {}); window.location.reload(); }
-      catch(err){ console.error(err); alert('Logout failed: ' + (err && err.message ? err.message : err)); }
-    }
-    window.connectWallet = connectWallet;
-    window.logoutWallet  = logoutWallet;
-        </script>
-        <script>
-    // Language switcher
-    (function(){
-      const $wrap = document.getElementById('langSwitcher');
-      if(!$wrap) return;
-      const $btn  = $wrap.querySelector('.lang-btn');
-      const $menu = $wrap.querySelector('.lang-menu');
-      const current = ($wrap.dataset.current || 'en').toLowerCase();
+        function pathFor(lang){
+          const loc = window.location;
+          const path = loc.pathname;
+          const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
+          const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
 
-      const flagEl = $btn.querySelector('.flag-emoji');
-      const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
-      flagEl.textContent = flagMap[current] || '🇺🇸';
-
-      function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
-      $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
-      document.addEventListener('click', ()=> close());
-      document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
-
-      function pathFor(lang){
-        const loc = window.location;
-        const path = loc.pathname;
-        const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
-
-        const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
-
-        // /rewards/apply/ variants
-        const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
-        if(isApply){
-          if(lang === 'en') return '/rewards/apply/?lang=en';
-          return `/rewards/apply/${lang}/`;
-        }
-
-        if(baseMap[clean]){
-          if(lang === 'en'){
-            const q = new URLSearchParams(loc.search);
-            q.set('lang','en');
-            return clean + (q.toString() ? `?${q.toString()}` : '');
+          // /rewards/apply/ variants
+          const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
+          if(isApply){
+            if(lang === 'en') return '/rewards/apply/?lang=en';
+            return `/rewards/apply/${lang}/`;
           }
-          return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
+
+          if(baseMap[clean]){
+            if(lang === 'en'){
+              const q = new URLSearchParams(loc.search);
+              q.set('lang','en');
+              return clean + (q.toString() ? `?${q.toString()}` : '');
+            }
+            return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
+          }
+
+          // Other pages: keep path, toggle ?lang=
+          const params = new URLSearchParams(loc.search);
+          params.set('lang', lang);
+          return path + (params.toString() ? `?${params.toString()}` : '');
         }
 
-        // Unknown/other page → keep path, toggle ?lang=xx
-        const params = new URLSearchParams(loc.search);
-        params.set('lang', lang);
-        return path + (params.toString() ? `?${params.toString()}` : '');
+        $menu.querySelectorAll('.lang-item').forEach(li=>{
+          li.addEventListener('click', ()=>{
+            const lang = li.getAttribute('data-lang');
+            const emoji = li.getAttribute('data-flag') || '';
+            flagEl.textContent = emoji;
+            $wrap.querySelector('.label').textContent =
+              lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
+            close();
+            const target = pathFor(lang);
+            if(target) window.location.href = target;
+          });
+        });
+      })();
+        </script>
+        <!-- CSRF + Wallet helpers (deep-link aware, same as leaderboard) -->
+        <script>
+      function getCookie(name){
+        const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
+        return m ? decodeURIComponent(m[2]) : null;
+      }
+      async function apiGet(url){
+        const r = await fetch(url, { credentials: 'same-origin' });
+        if(!r.ok) throw new Error((await r.text()) || ('GET ' + url + ' failed'));
+        return r.json();
+      }
+      async function apiPost(url, json){
+        const r = await fetch(url, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || '' },
+          body: JSON.stringify(json || {})
+        });
+        if(!r.ok){
+          let msg; try{ msg = (await r.json()).error }catch(e){ msg = await r.text(); }
+          throw new Error(msg || ('POST ' + url + ' failed'));
+        }
+        return r.json();
       }
 
-      $menu.querySelectorAll('.lang-item').forEach(li=>{
-        li.addEventListener('click', ()=>{
-          const lang = li.getAttribute('data-lang');
-          const emoji = li.getAttribute('data-flag') || '';
-          flagEl.textContent = emoji;
-          $wrap.querySelector('.label').textContent =
-            lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
-          close();
-          const target = pathFor(lang);
-          if(target) window.location.href = target;
-        });
-      });
-    })();
+      function pickEthereumProvider(){
+        const eth = window.ethereum;
+        if(!eth) return null;
+        if(Array.isArray(eth.providers)){
+          const mm = eth.providers.find(p => p.isMetaMask);
+          return mm || eth.providers[0] || eth;
+        }
+        return eth;
+      }
+      function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || ''); }
+      function buildMetaMaskDeepLink(){
+        const dapp = location.host + location.pathname + location.search + location.hash;
+        return 'https://metamask.app.link/dapp/' + dapp;
+      }
+
+      async function connectWallet(){
+        try{
+          const provider = pickEthereumProvider();
+          if(!provider){
+            if(isMobile()){ window.location.href = buildMetaMaskDeepLink(); return; }
+            else { alert('MetaMask not detected. Please install MetaMask and refresh.'); return; }
+          }
+          const accounts = await provider.request({ method: 'eth_requestAccounts' });
+          const address = (accounts && accounts[0]) ? accounts[0] : null;
+          if(!address){ alert('No account selected.'); return; }
+
+          const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
+          if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
+          const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
+
+          const signature = await provider.request({ method: 'personal_sign', params: [ message, address ] });
+          const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
+          if(verifyRes && verifyRes.ok){ window.location.reload(); } else { alert('Login failed.'); }
+        }catch(err){
+          console.error(err); alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+        }
+      }
+      async function logoutWallet(){
+        try{ await apiPost('/api/auth/logout', {}); window.location.reload(); }
+        catch(err){ console.error(err); alert('Logout failed: ' + (err && err.message ? err.message : err)); }
+      }
+      window.connectWallet = connectWallet;
+      window.logoutWallet  = logoutWallet;
+        </script>
+        <!-- Sheet toggle (exact behavior) -->
+        <script>
+      (function(){
+        const $toggle = document.getElementById('mnavToggle');
+        const $sheet  = document.getElementById('mnavSheet');
+        if($toggle && $sheet){
+          const open = ()=>{ $sheet.hidden = false; $toggle.setAttribute('aria-expanded','true'); document.documentElement.style.overflow='hidden'; };
+          const close= ()=>{ $sheet.hidden = true;  $toggle.setAttribute('aria-expanded','false'); document.documentElement.style.overflow=''; };
+          $toggle.addEventListener('click', ()=> $sheet.hidden ? open() : close());
+          document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
+          document.addEventListener('click', (e)=>{
+            if($sheet.hidden) return;
+            const within = e.target.closest('#mnavSheet') || e.target.closest('#mnavToggle');
+            if(!within) close();
+          });
+        }
+      })();
         </script>
     </body>
 </html>
