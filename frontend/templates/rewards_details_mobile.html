@@ -464,14 +464,6 @@
                                     <div class="note">
                                         {% if meta.lang == 'ko' %}아래 가이드를 따라 과제를 수행하세요. 화이트햇 활동만 허용됩니다.{% elif meta.lang == 'ja' %}以下のガイドに従って実施してください。ホワイトハット行為のみ許可します。{% elif meta.lang == 'zh' %}请按照下述指引完成任务，仅允许白帽操作。{% else %}Follow the guide below. Only white-hat contributions are allowed.{% endif %}
                                     </div>
-                                    {% if campaign.client_site_domain %}
-                                    <div class="note">
-                                        <strong>
-                                            {% if meta.lang == 'ko' %}사이트{% elif meta.lang == 'ja' %}サイト{% elif meta.lang == 'zh' %}站点{% else %}Site{% endif %}
-                                        </strong>
-                                        : {{ campaign.client_site_domain }}
-                                    </div>
-                                    {% endif %}
                   {% if campaign.rules %}
                                     <div class="note">
                                         <strong>
