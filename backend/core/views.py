@@ -622,32 +622,35 @@ def events_en(request):
 def events_ko(request):
     lang = "ko"
     events = _events_for_lang(lang)
-    return render(request, "events.html", {
+    ctx = {
         "meta": _meta_for_events(lang, request),
         "wallet_user": get_wallet_user(request),
         "lang": lang,
         "events": events,
-    })
+    }
+    return render_mobile_first(request, "events", ctx)
 
 def events_ja(request):
     lang = "ja"
     events = _events_for_lang(lang)
-    return render(request, "events.html", {
+    ctx = {
         "meta": _meta_for_events(lang, request),
         "wallet_user": get_wallet_user(request),
         "lang": lang,
         "events": events,
-    })
+    }
+    return render_mobile_first(request, "events", ctx)
 
 def events_zh(request):
     lang = "zh"
     events = _events_for_lang(lang)
-    return render(request, "events.html", {
+    ctx = {
         "meta": _meta_for_events(lang, request),
         "wallet_user": get_wallet_user(request),
         "lang": lang,
         "events": events,
-    })
+    }
+    return render_mobile_first(request, "events", ctx)
 
 # ================== WALLET AUTH API (EVM) ==================
 @require_GET
