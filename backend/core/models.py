@@ -107,6 +107,9 @@ class CampaignApplication(models.Model):
         max_digits=12, decimal_places=2, null=True, blank=True,
         validators=[MinValueValidator(Decimal("0"))]
     )
+    currency = models.CharField(
+        max_length=8, choices=Network.choices, default=Network.ETH
+    )
 
     # Dates (optional)
     start_date = models.DateField(null=True, blank=True)
@@ -180,6 +183,9 @@ class Campaign(models.Model):
     )
     payout_usdt = models.DecimalField(
         max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal("0"))]
+    )
+    currency = models.CharField(
+        max_length=8, choices=Network.choices, default=Network.ETH
     )
     start = models.DateField()
     end = models.DateField()
@@ -320,6 +326,8 @@ class Submission(models.Model):
         null=True, blank=True, help_text="Admin-assigned proof-of-work score (e.g., quality/DA)"
     )
     reviewer_note = models.TextField(blank=True)
+
+    admin_comment = models.TextField(null=True, blank=True)
 
     reviewed_by = models.ForeignKey(
         getattr(settings, "AUTH_USER_MODEL", "auth.User"),

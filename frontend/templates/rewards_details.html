@@ -560,7 +560,7 @@
                                     <!-- Left: instructions -->
                                     <div class="note important instr">
                                         <strong>
-                                            {% if meta.lang == 'ko' %}코드 찾는 방법{% elif meta.lang == 'ja' %}コードの見つけ方{% elif meta.lang == 'zh' %}如何找到验证码{% else %}How to find the code{% endif %}
+                                            {% if meta.lang == 'ko' %}정답 찾는 방법{% elif meta.lang == 'ja' %}正解の見つけ方{% elif meta.lang == 'zh' %}如何找到答案{% else %}How to find the answer{% endif %}
                                         </strong>
                                         <div style="margin-top:6px">
                                             {% if campaign.code_instructions %}
@@ -588,7 +588,7 @@
                                                 </li>
                                                 <li>
                                                     랜딩한 페이지를 끝까지 스크롤하여 푸터(footer)에 있는
-                                                    <em>CODE: xxxxxx</em>
+                                                    <em>정답: xxxxxx</em>
                                                     를 확인합니다.
                                                 </li>
                                                 <li>아래 입력창에 코드를 그대로 입력하고 제출하면 됩니다.</li>
@@ -615,7 +615,7 @@
                                                 </li>
                                                 <li>
                                                     遷移先ページを一番下までスクロールし、フッターにある
-                                                    <em>CODE: xxxxxx</em>
+                                                    <em>正解: xxxxxx</em>
                                                     を確認します。
                                                 </li>
                                                 <li>そのコードを下の入力欄に入力して送信してください。</li>
@@ -643,7 +643,7 @@
                                                 </li>
                                                 <li>
                                                     进入页面后滚动至页脚（footer），找到
-                                                    <em>CODE: xxxxxx</em>
+                                                    <em>答案：xxxxxx</em>
                                                     。
                                                 </li>
                                                 <li>将该代码原样填入下面输入框并提交。</li>
@@ -671,7 +671,7 @@
                                                 </li>
                                                 <li>
                                                     Scroll to the bottom of the landing page and locate
-                                                    <em>CODE: xxxxxx</em>
+                                                    <em>ANSWER: xxxxxx</em>
                                                     in the footer.
                                                 </li>
                                                 <li>Enter that code below exactly and submit.</li>
@@ -693,7 +693,7 @@
                                         <input
                                             type="text"
                                             name="code"
-                                            placeholder="{% if meta.lang == 'ko' %}코드 xxxxxx 입력{% elif meta.lang == 'ja' %}コード xxxxxx を入力{% elif meta.lang == 'zh' %}输入代码 xxxxxx{% else %}Enter code xxxxxx{% endif %}"
+                                            placeholder="{% if meta.lang == 'ko' %}정답 xxxxxx 입력{% elif meta.lang == 'ja' %}正解 xxxxxx を入力{% elif meta.lang == 'zh' %}输入答案 xxxxxx{% else %}Enter answer xxxxxx{% endif %}"
                                             required
                                         >
                                     </div>
