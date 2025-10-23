@@ -480,7 +480,7 @@
                                     <strong>
                                         {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
                                     </strong>
-                                    &nbsp; {{ c.pool_usdt }} USDT
+                                    &nbsp; {{ c.pool_usdt }} {{ c.currency|default:"USDT" }}
                                 </div>
                                 <div class="pill">
                                     <strong>
@@ -557,7 +557,7 @@
                                     <strong>
                                         {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
                                     </strong>
-                                    &nbsp; {{ c.pool_usdt }} USDT
+                                    &nbsp; {{ c.pool_usdt }} {{ c.currency|default:"USDT" }}
                                 </div>
                                 <div class="pill">
                                     <strong>

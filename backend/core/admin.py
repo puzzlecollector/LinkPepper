@@ -214,9 +214,11 @@ class CampaignApplicationAdmin(admin.ModelAdmin):
         "wants_link",
         "favicon_small",    # NEW: small preview + download
         "thumbnail_small",  # NEW: small preview + download
+        "currency", 
+        "currency_network",  
     )
-    search_fields = ("email", "phone", "campaign_title", "website_url")
-    list_filter = ("handled", "created_at", "country", "wants_visit", "wants_link")
+    search_fields = ("email", "phone", "campaign_title", "website_url", "currency", "currency_network")
+    list_filter = ("handled", "created_at", "country", "wants_visit", "wants_link",  "currency", "currency_network")
     readonly_fields = ("created_at", "favicon_large_preview", "thumbnail_large_preview")
     ordering = ("-created_at",)
 
@@ -229,7 +231,11 @@ class CampaignApplicationAdmin(admin.ModelAdmin):
             "description": "Exactly one should be true (Visit OR Link).",
         }),
         ("Dates & Budget", {
-            "fields": ("start_date", "end_date", "reward_pool_usdt", "payout_per_task_usdt"),
+            "fields": (
+                "start_date", "end_date",
+                "reward_pool_usdt", "payout_per_task_usdt",
+                "currency", "currency_network",   # <<< NEW
+            ),
         }),
         ("Verification & SEO", {
             "fields": ("visit_code", "current_seo_keywords"),
@@ -244,6 +250,7 @@ class CampaignApplicationAdmin(admin.ModelAdmin):
                        "airdrop_token_symbol", "airdrop_network", "airdrop_note"),
         }),
     )
+
 
     # --- Small previews in list view
     @admin.display(description="Favicon")
@@ -298,6 +305,8 @@ class CampaignApplicationAdmin(admin.ModelAdmin):
                 favicon_url=app.favicon_url or "",
                 pool_usdt=app.reward_pool_usdt or 0,
                 payout_usdt=app.payout_per_task_usdt or 0,
+                currency=app.currency,
+                currency_network=app.currency_network or Network.ETH,
                 start=app.start_date or timezone.localdate(),
                 end=app.end_date or timezone.localdate(),
                 airdrop_enabled=app.airdrop_enabled,
@@ -357,15 +366,16 @@ class CampaignAdmin(admin.ModelAdmin):
         "id", "title", "slug", "task_type", "is_published", "is_paused",
         "pool_usdt", "payout_usdt", "participants", "claimed_percent",
         "start", "end", "client_site_domain", "visit_code",
-        "favicon_small", "image_small", "preview",
+        "favicon_small", "image_small", "preview", "currency", "currency_network", 
     )
 
     search_fields = (
         "title", "slug", "summary", "long_description",
-        "client_site_domain", "seo_keywords", "visit_code",
+        "client_site_domain", "seo_keywords", "visit_code", "currency", "currency_network", 
     )
 
-    list_filter = ("task_type", HasVisitCodeFilter, "is_published", "is_paused", "start", "end")
+    list_filter = ("task_type", HasVisitCodeFilter, "is_published", "is_paused", "start", "end",
+                   "currency", "currency_network", )
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ("created_at", "updated_at", "image_large_preview", "favicon_large_preview")
     date_hierarchy = "start"
@@ -384,9 +394,12 @@ class CampaignAdmin(admin.ModelAdmin):
         ("Assets", {
             "fields": ("image_url", "favicon_url", "image_large_preview", "favicon_large_preview"),
         }),
-        # Optional extra uploads (keep if you want an extra “append image” button below editors)
         ("Rewards & Window", {
-            "fields": ("pool_usdt", "payout_usdt", "start", "end"),
+            "fields": (
+                "pool_usdt", "payout_usdt",
+                "currency", "currency_network",     # <<< NEW
+                "start", "end",
+            ),
         }),
         ("Airdrop (optional)", {
             "classes": ("collapse",),
@@ -401,6 +414,7 @@ class CampaignAdmin(admin.ModelAdmin):
             "fields": ("created_at", "updated_at"),
         }),
     )
+
 
     # small previews for list view (with Download)
     @admin.display(description="Favicon")
@@ -467,6 +481,7 @@ class SubmissionAdmin(admin.ModelAdmin):
     list_display = (
         "id", "campaign", "user", "wallet_address", "network", "status",
         "post_url", "visited_url", "code_entered",
+        "campaign_currency", "campaign_currency_network",
         "proof_score", "is_approved", "is_paid",
         "user_comment_short", "admin_comment_short",  # NEW columns
         "created_at", "reviewed_at", "payout_admin_link",
@@ -503,6 +518,9 @@ class SubmissionAdmin(admin.ModelAdmin):
                 "status", "proof_score", "is_approved", "is_paid",
             )
         }),
+        ("Payout Info", {
+            "fields": ("campaign_currency", "campaign_currency_network",),
+        }),
         ("Task Data", {
             "fields": ("post_url", "visited_url", "code_entered"),
         }),
@@ -518,6 +536,15 @@ class SubmissionAdmin(admin.ModelAdmin):
             "fields": ("created_at",),
         }),
     )
+
+    @admin.display(description="Currency")
+    def campaign_currency(self, obj):
+        return getattr(getattr(obj, "campaign", None), "currency", None) or "-"
+
+    @admin.display(description="Currency Net")
+    def campaign_currency_network(self, obj):
+        net = getattr(getattr(obj, "campaign", None), "currency_network", None)
+        return net or "-"
 
     # ---------- List table helper columns ----------
     @admin.display(description="User Comment")

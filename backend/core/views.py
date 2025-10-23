@@ -564,6 +564,14 @@ def rewards_apply_submit(request):
     phone = (data.get("phone") or "").strip()
     if not email or not phone:
         return JsonResponse({"ok": False, "error": "email and phone required"}, status=400)
+    
+
+    # NEW: read & normalize currency + network
+    currency = (data.get("currency") or "").strip() or None
+    raw_net = (data.get("currency_network") or "").strip().upper()
+    # Guard against invalid values; fallback to ETH
+    valid_nets = {k for k, _ in Network.choices}
+    currency_network = raw_net if raw_net in valid_nets else Network.ETH
 
     app = CampaignApplication.objects.create(
         email=email,
@@ -579,6 +587,8 @@ def rewards_apply_submit(request):
         current_seo_keywords=(data.get("current_seo_keywords") or "").strip(),
         reward_pool_usdt=(data.get("reward_pool_usdt") or None) or None,
         payout_per_task_usdt=(data.get("payout_per_task_usdt") or None) or None,
+        currency=currency,
+        currency_network=currency_network,
         start_date=(data.get("start_date") or None) or None,
         end_date=(data.get("end_date") or None) or None,
         airdrop_enabled=bool(data.get("airdrop_enabled")),

@@ -344,13 +344,13 @@
                             <strong>
                                 {% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}
                             </strong>
-                            &nbsp; {{ campaign.pool_usdt|default:"0" }} USDT
+                            &nbsp; {{ campaign.pool_usdt|default:"0" }} {{ campaign.currency|default:"USDT" }}
                         </span>
                         <span class="fact">
                             <strong>
                                 {% if meta.lang == 'ko' %}개별 보상{% elif meta.lang == 'ja' %}個別報酬{% elif meta.lang == 'zh' %}单次奖励{% else %}Payout{% endif %}
                             </strong>
-                            &nbsp; {{ campaign.payout_usdt|default:"-" }} USDT
+                            &nbsp; {{ campaign.payout_usdt|default:"-" }} {{ campaign.currency|default:"USDT" }}
                         </span>
                         <span class="fact">
                             <strong>
@@ -747,11 +747,11 @@
                     </div>
                     <div class="row">
                         <span class="label">{% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</span>
-                        <span>{{ campaign.pool_usdt|default:"0" }} USDT</span>
+                        <span>{{ campaign.pool_usdt|default:"0" }} {{ campaign.currency|default:"USDT" }}</span>
                     </div>
                     <div class="row">
                         <span class="label">{% if meta.lang == 'ko' %}개별 보상{% elif meta.lang == 'ja' %}個別報酬{% elif meta.lang == 'zh' %}单次奖励{% else %}Payout{% endif %}</span>
-                        <span>{{ campaign.payout_usdt|default:"-" }} USDT</span>
+                        <span>{{ campaign.payout_usdt|default:"-" }} {{ campaign.currency|default:"USDT" }}</span>
                     </div>
                     <div class="row">
                         <span class="label">{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}参加者{% elif meta.lang == 'zh' %}参与者{% else %}Participants{% endif %}</span>

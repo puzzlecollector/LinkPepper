@@ -472,9 +472,9 @@
                                     <span class="pill-label">
                                         {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Reward pool{% endif %}
                                     </span>
-                                    <span class="pill-val" aria-label="{{ c.pool_usdt }} USDT">
+                                    <span class="pill-val" aria-label="{{ c.pool_usdt }} {{ c.currency|default:'USDT' }}">
                                         <span class="amount">{{ c.pool_usdt }}</span>
-                                        <span class="unit">USDT</span>
+                                        <span class="unit">{{ c.currency|default:"USDT" }}</span>
                                     </span>
                                 </div>
                                 <!-- Participants pill -->
@@ -544,9 +544,9 @@
                                     <span class="pill-label">
                                         {% if meta.lang == 'ko' %}리워드 풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Reward pool{% endif %}
                                     </span>
-                                    <span class="pill-val" aria-label="{{ c.pool_usdt }} USDT">
+                                    <span class="pill-val" aria-label="{{ c.pool_usdt }} {{ c.currency|default:'USDT' }}">
                                         <span class="amount">{{ c.pool_usdt }}</span>
-                                        <span class="unit">USDT</span>
+                                        <span class="unit">{{ c.currency|default:"USDT" }}</span>
                                     </span>
                                 </div>
                                 <div class="pill">
