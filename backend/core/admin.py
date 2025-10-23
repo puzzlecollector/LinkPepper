@@ -446,61 +446,91 @@ class CampaignAdmin(admin.ModelAdmin):
 
 # ---------- Submission
 
+# --- Custom form for Submission: relabel fields
+class SubmissionAdminForm(forms.ModelForm):
+    class Meta:
+        model = Submission
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "comment" in self.fields:
+            self.fields["comment"].label = "User Comment"  # read-only (via ModelAdmin)
+        if "admin_comment" in self.fields:
+            self.fields["admin_comment"].label = "Admin Comment"  # editable
+
+
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
+    form = SubmissionAdminForm
+
     list_display = (
-        "id",
-        "campaign",
-        "user",
-        "wallet_address",
-        "network",
-        "status",
-        "post_url",
-        "visited_url",
-        "code_entered",
-        "proof_score",
-        "is_approved",
-        "is_paid",
-        "created_at",
-        "reviewed_at",
-        "payout_admin_link",
+        "id", "campaign", "user", "wallet_address", "network", "status",
+        "post_url", "visited_url", "code_entered",
+        "proof_score", "is_approved", "is_paid",
+        "user_comment_short", "admin_comment_short",  # NEW columns
+        "created_at", "reviewed_at", "payout_admin_link",
     )
+
     list_filter = (
-        NeedsReviewFilter,
-        HasPayoutFilter,
-        "status",
-        "campaign",
-        "network",
-        "is_approved",
-        "is_paid",
-        "created_at",
+        NeedsReviewFilter, HasPayoutFilter, "status", "campaign", "network",
+        "is_approved", "is_paid", "created_at",
     )
+
     search_fields = (
         "wallet_address",
-        "user__address",
-        "user__display_name",
-        "user__email",
-        "post_url",
-        "visited_url",
-        "code_entered",
-        "comment",
+        "user__address", "user__display_name", "user__email",
+        "post_url", "visited_url", "code_entered",
+        "comment",       # user comment (read-only here)
+        "admin_comment", # admin comment (editable)
     )
+
     autocomplete_fields = ("campaign", "user")
-    readonly_fields = ("created_at",)
+
+    # Make user comment read-only; admin_comment remains editable
+    readonly_fields = ("created_at", "comment")  # <- comment shown but not editable
+
     inlines = (PayoutInline,)
     list_select_related = ("campaign", "user")
     date_hierarchy = "created_at"
     ordering = ("-created_at",)
 
-    actions = (
-        "mark_approved",
-        "mark_rejected",
-        "create_payouts_for_selected",
-        "set_score_1",
-        "set_score_3",
-        "set_score_5",
+    # Optional: organize the form with fieldsets so comments are obvious
+    fieldsets = (
+        (None, {
+            "fields": (
+                "campaign", "user", "wallet_address", "network",
+                "status", "proof_score", "is_approved", "is_paid",
+            )
+        }),
+        ("Task Data", {
+            "fields": ("post_url", "visited_url", "code_entered"),
+        }),
+        ("Comments", {  # <- clear grouping
+            "fields": ("comment", "admin_comment"),
+            "description": "“User Comment” is read-only (what the user submitted). “Admin Comment” is visible on the public page."
+        }),
+        ("Review", {
+            "fields": ("reviewed_at",),
+        }),
+        ("Timestamps", {
+            "classes": ("collapse",),
+            "fields": ("created_at",),
+        }),
     )
 
+    # ---------- List table helper columns ----------
+    @admin.display(description="User Comment")
+    def user_comment_short(self, obj):
+        txt = (obj.comment or "").strip()
+        return (txt[:80] + "…") if len(txt) > 80 else (txt or "-")
+
+    @admin.display(description="Admin Comment")
+    def admin_comment_short(self, obj):
+        txt = (obj.admin_comment or "").strip()
+        return (txt[:80] + "…") if len(txt) > 80 else (txt or "-")
+
+    # ---------- Payout link ----------
     @admin.display(description="Payout")
     def payout_admin_link(self, obj):
         payout = getattr(obj, "payout", None)
@@ -513,8 +543,7 @@ class SubmissionAdmin(admin.ModelAdmin):
             pk=payout.pk,
         )
 
-    # ----- Actions
-
+    # ---------- Actions (unchanged) ----------
     @admin.action(description="Approve (status=APPROVED)")
     def mark_approved(self, request, qs):
         n = 0

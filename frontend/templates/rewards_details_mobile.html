@@ -480,6 +480,10 @@
                                     {% for s in examples %}
                                     <div class="example">
                                         <div style="margin-bottom:6px;">
+                                        {# Show admin comment if set; otherwise show task-type placeholder #}
+                                        {% if s.admin_comment %}
+                                            <span class="rt" style="color:#cfe7dd">{{ s.admin_comment }}</span>
+                                        {% else %}
                                             {% if s.post_url %}
                                             <span style="color:#cfe7dd">
                                                 {% if meta.lang == 'ko' %}외부 게시물 제출{% elif meta.lang == 'ja' %}外部投稿を提出{% elif meta.lang == 'zh' %}已提交外部帖子{% else %}External post submitted{% endif %}
@@ -489,8 +493,11 @@
                                                 {% if meta.lang == 'ko' %}방문 완료{% elif meta.lang == 'ja' %}訪問完了{% elif meta.lang == 'zh' %}已访问{% else %}Visit recorded{% endif %}
                                             </span>
                                             {% else %}
-                                            <span style="color:#cfe7dd">{{ s.comment|default:"(no comment)" }}</span>
+                                            <span style="color:#cfe7dd">
+                                                {% if meta.lang == 'ko' %}제출됨{% elif meta.lang == 'ja' %}送信済み{% elif meta.lang == 'zh' %}已提交{% else %}Submitted{% endif %}
+                                            </span>
                                             {% endif %}
+                                        {% endif %}
                                         </div>
                                         <div class="meta">
                                             <span class="addr">
