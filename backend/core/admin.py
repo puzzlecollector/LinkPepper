@@ -800,89 +800,89 @@ class EventAdmin(admin.ModelAdmin):
         self.message_user(request, f"Created {created} duplicate event(s). Edit and publish when ready.", level=messages.SUCCESS)
 
 
-@admin.register(Network)
-class NetworkAdmin(admin.ModelAdmin):
-    """
-    Manage networks (add/edit/delete) and see per-network stats.
-    Assumes Campaign.currency_network and Submission.network reference this model
-    (FK) or at least store its PK.
-    """
-    list_display = (
-        "id", "code", "name", "chain_id",
-        "campaigns_count", "submissions_count", "payouts_count",
-        "total_pool_usdt", "total_payouts_usdt",
-        "is_active",
-    )
-    list_filter = ("is_active",)
-    search_fields = ("code", "name")
-    ordering = ("code",)
+# @admin.register(Network)
+# class NetworkAdmin(admin.ModelAdmin):
+#     """
+#     Manage networks (add/edit/delete) and see per-network stats.
+#     Assumes Campaign.currency_network and Submission.network reference this model
+#     (FK) or at least store its PK.
+#     """
+#     list_display = (
+#         "id", "code", "name", "chain_id",
+#         "campaigns_count", "submissions_count", "payouts_count",
+#         "total_pool_usdt", "total_payouts_usdt",
+#         "is_active",
+#     )
+#     list_filter = ("is_active",)
+#     search_fields = ("code", "name")
+#     ordering = ("code",)
 
-    # If your model fields differ, adjust the tuple above accordingly.
+#     # If your model fields differ, adjust the tuple above accordingly.
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
+#     def get_queryset(self, request):
+#         qs = super().get_queryset(request)
 
-        # Annotate counts/sums. Adjust field names if your FKs/related_names differ.
-        # Assumes:
-        #   Campaign.currency_network -> FK to NetworkModel
-        #   Submission.network        -> FK to NetworkModel
-        #   Payout.campaign -> FK to Campaign; Payout.amount_usdt numeric
-        #
-        # We do it via conditional aggregates to avoid relying on related_name.
-        from .models import Campaign, Submission, Payout
+#         # Annotate counts/sums. Adjust field names if your FKs/related_names differ.
+#         # Assumes:
+#         #   Campaign.currency_network -> FK to NetworkModel
+#         #   Submission.network        -> FK to NetworkModel
+#         #   Payout.campaign -> FK to Campaign; Payout.amount_usdt numeric
+#         #
+#         # We do it via conditional aggregates to avoid relying on related_name.
+#         from .models import Campaign, Submission, Payout
 
-        return qs.annotate(
-            _camp_count=Count(
-                "pk",
-                filter=Q(pk__in=Campaign.objects.filter(currency_network_id__isnull=False)
-                                            .values_list("currency_network_id", flat=True)),
-                distinct=True
-            ),
-            _sub_count=Count(
-                "pk",
-                filter=Q(pk__in=Submission.objects.filter(network_id__isnull=False)
-                                                .values_list("network_id", flat=True)),
-                distinct=True
-            ),
-            _pool_sum=Sum(
-                # sum Campaign.pool_usdt per network
-                Campaign.objects.filter(currency_network_id=admin.models.OuterRef("pk"))
-                                .values("currency_network_id")
-                                .annotate(s=Sum("pool_usdt")).values("s"),
-                default=0
-            ),
-            _payout_sum=Sum(
-                # sum Payout.amount_usdt for campaigns on this network
-                Payout.objects.filter(campaign__currency_network_id=admin.models.OuterRef("pk"))
-                                .values("campaign__currency_network_id")
-                                .annotate(s=Sum("amount_usdt")).values("s"),
-                default=0
-            ),
-            _payouts_count=Count(
-                Payout.objects.filter(campaign__currency_network_id=admin.models.OuterRef("pk"))
-                                .values("campaign__currency_network_id")
-                                .annotate(c=Count("id")).values("c"),
-            ),
-        )
+#         return qs.annotate(
+#             _camp_count=Count(
+#                 "pk",
+#                 filter=Q(pk__in=Campaign.objects.filter(currency_network_id__isnull=False)
+#                                             .values_list("currency_network_id", flat=True)),
+#                 distinct=True
+#             ),
+#             _sub_count=Count(
+#                 "pk",
+#                 filter=Q(pk__in=Submission.objects.filter(network_id__isnull=False)
+#                                                 .values_list("network_id", flat=True)),
+#                 distinct=True
+#             ),
+#             _pool_sum=Sum(
+#                 # sum Campaign.pool_usdt per network
+#                 Campaign.objects.filter(currency_network_id=admin.models.OuterRef("pk"))
+#                                 .values("currency_network_id")
+#                                 .annotate(s=Sum("pool_usdt")).values("s"),
+#                 default=0
+#             ),
+#             _payout_sum=Sum(
+#                 # sum Payout.amount_usdt for campaigns on this network
+#                 Payout.objects.filter(campaign__currency_network_id=admin.models.OuterRef("pk"))
+#                                 .values("campaign__currency_network_id")
+#                                 .annotate(s=Sum("amount_usdt")).values("s"),
+#                 default=0
+#             ),
+#             _payouts_count=Count(
+#                 Payout.objects.filter(campaign__currency_network_id=admin.models.OuterRef("pk"))
+#                                 .values("campaign__currency_network_id")
+#                                 .annotate(c=Count("id")).values("c"),
+#             ),
+#         )
 
-    @admin.display(description="Campaigns")
-    def campaigns_count(self, obj):
-        return getattr(obj, "_camp_count", 0)
+#     @admin.display(description="Campaigns")
+#     def campaigns_count(self, obj):
+#         return getattr(obj, "_camp_count", 0)
 
-    @admin.display(description="Submissions")
-    def submissions_count(self, obj):
-        return getattr(obj, "_sub_count", 0)
+#     @admin.display(description="Submissions")
+#     def submissions_count(self, obj):
+#         return getattr(obj, "_sub_count", 0)
 
-    @admin.display(description="Payouts")
-    def payouts_count(self, obj):
-        return getattr(obj, "_payouts_count", 0)
+#     @admin.display(description="Payouts")
+#     def payouts_count(self, obj):
+#         return getattr(obj, "_payouts_count", 0)
 
-    @admin.display(description="Total pool (USDT)")
-    def total_pool_usdt(self, obj):
-        val = getattr(obj, "_pool_sum", 0) or 0
-        return round(val, 2)
+#     @admin.display(description="Total pool (USDT)")
+#     def total_pool_usdt(self, obj):
+#         val = getattr(obj, "_pool_sum", 0) or 0
+#         return round(val, 2)
 
-    @admin.display(description="Total paid (USDT)")
-    def total_payouts_usdt(self, obj):
-        val = getattr(obj, "_payout_sum", 0) or 0
-        return round(val, 2)
+#     @admin.display(description="Total paid (USDT)")
+#     def total_payouts_usdt(self, obj):
+#         val = getattr(obj, "_payout_sum", 0) or 0
+#         return round(val, 2)
