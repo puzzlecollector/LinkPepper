@@ -107,7 +107,11 @@ class CampaignApplication(models.Model):
         max_digits=12, decimal_places=2, null=True, blank=True,
         validators=[MinValueValidator(Decimal("0"))]
     )
-    currency = models.CharField(
+    # NEW: currency is free text (nullable), e.g. "USDT", "USDC", "BONK"
+    currency = models.CharField(max_length=24, blank=True, null=True)
+
+    # NEW: currency_network keeps on-chain network choice (ETH/SOL/BNB/POL)
+    currency_network = models.CharField(
         max_length=8, choices=Network.choices, default=Network.ETH
     )
 
@@ -184,7 +188,11 @@ class Campaign(models.Model):
     payout_usdt = models.DecimalField(
         max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal("0"))]
     )
-    currency = models.CharField(
+    # NEW: currency is free text (nullable), e.g. "USDT", "USDC", "BONK"
+    currency = models.CharField(max_length=24, blank=True, null=True)
+
+    # NEW: currency_network keeps on-chain network choice (ETH/SOL/BNB/POL)
+    currency_network = models.CharField(
         max_length=8, choices=Network.choices, default=Network.ETH
     )
     start = models.DateField()
