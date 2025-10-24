@@ -22,7 +22,7 @@ from django.conf import settings  # <-- add this
 
 # Defaults for “How to use” guide links (can be overridden in settings.py)
 GUIDE_DEFAULTS = {
-    "instagram": "https://www.instagram.com/meetandspeakenglish/",
+    "instagram": "https://www.instagram.com",
     "twitter":   "https://x.com",
 }
 
