@@ -17,6 +17,15 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from eth_account.messages import encode_defunct
 from eth_account import Account
 from django.template.loader import select_template
+
+from django.conf import settings  # <-- add this
+
+# Defaults for “How to use” guide links (can be overridden in settings.py)
+GUIDE_DEFAULTS = {
+    "instagram": "https://www.instagram.com/meetandspeakenglish/",
+    "twitter":   "https://x.com",
+}
+
 # IMPORTANT: import models from the rewards app
 from .models import (
     WalletUser,
@@ -100,7 +109,22 @@ def render_mobile_first(request, base_template_name: str, context: dict):
     Try {base}_mobile.html first when mobile is preferred, then fallback.
     Also persists explicit choice into a cookie when present, and sets Vary
     so caches don’t mix variants.
+
+    Additionally: injects guide URLs into meta so all templates can read
+    meta.instagram_guide_url and meta.twitter_guide_url.
     """
+    # --- Inject guide URLs into meta (with settings overrides) ---
+    ctx = dict(context or {})
+    meta = dict(ctx.get("meta") or {})
+
+    ig_url = getattr(settings, "INSTAGRAM_GUIDE_URL", GUIDE_DEFAULTS["instagram"])
+    tw_url = getattr(settings, "TWITTER_GUIDE_URL",   GUIDE_DEFAULTS["twitter"])
+    # Don’t clobber if already set explicitly upstream
+    meta.setdefault("instagram_guide_url", ig_url)
+    meta.setdefault("twitter_guide_url",   tw_url)
+    ctx["meta"] = meta
+
+    # --- Choose template (mobile-first) ---
     template_candidates = []
     use_mobile = _should_use_mobile(request)
     if use_mobile:
@@ -108,7 +132,7 @@ def render_mobile_first(request, base_template_name: str, context: dict):
     template_candidates.append(f"{base_template_name}.html")
 
     t = select_template(template_candidates)
-    resp = render(request, t.template.name, context)
+    resp = render(request, t.template.name, ctx)
 
     # Persist explicit choice to a cookie (so it sticks across pages)
     override = _query_overrides_mobile(request)
@@ -124,6 +148,7 @@ def render_mobile_first(request, base_template_name: str, context: dict):
     vary = resp.get("Vary")
     resp["Vary"] = (vary + ", " if vary else "") + "Cookie, User-Agent, Host, Accept-Language"
     return resp
+
 
 def _normalize_evm_address(addr: str | None) -> str | None:
     """

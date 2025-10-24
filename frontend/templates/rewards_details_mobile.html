@@ -276,13 +276,42 @@
                     <span class="name">LinkHash</span>
                 </a>
                 <div class="mnav-actions">
-                    {% if wallet_user %}
-                    <span class="pill-addr" title="{{ wallet_user.address }}">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
-                    {% else %}
-                    <button class="btn" type="button" onclick="(window.connectWallet||(()=>alert('Wallet script missing')))()">
-                        {% if meta.lang == 'ko' %}지갑{% elif meta.lang == 'ja' %}ウォレット{% elif meta.lang == 'zh' %}钱包{% else %}Wallet{% endif %}
-                    </button>
-                    {% endif %}
+                    {% with ig=meta.instagram_guide_url|default:'https://www.instagram.com/' tw=meta.twitter_guide_url|default:'https://x.com/' %}
+                        <div class="howto">
+                        <span class="howto-label">
+                            {% if meta.lang == 'ko' %}이용 방법:{% elif meta.lang == 'ja' %}使い方:{% elif meta.lang == 'zh' %}使用方法：{% else %}How to use:{% endif %}
+                        </span>
+
+                        <!-- Instagram guide (icon only) -->
+                        <a class="pill"
+                            href="{{ ig }}"
+                            target="_blank"
+                            rel="noopener"
+                            aria-label="{% if meta.lang == 'ko' %}인스타그램 가이드{% elif meta.lang == 'ja' %}Instagramガイド{% elif meta.lang == 'zh' %}Instagram 指南{% else %}Instagram Guide{% endif %}"
+                            title="{% if meta.lang == 'ko' %}인스타그램 가이드{% elif meta.lang == 'ja' %}Instagramガイド{% elif meta.lang == 'zh' %}Instagram 指南{% else %}Instagram Guide{% endif %}">
+                            <span class="icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM18.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                            </svg>
+                            </span>
+                        </a>
+
+                        <!-- X (Twitter) guide (icon only) -->
+                        <a class="pill"
+                            href="{{ tw }}"
+                            target="_blank"
+                            rel="noopener"
+                            aria-label="{% if meta.lang == 'ko' %}X 가이드{% elif meta.lang == 'ja' %}Xガイド{% elif meta.lang == 'zh' %}X 指南{% else %}X Guide{% endif %}"
+                            title="{% if meta.lang == 'ko' %}X 가이드{% elif meta.lang == 'ja' %}Xガイド{% elif meta.lang == 'zh' %}X 指南{% else %}X Guide{% endif %}">
+                            <span class="icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M3 3h3.3l5.3 7.2L15.9 3H21l-8.1 10.6L21 21h-3.3l-6-8.1L8.1 21H3l8-10.4L3 3z"/>
+                            </svg>
+                            </span>
+                        </a>
+                        </div>
+                        {% endwith %}
+
                     <button
                         class="mnav-toggle"
                         id="mnavToggle"
