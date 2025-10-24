@@ -83,7 +83,9 @@
         background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
       .mnav .lang-menu{position:absolute; top:110%; left:0; min-width:200px; padding:6px; margin:0; list-style:none; display:none; z-index:90;
         background:linear-gradient(180deg,#0f1419,#0c1116); border:1px solid rgba(255,255,255,.08); border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45)}
-      .mnav .lang.open .lang-menu{display:block; animation:mnavMenuIn .14s ease-out}
+      .mnav .lang.open .lang-menu,
+      .mnav .mnav-lang.open .lang-menu{display:block; animation:mnavMenuIn .14s ease-out}
+
       @keyframes mnavMenuIn{from{transform:translateY(-6px);opacity:0} to{transform:translateY(0);opacity:1}}
       .mnav .lang-item{display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; color:#cfe7dd; font-weight:700;}
       .mnav .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
