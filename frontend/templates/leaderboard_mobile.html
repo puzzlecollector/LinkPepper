@@ -82,7 +82,9 @@
         background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
       .mnav .lang-menu{position:absolute; top:110%; left:0; min-width:200px; padding:6px; margin:0; list-style:none; display:none; z-index:90;
         background:linear-gradient(180deg,#0f1419,#0c1116); border:1px solid rgba(255,255,255,.08); border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45)}
-      .mnav .lang.open .lang-menu{display:block; animation:mnavMenuIn .14s ease-out}
+      .mnav .lang.open .lang-menu,
+      .mnav .mnav-lang.open .lang-menu{display:block; animation:mnavMenuIn .14s ease-out}
+
       @keyframes mnavMenuIn{from{transform:translateY(-6px);opacity:0} to{transform:translateY(0);opacity:1}}
       .mnav .lang-item{display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; color:#cfe7dd; font-weight:700;}
       .mnav .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
@@ -409,7 +411,8 @@
         <!-- FOOTER -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">
@@ -419,63 +422,69 @@
         </footer>
         <!-- Language switcher -->
         <script>
-      (function(){
-        const $wrap = document.getElementById('langSwitcher');
-        if(!$wrap) return;
-        const $btn  = $wrap.querySelector('.lang-btn');
-        const $menu = $wrap.querySelector('.lang-menu');
-        const current = ($wrap.dataset.current || 'en').toLowerCase();
+  (function(){
+    const $wrap = document.getElementById('langSwitcher');
+    if(!$wrap) return;
+    const $btn  = $wrap.querySelector('.lang-btn');
+    const $menu = $wrap.querySelector('.lang-menu');
+    const current = ($wrap.dataset.current || 'en').toLowerCase();
 
-        const flagEl = $btn.querySelector('.flag-emoji');
-        const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
-        flagEl.textContent = flagMap[current] || '🇺🇸';
+    const flagEl = $btn.querySelector('.flag-emoji');
+    const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
+    flagEl.textContent = flagMap[current] || '🇺🇸';
 
-        function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
-        $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
-        document.addEventListener('click', ()=> close());
-        document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
+    function open(){ $wrap.classList.add('open');  $btn.setAttribute('aria-expanded','true'); }
+    function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
 
-        function pathFor(lang){
-          const loc = window.location;
-          const path = loc.pathname;
-          const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
-          const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
+    // Toggle menu; prevent bubbling so global click handler doesn't immediately close it
+    $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.contains('open') ? close() : open(); });
+    // Also stop clicks inside the menu from bubbling
+    $menu.addEventListener('click', (e)=>{ e.stopPropagation(); });
 
-          // /rewards/apply/ variants (kept for consistency)
-          const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
-          if(isApply){
-            if(lang === 'en') return '/rewards/apply/?lang=en';
-            return `/rewards/apply/${lang}/`;
-          }
+    document.addEventListener('click', ()=> close());
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
 
-          if(baseMap[clean]){
-            if(lang === 'en'){
-              const q = new URLSearchParams(loc.search);
-              q.set('lang','en');
-              return clean + (q.toString() ? `?${q.toString()}` : '');
-            }
-            return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
-          }
+    function pathFor(lang){
+      const loc = window.location;
+      const path = loc.pathname;
+      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
+      const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
 
-          // Other pages: keep path, toggle ?lang=
-          const params = new URLSearchParams(loc.search);
-          params.set('lang', lang);
-          return path + (params.toString() ? `?${params.toString()}` : '');
+      // /rewards/apply/ variants (kept for consistency)
+      const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
+      if(isApply){
+        if(lang === 'en') return '/rewards/apply/?lang=en';
+        return `/rewards/apply/${lang}/`;
+      }
+
+      if(baseMap[clean]){
+        if(lang === 'en'){
+          const q = new URLSearchParams(loc.search);
+          q.set('lang','en');
+          return clean + (q.toString() ? `?${q.toString()}` : '');
         }
+        return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
+      }
 
-        $menu.querySelectorAll('.lang-item').forEach(li=>{
-          li.addEventListener('click', ()=>{
-            const lang = li.getAttribute('data-lang');
-            const emoji = li.getAttribute('data-flag') || '';
-            flagEl.textContent = emoji;
-            $wrap.querySelector('.label').textContent =
-              lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
-            close();
-            const target = pathFor(lang);
-            if(target) window.location.href = target;
-          });
-        });
-      })();
+      // Other pages: keep path, toggle ?lang=
+      const params = new URLSearchParams(loc.search);
+      params.set('lang', lang);
+      return path + (params.toString() ? `?${params.toString()}` : '');
+    }
+
+    $menu.querySelectorAll('.lang-item').forEach(li=>{
+      li.addEventListener('click', ()=>{
+        const lang = li.getAttribute('data-lang');
+        const emoji = li.getAttribute('data-flag') || '';
+        flagEl.textContent = emoji;
+        $wrap.querySelector('.label').textContent =
+          lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
+        close();
+        const target = pathFor(lang);
+        if(target) window.location.href = target;
+      });
+    });
+  })();
         </script>
         <!-- CSRF + Wallet helpers (same pattern as other pages) -->
         <script>
