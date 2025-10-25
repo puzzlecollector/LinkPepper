@@ -2,6 +2,7 @@
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
+        {% include "partials/gtm_head.html" %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <title>{{ meta.title|default:"LinkHash | Leaderboard" }}</title>
@@ -188,6 +189,7 @@
         </style>
     </head>
     <body>
+        {% include "partials/gtm_body.html" %}
         <!-- ===== MOBILE HEADER ===== -->
         <header class="mnav" role="banner">
             <div class="container mnav-bar">

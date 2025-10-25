@@ -2,6 +2,7 @@
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
+        {% include "partials/gtm_head.html" %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ meta.title|default:"LinkHash | Leaderboard" }}</title>
@@ -172,6 +173,7 @@
         </style>
     </head>
     <body>
+        {% include "partials/gtm_body.html" %}
         <!-- NAV -->
         <header class="nav">
             <div class="container row">
@@ -459,7 +461,8 @@
         <!-- FOOTER -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">

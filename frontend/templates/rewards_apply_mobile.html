@@ -2,6 +2,7 @@
 {% load static %}
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
+        {% include "partials/gtm_head.html" %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <title>{{ meta.title|default:"LinkHash | Launch a Campaign" }}</title>
@@ -212,6 +213,7 @@
         </style>
     </head>
     <body>
+        {% include "partials/gtm_body.html" %}
         <!-- NAV -->
         <!-- ===== MOBILE HEADER (copy/paste) ===== -->
         <header class="mnav" role="banner">

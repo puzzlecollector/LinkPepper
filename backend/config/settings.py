@@ -15,6 +15,10 @@ PROJECT_ROOT = BASE_DIR.parent                              # backend/
 FRONTEND_DIR = PROJECT_ROOT / "frontend"                    # frontend/
 CORE_APP = "core"
 
+
+# Google Tag Manager
+GTM_CONTAINER_ID = os.environ.get("GTM_CONTAINER_ID", "GTM-WDQTKR33")
+
 # --------------------------------------------------------------------------------------
 # Basic
 # --------------------------------------------------------------------------------------
@@ -148,6 +152,7 @@ TEMPLATES = [
                 # If you implemented a wallet_user context processor in core/context_processors.py
                 # leave this line; otherwise remove/comment it.
                 "core.context_processors.wallet_user",
+                "core.context_processors.gtm",
             ],
         },
     },
