@@ -952,6 +952,7 @@ NETWORK_VERBOSE = {
     "SOL": "Solana",
     "BNB": "BNB Chain",
     "POL": "Polygon",
+    "BASE": "Base",
 }
 
 EXPLORER_BASE = {
@@ -959,6 +960,7 @@ EXPLORER_BASE = {
     "POL": "https://polygonscan.com/address/",
     "BNB": "https://bscscan.com/address/",
     "SOL": "https://solscan.io/account/",
+    "BASE": "https://etherscan.io/address/"
 }
 
 def _explorer_url(address: str, network: str | None) -> str | None:
