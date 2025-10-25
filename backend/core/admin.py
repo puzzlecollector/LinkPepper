@@ -504,7 +504,8 @@ class SubmissionAdmin(admin.ModelAdmin):
     autocomplete_fields = ("campaign", "user")
 
     # Make user comment read-only; admin_comment remains editable
-    readonly_fields = ("created_at", "comment")  # <- comment shown but not editable
+    readonly_fields = ("created_at", "comment", "campaign_currency", "campaign_currency_network")
+
 
     inlines = (PayoutInline,)
     list_select_related = ("campaign", "user")
@@ -593,7 +594,7 @@ class SubmissionAdmin(admin.ModelAdmin):
             status=SubmissionStatus.REJECTED,
             is_approved=False,
             reviewed_at=_now(),
-            reviewed_by=request.user,
+            reviewed_by=request.user.id,
         )
         self.message_user(request, f"Rejected {n} submission(s).", level=messages.WARNING)
 
