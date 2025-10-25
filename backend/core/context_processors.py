@@ -4,3 +4,7 @@ def wallet_user(request):
 def gtm(request):
     from django.conf import settings
     return {"GTM_CONTAINER_ID": getattr(settings, "GTM_CONTAINER_ID", "")}
+
+def ga(request):
+    from django.conf import settings
+    return {"GA_MEASUREMENT_ID": getattr(settings, "GA_MEASUREMENT_ID", "")}

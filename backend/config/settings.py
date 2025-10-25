@@ -18,6 +18,7 @@ CORE_APP = "core"
 
 # Google Tag Manager
 GTM_CONTAINER_ID = os.environ.get("GTM_CONTAINER_ID", "GTM-WDQTKR33")
+GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "G-9MYB9YXKKH")
 
 # --------------------------------------------------------------------------------------
 # Basic
@@ -153,6 +154,7 @@ TEMPLATES = [
                 # leave this line; otherwise remove/comment it.
                 "core.context_processors.wallet_user",
                 "core.context_processors.gtm",
+                "core.context_processors.ga",
             ],
         },
     },
