@@ -25,6 +25,7 @@ class Network(models.TextChoices):
     SOL = "SOL", "Solana"
     BNB = "BNB", "BNB Chain"
     POL = "POL", "Polygon"
+    BASE = "BASE", "Base"
 
 
 class SubmissionStatus(models.TextChoices):
