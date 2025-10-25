@@ -477,13 +477,14 @@ class SubmissionAdminForm(forms.ModelForm):
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
     form = SubmissionAdminForm
+    empty_value_display = "-"
 
     list_display = (
-        "id", "campaign", "user", "wallet_address", "network", "status",
+        "id", "campaign", "user", "wallet_address", "network_safe", "status",
         "post_url", "visited_url", "code_entered",
         "campaign_currency", "campaign_currency_network",
         "proof_score", "is_approved", "is_paid",
-        "user_comment_short", "admin_comment_short",  # NEW columns
+        "user_comment_short", "admin_comment_short",
         "created_at", "reviewed_at", "payout_admin_link",
     )
 
@@ -536,6 +537,13 @@ class SubmissionAdmin(admin.ModelAdmin):
             "fields": ("created_at",),
         }),
     )
+    
+    @admin.display(description="Network")
+    def network_safe(self, obj):
+        # Show a friendly label for known choices; fall back gracefully for odd/legacy values
+        labels = dict(Network.choices)
+        val = (obj.network or "").upper()
+        return labels.get(val, val or "—")
 
     @admin.display(description="Currency")
     def campaign_currency(self, obj):
@@ -636,7 +644,7 @@ class PayoutAdmin(admin.ModelAdmin):
         "campaign",
         "amount_usdt",
         "token_symbol",
-        "network",
+        "network_safe",
         "tx_hash",
         "paid_at",
         "paid_by",
@@ -660,6 +668,12 @@ class PayoutAdmin(admin.ModelAdmin):
             return obj.submission.wallet_address
         except Exception:
             return "-"
+        
+    @admin.display(description="Network")
+    def network_safe(self, obj):
+        labels = dict(Network.choices)
+        val = (obj.network or "").upper()
+        return labels.get(val, val or "—")
 
 
 @admin.register(Event)
