@@ -615,31 +615,49 @@
                                             <span>{% if meta.lang == 'ko' %}상태{% elif meta.lang == 'ja' %}ステータス{% elif meta.lang == 'zh' %}状态{% else %}Status{% endif %}: {% firstof s.get_status_display s.status "PENDING" %}</span>
                                             {% endif %}
 
-                                            {# TXID badge (only if present) #}
-                                            {% if s.transaction_id %}
-                                            <span>·</span>
-                                            {% with net=s.network|default:"ETH"|upper tx=s.transaction_id %}
-                                                {# choose an explorer by network #}
-                                                {% if net == 'SOL' %}
-                                                {% with txurl="https://solscan.io/tx/"|add:tx %}
-                                                {% elif net == 'BNB' %}
-                                                {% with txurl="https://bscscan.com/tx/"|add:tx %}
-                                                {% elif net == 'POL' %}
-                                                {% with txurl="https://polygonscan.com/tx/"|add:tx %}
-                                                {% elif net == 'BASE' %}
-                                                {% with txurl="https://basescan.org/tx/"|add:tx %}
-                                                {% else %}
-                                                {% with txurl="https://etherscan.io/tx/"|add:tx %}
-                                                {% endif %}
+                                                {# TXID badge (only if present) #}
+                                                {% if s.transaction_id %}
+                                                <span>·</span>
+                                                {% with net=s.network|default:"ETH"|upper tx=s.transaction_id %}
+                                                    {% if net == 'SOL' %}
                                                     <span class="tx-badge">
-                                                    <span class="icon" aria-hidden="true">🔗</span>
-                                                    txid <a href="{{ txurl }}" target="_blank" rel="noopener">
+                                                        <span class="icon" aria-hidden="true">🔗</span>
+                                                        txid <a href="https://solscan.io/tx/{{ tx }}" target="_blank" rel="noopener">
                                                         {{ tx|slice:":6" }}…{{ tx|slice:"-6:" }}
-                                                    </a>
+                                                        </a>
                                                     </span>
+                                                    {% elif net == 'BNB' %}
+                                                    <span class="tx-badge">
+                                                        <span class="icon" aria-hidden="true">🔗</span>
+                                                        txid <a href="https://bscscan.com/tx/{{ tx }}" target="_blank" rel="noopener">
+                                                        {{ tx|slice:":6" }}…{{ tx|slice:"-6:" }}
+                                                        </a>
+                                                    </span>
+                                                    {% elif net == 'POL' %}
+                                                    <span class="tx-badge">
+                                                        <span class="icon" aria-hidden="true">🔗</span>
+                                                        txid <a href="https://polygonscan.com/tx/{{ tx }}" target="_blank" rel="noopener">
+                                                        {{ tx|slice:":6" }}…{{ tx|slice:"-6:" }}
+                                                        </a>
+                                                    </span>
+                                                    {% elif net == 'BASE' %}
+                                                    <span class="tx-badge">
+                                                        <span class="icon" aria-hidden="true">🔗</span>
+                                                        txid <a href="https://basescan.org/tx/{{ tx }}" target="_blank" rel="noopener">
+                                                        {{ tx|slice:":6" }}…{{ tx|slice:"-6:" }}
+                                                        </a>
+                                                    </span>
+                                                    {% else %}
+                                                    <span class="tx-badge">
+                                                        <span class="icon" aria-hidden="true">🔗</span>
+                                                        txid <a href="https://etherscan.io/tx/{{ tx }}" target="_blank" rel="noopener">
+                                                        {{ tx|slice:":6" }}…{{ tx|slice:"-6:" }}
+                                                        </a>
+                                                    </span>
+                                                    {% endif %}
                                                 {% endwith %}
-                                            {% endwith %}
-                                            {% endif %}
+                                                {% endif %}
+
                                         </div>
                                     </div>
                                     {% empty %}
