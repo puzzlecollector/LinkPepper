@@ -320,6 +320,8 @@ class Submission(models.Model):
     wallet_address = models.CharField(max_length=128)
     network = models.CharField(max_length=8, choices=Network.choices)
 
+    transaction_id = models.CharField(max_length=180, blank=True, null=True, db_index=True)
+
     # Two task shapes (only one will be actually used depending on campaign.task_type):
     # LINK
     post_url = models.URLField(blank=True)

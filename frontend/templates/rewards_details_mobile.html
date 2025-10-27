@@ -1,5 +1,5 @@
 <!doctype html>
-{% load static %}
+{% load static chain %}
 <html lang="{{ meta.lang|default:'en' }}">
     <head>
         {% include "partials/ga_head.html" %}
@@ -167,7 +167,44 @@
       /* Examples */
       .scroller{max-height:240px; overflow:auto; padding-right:6px;}
       .example{border:1px dashed #243040; border-radius:12px; padding:10px; margin-bottom:8px; background:#0a1117;}
-      .example .meta{display:flex; gap:8px; flex-wrap:wrap; font-size:12px; color:#8aa099;}
+      .example .meta{
+        display:flex;
+        align-items:center;      /* NEW */
+        gap:8px;
+        flex-wrap:wrap;
+        font-size:12px;
+        color:#8aa099;
+        line-height:1.4;         /* helps baseline consistency */
+        }
+        /* Normalize inline items in the row */
+        .example .meta > span,
+        .example .meta > a{
+        display:inline-flex;
+        align-items:center;
+        line-height:1.2;
+        }
+
+        /* Reusable tx chip */
+        .tx-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        padding:4px 10px;
+        border-radius:999px;
+        background:rgba(35,209,106,.10);
+        border:1px solid #2a6f47;
+        color:#cfe7dd;
+        font-weight:700;
+        font-size:12px;
+        line-height:1;
+        box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;
+        }
+        .tx-badge a{
+        color:#aef2c9;
+        text-decoration:underline;
+        text-underline-offset:3px;
+        }
+        .tx-badge .icon{ font-size:13px; line-height:1; }
       .example .meta .addr{ overflow-wrap:anywhere; word-break:break-word; }
             /* ===== MOBILE HEADER (namespaced .mnav) ===== */
 .mnav{position:sticky; top:0; z-index:80; padding-top:env(safe-area-inset-top);
@@ -576,6 +613,32 @@
                         {% if s.get_status_display or s.status %}
                                             <span>·</span>
                                             <span>{% if meta.lang == 'ko' %}상태{% elif meta.lang == 'ja' %}ステータス{% elif meta.lang == 'zh' %}状态{% else %}Status{% endif %}: {% firstof s.get_status_display s.status "PENDING" %}</span>
+                                            {% endif %}
+
+                                            {# TXID badge (only if present) #}
+                                            {% if s.transaction_id %}
+                                            <span>·</span>
+                                            {% with net=s.network|default:"ETH"|upper tx=s.transaction_id %}
+                                                {# choose an explorer by network #}
+                                                {% if net == 'SOL' %}
+                                                {% with txurl="https://solscan.io/tx/"|add:tx %}
+                                                {% elif net == 'BNB' %}
+                                                {% with txurl="https://bscscan.com/tx/"|add:tx %}
+                                                {% elif net == 'POL' %}
+                                                {% with txurl="https://polygonscan.com/tx/"|add:tx %}
+                                                {% elif net == 'BASE' %}
+                                                {% with txurl="https://basescan.org/tx/"|add:tx %}
+                                                {% else %}
+                                                {% with txurl="https://etherscan.io/tx/"|add:tx %}
+                                                {% endif %}
+                                                    <span class="tx-badge">
+                                                    <span class="icon" aria-hidden="true">🔗</span>
+                                                    txid <a href="{{ txurl }}" target="_blank" rel="noopener">
+                                                        {{ tx|slice:":6" }}…{{ tx|slice:"-6:" }}
+                                                    </a>
+                                                    </span>
+                                                {% endwith %}
+                                            {% endwith %}
                                             {% endif %}
                                         </div>
                                     </div>

@@ -497,8 +497,9 @@ class SubmissionAdmin(admin.ModelAdmin):
         "wallet_address",
         "user__address", "user__display_name", "user__email",
         "post_url", "visited_url", "code_entered",
-        "comment",       # user comment (read-only here)
-        "admin_comment", # admin comment (editable)
+        "transaction_id",                              # <-- NEW
+        "comment",
+        "admin_comment",
     )
 
     autocomplete_fields = ("campaign", "user")
@@ -526,6 +527,9 @@ class SubmissionAdmin(admin.ModelAdmin):
         ("Task Data", {
             "fields": ("post_url", "visited_url", "code_entered"),
         }),
+        ("On-chain / Settlement", {                   # <-- NEW group
+            "fields": ("transaction_id",),            # <-- editable field
+        }),
         ("Comments", {  # <- clear grouping
             "fields": ("comment", "admin_comment"),
             "description": "“User Comment” is read-only (what the user submitted). “Admin Comment” is visible on the public page."
@@ -538,6 +542,17 @@ class SubmissionAdmin(admin.ModelAdmin):
             "fields": ("created_at",),
         }),
     )
+
+    actions = (                                 # <-- make actions explicit
+        "mark_approved",
+        "mark_rejected",
+        "create_payouts_for_selected",
+        "set_score_1",
+        "set_score_3",
+        "set_score_5",
+    )
+    actions_on_top = True
+    actions_on_bottom = True
     
     @admin.display(description="Network")
     def network_safe(self, obj):
@@ -594,7 +609,7 @@ class SubmissionAdmin(admin.ModelAdmin):
             status=SubmissionStatus.REJECTED,
             is_approved=False,
             reviewed_at=_now(),
-            reviewed_by=request.user.id,
+            reviewed_by_id=request.user.id,   # <= use _id here with update()
         )
         self.message_user(request, f"Rejected {n} submission(s).", level=messages.WARNING)
 
