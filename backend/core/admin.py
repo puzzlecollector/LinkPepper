@@ -472,6 +472,9 @@ class SubmissionAdminForm(forms.ModelForm):
             self.fields["comment"].label = "User Comment"  # read-only (via ModelAdmin)
         if "admin_comment" in self.fields:
             self.fields["admin_comment"].label = "Admin Comment"  # editable
+        if "wallet_address" in self.fields:
+            # This is the raw value the user typed in the submission form
+            self.fields["wallet_address"].label = "Submitted Wallet"
 
 
 @admin.register(Submission)
@@ -479,8 +482,12 @@ class SubmissionAdmin(admin.ModelAdmin):
     form = SubmissionAdminForm
     empty_value_display = "-"
 
+    # Show both wallets distinctly in the list
     list_display = (
-        "id", "campaign", "user", "wallet_address", "network_safe", "status",
+        "id", "campaign", "user",
+        "submitted_wallet",           # NEW: value typed in the form
+        "login_wallet",               # NEW: wallet of the logged-in user (or 'anonymous user')
+        "network_safe", "status",
         "post_url", "visited_url", "code_entered",
         "campaign_currency", "campaign_currency_network",
         "proof_score", "is_approved", "is_paid",
@@ -494,30 +501,39 @@ class SubmissionAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "wallet_address",
-        "user__address", "user__display_name", "user__email",
+        "wallet_address",                 # submitted wallet
+        "user__address", "user__display_name", "user__email",  # login user (if any)
         "post_url", "visited_url", "code_entered",
-        "transaction_id",                              # <-- NEW
+        "transaction_id",
         "comment",
         "admin_comment",
     )
 
     autocomplete_fields = ("campaign", "user")
 
-    # Make user comment read-only; admin_comment remains editable
-    readonly_fields = ("created_at", "comment", "campaign_currency", "campaign_currency_network")
-
+    # Add computed readonly for detail page (“User Login Wallet”)
+    readonly_fields = (
+        "created_at",
+        "comment",
+        "campaign_currency",
+        "campaign_currency_network",
+        "login_wallet_display",          # NEW: shows wallet from the linked WalletUser (or 'anonymous user')
+    )
 
     inlines = (PayoutInline,)
     list_select_related = ("campaign", "user")
     date_hierarchy = "created_at"
     ordering = ("-created_at",)
 
-    # Optional: organize the form with fieldsets so comments are obvious
+    # Clear grouping; explicitly show both wallets
     fieldsets = (
         (None, {
             "fields": (
-                "campaign", "user", "wallet_address", "network",
+                "campaign",
+                "user",
+                "login_wallet_display",      # NEW (readonly): wallet of the logged-in user (if any)
+                "wallet_address",            # model field, relabeled by the form to "Submitted Wallet"
+                "network",
                 "status", "proof_score", "is_approved", "is_paid",
             )
         }),
@@ -527,10 +543,10 @@ class SubmissionAdmin(admin.ModelAdmin):
         ("Task Data", {
             "fields": ("post_url", "visited_url", "code_entered"),
         }),
-        ("On-chain / Settlement", {                   # <-- NEW group
-            "fields": ("transaction_id",),            # <-- editable field
+        ("On-chain / Settlement", {
+            "fields": ("transaction_id",),
         }),
-        ("Comments", {  # <- clear grouping
+        ("Comments", {
             "fields": ("comment", "admin_comment"),
             "description": "“User Comment” is read-only (what the user submitted). “Admin Comment” is visible on the public page."
         }),
@@ -543,7 +559,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         }),
     )
 
-    actions = (                                 # <-- make actions explicit
+    actions = (
         "mark_approved",
         "mark_rejected",
         "create_payouts_for_selected",
@@ -553,10 +569,32 @@ class SubmissionAdmin(admin.ModelAdmin):
     )
     actions_on_top = True
     actions_on_bottom = True
-    
+
+    # ---------- New wallet columns / readonly display ----------
+
+    @admin.display(description="Submitted Wallet")
+    def submitted_wallet(self, obj):
+        # What user typed at submission time
+        return (obj.wallet_address or "-")
+
+    @admin.display(description="User Login Wallet")
+    def login_wallet(self, obj):
+        # Wallet of the logged-in WalletUser (if the submission is linked to one)
+        try:
+            wa = getattr(getattr(obj, "user", None), "address", None)
+            return wa or "anonymous user"
+        except Exception:
+            return "anonymous user"
+
+    @admin.display(description="User Login Wallet")
+    def login_wallet_display(self, obj):
+        # Readonly field for the detail page
+        return self.login_wallet(obj)
+
+    # ---------- Existing helpers (unchanged) ----------
+
     @admin.display(description="Network")
     def network_safe(self, obj):
-        # Show a friendly label for known choices; fall back gracefully for odd/legacy values
         labels = dict(Network.choices)
         val = (obj.network or "").upper()
         return labels.get(val, val or "—")
@@ -570,7 +608,6 @@ class SubmissionAdmin(admin.ModelAdmin):
         net = getattr(getattr(obj, "campaign", None), "currency_network", None)
         return net or "-"
 
-    # ---------- List table helper columns ----------
     @admin.display(description="User Comment")
     def user_comment_short(self, obj):
         txt = (obj.comment or "").strip()
@@ -581,7 +618,6 @@ class SubmissionAdmin(admin.ModelAdmin):
         txt = (obj.admin_comment or "").strip()
         return (txt[:80] + "…") if len(txt) > 80 else (txt or "-")
 
-    # ---------- Payout link ----------
     @admin.display(description="Payout")
     def payout_admin_link(self, obj):
         payout = getattr(obj, "payout", None)
@@ -609,7 +645,7 @@ class SubmissionAdmin(admin.ModelAdmin):
             status=SubmissionStatus.REJECTED,
             is_approved=False,
             reviewed_at=_now(),
-            reviewed_by_id=request.user.id,   # <= use _id here with update()
+            reviewed_by_id=request.user.id,
         )
         self.message_user(request, f"Rejected {n} submission(s).", level=messages.WARNING)
 
@@ -648,7 +684,6 @@ class SubmissionAdmin(admin.ModelAdmin):
     def set_score_5(self, request, qs):
         n = qs.update(proof_score=5)
         self.message_user(request, f"Set score=5 for {n} submission(s).", level=messages.INFO)
-
 
 # ---------- Payout
 
