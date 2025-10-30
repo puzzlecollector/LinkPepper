@@ -95,58 +95,16 @@
       tbody tr{transition:background .15s ease}
       tbody tr:hover{background:rgba(22,163,74,.06)}
       .rank{width:70px; font-weight:900; color:#e6f1ee;}
-      /* User cell */
-      .user{display:flex; align-items:center; gap:12px; min-width:300px;} /* was 360px */
+      .user{display:flex; align-items:center; gap:12px; min-width:360px;}
       .avatar{width:36px; height:36px; border-radius:999px; overflow:hidden; border:1px solid #1d2836; background:#0b1117; flex:0 0 36px;}
       .handle{display:flex; flex-direction:column; gap:4px; min-width:0;}
-
-      /* Responsive address:
-        - Scales with viewport but never smaller than 11px, never larger than 14px
-        - Ellipsizes when full address is shown
-        - Swaps to a short version on smaller screens (see media rules below)
-      */
-      .addr{
-        font-weight:900;
-        white-space:nowrap;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        font-size: clamp(11px, 1.2vw, 14px);
-        line-height: 1.15;
-      }
-
-      /* Two variants we can toggle with media queries */
-      .addr-full{ display:inline; }   /* full address text (ellipsis if needed) */
-      .addr-short{ display:none; }    /* short "0x1234…ABCD" version */
-
-      /* Subtitle under address */
+      .addr{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
       .muted{color:#9fb0aa; font-size:12px;}
       .mind{white-space:nowrap;}
       .stat{white-space:nowrap; text-align:right;}
 
-      /* Network cell (narrower to help table fit) */
-      .net-cell{min-width:130px;} /* was 160px */
-
-      /* Split column padding (give the table more room) */
-      @media (max-width: 1200px){
-        .user{min-width:280px;}
-      }
-
-      /* When space gets tight, keep shrinking the address text a bit more */
-      @media (max-width: 1020px){
-        .addr{font-size: clamp(10px, 1.05vw, 13px);}
-      }
-
-      /* At narrow widths, switch to the shortened address variant */
-      @media (max-width: 920px){
-        .addr-full{ display:none; }
-        .addr-short{ display:inline; }  /* show "0x1234…ABCD" */
-      }
-
-      /* Optional: reduce the split (links/visits) cell minimum to prevent overflow */
-      @media (max-width: 1100px){
-        td[style*="min-width:260px"]{ min-width:220px !important; }
-      }
-
+      /* Network cell */
+      .net-cell{min-width:160px;}
       .net{display:flex; align-items:center; gap:10px;}
       .net img{width:24px; height:24px; display:block; filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));}
       .net-name{font-size:13px; color:#cfe7dd; font-weight:800; white-space:nowrap;}
@@ -427,25 +385,15 @@
                                     </svg>
                                     <div class="handle">
                                         {% if r.explorer_url %}
-                                            {# Full address (ellipsized visually if needed) #}
                                         <a
-                                            class="addr addr-full"
+                                            class="addr"
                                             href="{{ r.explorer_url }}"
                                             target="_blank"
                                             rel="noopener"
                                             title="{{ r.address }}"
                                         >{{ r.address }}</a>
-                                        {# Short address for tight layouts #}
-                                        <a
-                                            class="addr addr-short"
-                                            href="{{ r.explorer_url }}"
-                                            target="_blank"
-                                            rel="noopener"
-                                            title="{{ r.address }}"
-                                        >{{ r.address|slice:":6" }}…{{ r.address|slice:"-4:" }}</a>
                                         {% else %}
-                                        <span class="addr addr-full" title="{{ r.address }}">{{ r.address }}</span>
-                                        <span class="addr addr-short" title="{{ r.address }}">{{ r.address|slice:":6" }}…{{ r.address|slice:"-4:" }}</span>
+                                        <span class="addr" title="{{ r.address }}">{{ r.address }}</span>
                                         {% endif %}
                                         <span class="muted">
                                             {% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}コントリビューター{% elif meta.lang == 'zh' %}贡献者{% else %}Contributor{% endif %}
@@ -473,7 +421,7 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td style="min-width:240px;">
+                            <td style="min-width:260px;">
                                 <div class="bar-split" style="--links: {{ r.ratio_links|floatformat:'2' }}%;" aria-label="Links {{ r.links }}, Visits {{ r.visits }}"></div>
                                 <div class="split-meta">
                                     <span>
