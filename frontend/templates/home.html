@@ -407,13 +407,13 @@
                     </h1>
                     <p>
                         {% if meta.lang == 'ko' %}
-              광고주는 USDT로 풀을 펀딩, 사용자는 방문/링크 과제를 수행합니다. 모든 수치가 공개됩니다.
+              광고주는 암호화폐 풀을 펀딩, 사용자는 방문/링크 과제를 수행합니다. 모든 수치가 공개됩니다.
             {% elif meta.lang == 'ja' %}
-              広告主はUSDTでプールを資金化、ユーザーはVISIT/LINKタスクを実行。数値はすべて公開。
+              広告主はCryptoでプールを資金化、ユーザーはVISIT/LINKタスクを実行。数値はすべて公開。
             {% elif meta.lang == 'zh' %}
-              广告主用 USDT 注资奖励池，用户完成访问/外链任务；所有数据公开透明。
+              广告主用 Crypto 注资奖励池，用户完成访问/外链任务；所有数据公开透明。
             {% else %}
-              Advertisers fund pools in USDT. Users complete visit & link-share tasks. Everyone sees the numbers.
+              Advertisers fund pools in crypto. Users complete visit & link-share tasks. Everyone sees the numbers.
             {% endif %}
                     </p>
                     <div class="cta">
@@ -430,7 +430,7 @@
                 <!-- Step 1: Apply -->
                 <div class="step">
                     <div class="reveal">
-                        <h3>1) {% if meta.lang == 'ko' %}클라이언트가 USDT 풀을 펀딩{% elif meta.lang == 'ja' %}クライアントがUSDTプールに資金投入{% elif meta.lang == 'zh' %}客户注资 USDT 奖励池{% else %}Client funds a USDT pool{% endif %}</h3>
+                        <h3>1) {% if meta.lang == 'ko' %}클라이언트가 암호화폐 풀을 펀딩{% elif meta.lang == 'ja' %}クライアントがCryptoプールに資金投入{% elif meta.lang == 'zh' %}客户注资 Crypto 奖励池{% else %}Client funds a crypto pool{% endif %}</h3>
                         <p>
                             {% if meta.lang == 'ko' %}
                 예산과 기간을 선택하면 명확한 규칙(VISIT/LINK, 허용 링크, 가이드)을 공개합니다. 라이브 풀 규모도 함께 표시됩니다.
@@ -482,7 +482,7 @@
                                     <input placeholder="https://example.com" disabled>
                                 </div>
                                 <div>
-                                    <label>{% if meta.lang == 'ko' %}총 리워드 풀 (USDT){% elif meta.lang == 'ja' %}総プール (USDT){% elif meta.lang == 'zh' %}总奖励池 (USDT){% else %}Total Reward Pool (USDT){% endif %}</label>
+                                    <label>{% if meta.lang == 'ko' %}총 리워드 풀 (암호화폐){% elif meta.lang == 'ja' %}総プール (Crypto){% elif meta.lang == 'zh' %}总奖励池 (Crypto){% else %}Total Reward Pool (Crypto){% endif %}</label>
                                     <input placeholder="2500" disabled>
                                 </div>
                             </div>
@@ -644,13 +644,13 @@
                         <h3>3) {% if meta.lang == 'ko' %}검증 후 즉시 보상{% elif meta.lang == 'ja' %}検証後すぐに報酬{% elif meta.lang == 'zh' %}验证通过即刻发放{% else %}Rewards claimed instantly{% endif %}</h3>
                         <p>
                             {% if meta.lang == 'ko' %}
-                승인된 액션마다 USDT가 지급됩니다. 풀 잔액, 참여자 수, 클레임률 등 모든 진행 상황이 공개됩니다.
+                승인된 액션마다 암호화폐가 지급됩니다. 풀 잔액, 참여자 수, 클레임률 등 모든 진행 상황이 공개됩니다.
               {% elif meta.lang == 'ja' %}
-                承認されたアクションごとにUSDT支払い。残高・参加者・クレーム率など進行状況はすべて公開。
+                承認されたアクションごとにCrypto支払い。残高・参加者・クレーム率など進行状況はすべて公開。
               {% elif meta.lang == 'zh' %}
-                每次通过的提交都会从奖励池即时支付 USDT。剩余池、参与人数、领取率等进度公开透明。
+                每次通过的提交都会从奖励池即时支付 Crypto。剩余池、参与人数、领取率等进度公开透明。
               {% else %}
-                Every approved action pays from the pool in USDT. Pool left, participants, claim % — all public for trust.
+                Every approved action pays from the pool in Crypto. Pool left, participants, claim % — all public for trust.
               {% endif %}
                         </p>
                     </div>
@@ -711,7 +711,7 @@
                     </div>
                     <div class="card">
                         <h3>{% if meta.lang == 'ko' %}참여자용{% elif meta.lang == 'ja' %}参加者向け{% elif meta.lang == 'zh' %}面向参与者{% else %}For Contributors{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}VISIT/LINK 과제를 수행하고 USDT를 받으세요. 규칙은 공개되어 간단합니다.{% elif meta.lang == 'ja' %}VISIT/LINKタスクを実行してUSDTを獲得。ルールは公開・シンプル。{% elif meta.lang == 'zh' %}完成 VISIT/LINK 任务领取 USDT。规则公开且简单。{% else %}Complete visit/link tasks; earn USDT from the pool. Rules are public and easy.{% endif %}</p>
+                        <p>{% if meta.lang == 'ko' %}VISIT/LINK 과제를 수행하고 암호화폐를 받으세요. 규칙은 공개되어 간단합니다.{% elif meta.lang == 'ja' %}VISIT/LINKタスクを実行してCryptoを獲得。ルールは公開・シンプル。{% elif meta.lang == 'zh' %}完成 VISIT/LINK 任务领取 Crypto。规则公开且简单。{% else %}Complete visit/link tasks; earn crypto from the pool. Rules are public and easy.{% endif %}</p>
                         <div class="chips">
                             <span class="chip">VISIT</span>
                             <span class="chip">LINK</span>
@@ -766,7 +766,7 @@
                                     <div class="meta">
                                         <div class="pill">
                                             <strong>{% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>
-                                            &nbsp; {{ c.pool_usdt }} USDT
+                                            &nbsp; {{ c.pool_usdt }} {{ c.currency|default:"USDT" }}
                                         </div>
                                         <div class="pill">
                                             <strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}人数{% elif meta.lang == 'zh' %}参与者{% else %}People{% endif %}</strong>
@@ -837,7 +837,7 @@
                                     <div class="meta">
                                         <div class="pill">
                                             <strong>{% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>
-                                            &nbsp; {{ c.pool_usdt }} USDT
+                                            &nbsp; {{ c.pool_usdt }} {{ c.currency|default:"USDT" }}
                                         </div>
                                         <div class="pill">
                                             <strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}人数{% elif meta.lang == 'zh' %}参与者{% else %}People{% endif %}</strong>
