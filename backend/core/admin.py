@@ -328,28 +328,23 @@ class CampaignApplicationAdmin(admin.ModelAdmin):
         )
 
 
-# ---------- Campaign
-
-# ---------- Campaign
-
-# ---------- Campaign
-
 @admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):
     """
-    Rich text friendly:
-    - CKEditor (with uploader) for long_description / code_instructions.
-    - Two OPTIONAL file inputs that append an <img> into those fields.
-    - Uploaded files are stored under /media/campaigns/body/ and /media/campaigns/instructions/.
+    - Keep CKEditor for long_description / code_instructions.
+    - Add two file inputs (image_upload, favicon_upload) that save to /media and
+      set Campaign.image_url / Campaign.favicon_url to the stored file URL.
     """
 
-    # >>> ADD the two ImageFields to the form so Admin knows these fields exist <<<
     class Form(forms.ModelForm):
-        long_desc_image_upload = forms.ImageField(
-            required=False, help_text="Append image to Long description"
+        # NEW: real file inputs (not base64)
+        image_upload = forms.ImageField(
+            required=False,
+            help_text="Upload a main image (PNG/JPG/WebP/SVG). Overwrites image_url."
         )
-        code_instr_image_upload = forms.ImageField(
-            required=False, help_text="Append image to Code instructions"
+        favicon_upload = forms.ImageField(
+            required=False,
+            help_text="Upload a favicon (PNG/ICO/SVG). Overwrites favicon_url."
         )
 
         class Meta:
@@ -366,12 +361,12 @@ class CampaignAdmin(admin.ModelAdmin):
         "id", "title", "slug", "task_type", "is_published", "is_paused",
         "pool_usdt", "payout_usdt", "participants", "claimed_percent",
         "start", "end", "client_site_domain", "visit_code",
-        "favicon_small", "image_small", "preview", "currency", "currency_network", 
+        "favicon_small", "image_small", "preview", "currency", "currency_network",
     )
 
     search_fields = (
         "title", "slug", "summary", "long_description",
-        "client_site_domain", "seo_keywords", "visit_code", "currency", "currency_network", 
+        "client_site_domain", "seo_keywords", "visit_code", "currency", "currency_network",
     )
 
     list_filter = ("task_type", HasVisitCodeFilter, "is_published", "is_paused", "start", "end",
@@ -392,12 +387,18 @@ class CampaignAdmin(admin.ModelAdmin):
             "fields": ("client_site_domain", "seo_keywords"),
         }),
         ("Assets", {
-            "fields": ("image_url", "favicon_url", "image_large_preview", "favicon_large_preview"),
+            # Keep the URL fields (they’ll be auto-filled when you upload)
+            "fields": (
+                "image_url", "favicon_url",
+                "image_upload", "favicon_upload",     # NEW upload inputs
+                "image_large_preview", "favicon_large_preview"
+            ),
+            "description": "Upload files to store under /media/ and auto-fill the URL fields.",
         }),
         ("Rewards & Window", {
             "fields": (
                 "pool_usdt", "payout_usdt",
-                "currency", "currency_network",     # <<< NEW
+                "currency", "currency_network",
                 "start", "end",
             ),
         }),
@@ -415,8 +416,7 @@ class CampaignAdmin(admin.ModelAdmin):
         }),
     )
 
-
-    # small previews for list view (with Download)
+    # --- previews already compatible (use your existing helpers) ---
     @admin.display(description="Favicon")
     def favicon_small(self, obj):
         src = getattr(obj, "favicon_url", "") or ""
@@ -429,7 +429,6 @@ class CampaignAdmin(admin.ModelAdmin):
         hint = f"campaign_{obj.pk}_image"
         return _img_with_download(src, f"{obj.title} image", size_px=32, filename_hint=hint)
 
-    # larger previews on the detail page (with Download)
     @admin.display(description="Image preview")
     def image_large_preview(self, obj):
         src = getattr(obj, "image_url", "") or ""
@@ -442,7 +441,6 @@ class CampaignAdmin(admin.ModelAdmin):
         hint = f"campaign_{obj.pk}_favicon"
         return _img_with_download(src, f"{obj.title} favicon", size_px=48, filename_hint=hint)
 
-    # frontend preview link
     @admin.display(description="Preview")
     def preview(self, obj):
         if not obj.slug:
@@ -452,10 +450,42 @@ class CampaignAdmin(admin.ModelAdmin):
             slug=obj.slug, id=obj.id
         )
 
-    # Save uploads and append <img> tags to the HTML fields
+    # --- Save uploads and write their URLs into the model fields ---
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
+        """
+        If admin uploaded files, store them via default_storage and set image_url / favicon_url.
+        """
+        def _unique_target(dir_prefix: str, base_slug: str, filename: str) -> str:
+            """
+            Ensure a unique path under /media/<dir_prefix>/.
+            """
+            root, ext = os.path.splitext(filename or "")
+            if not ext:
+                ext = ".png"
+            base = (slugify(base_slug) or "campaign").rstrip("-")
+            path = f"{dir_prefix}/{base}{ext}"
+            if default_storage.exists(path):
+                i = 2
+                while default_storage.exists(f"{dir_prefix}/{base}-{i}{ext}"):
+                    i += 1
+                path = f"{dir_prefix}/{base}-{i}{ext}"
+            return path
 
+        # Process image upload
+        img_upload = form.cleaned_data.get("image_upload")
+        if img_upload:
+            img_path = _unique_target("campaigns/images", (obj.slug or obj.title or "campaign"), img_upload.name)
+            saved = default_storage.save(img_path, img_upload)
+            obj.image_url = default_storage.url(saved)
+
+        # Process favicon upload
+        favi_upload = form.cleaned_data.get("favicon_upload")
+        if favi_upload:
+            favi_path = _unique_target("campaigns/favicons", (obj.slug or obj.title or "campaign"), favi_upload.name)
+            saved = default_storage.save(favi_path, favi_upload)
+            obj.favicon_url = default_storage.url(saved)
+
+        super().save_model(request, obj, form, change)
 
 
 # ---------- Submission
