@@ -931,7 +931,7 @@ def rewards_detail(request, slug, pk):
         quota_total = getattr(campaign_obj, "quota_total", 0) or 0
         claimed_percent = int(submitted * 100 / quota_total) if quota_total else 0
     else:
-        examples = Submission.objects.filter(campaign=campaign_obj).order_by("-created_at")[:12]
+        examples = Submission.objects.filter(campaign=campaign_obj).order_by("-created_at")
         quota_total = 0  # your template can ignore quota if you don't track it here
         submitted = Submission.objects.filter(campaign=campaign_obj).count()
         # claimed percent comes from model property; mirror template usage if needed
