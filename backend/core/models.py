@@ -329,7 +329,7 @@ class Submission(models.Model):
 
     # VISIT
     visited_url = models.URLField(blank=True)  # optional if you want to capture landing
-    code_entered = models.CharField(max_length=64, blank=True)
+    code_entered = models.TextField(blank=True)
 
     # Review / moderation
     status = models.CharField(max_length=12, choices=SubmissionStatus.choices, default=SubmissionStatus.PENDING)
