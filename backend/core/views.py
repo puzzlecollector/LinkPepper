@@ -351,6 +351,49 @@ def _meta_for_leaderboard(lang, request):
         "url": f"{base}/leaderboard/",
     }
 
+# --- Meta for advertiser guide ---
+def _meta_for_advertiser(lang, request):
+    base = _base_url(request)
+    if lang == "ko":
+        return {
+            "lang": "ko",
+            "title": "LinkHash | 광고주 가이드",
+            "description": "봇 없이 자연스럽게 홍보하는 방법. 투명한 리워드와 데이터 기반 운영.",
+            "og_title": "LinkHash | 광고주 가이드",
+            "og_description": "투명·탈중앙 마케팅으로 유입 품질을 높이세요.",
+            "canonical": f"{base}/ko/advertiser/",
+            "url": f"{base}/ko/advertiser/",
+        }
+    if lang == "ja":
+        return {
+            "lang": "ja",
+            "title": "LinkHash | 広告主ガイド",
+            "description": "ボットに頼らない自然な集客。透明な報酬とデータ運用。",
+            "og_title": "LinkHash | 広告主ガイド",
+            "og_description": "透明・分散型マーケで質の高い流入を実現。",
+            "canonical": f"{base}/ja/advertiser/",
+            "url": f"{base}/ja/advertiser/",
+        }
+    if lang == "zh":
+        return {
+            "lang": "zh",
+            "title": "LinkHash | 广告主指南",
+            "description": "无需机器人获得自然推广。透明奖励与数据化运营。",
+            "og_title": "LinkHash | 广告主指南",
+            "og_description": "透明去中心化营销，提升真实转化。",
+            "canonical": f"{base}/zh/advertiser/",
+            "url": f"{base}/zh/advertiser/",
+        }
+    return {
+        "lang": "en",
+        "title": "LinkHash | Advertiser Guide",
+        "description": "Get organic promotion without bots. Transparent crypto rewards and data-driven ops.",
+        "og_title": "LinkHash | Advertiser Guide",
+        "og_description": "Transparent, decentralized marketing for real results.",
+        "canonical": f"{base}/advertiser/",
+        "url": f"{base}/advertiser/",
+    }
+
 
 # ================== PAGES ==================
 @ensure_csrf_cookie
@@ -394,6 +437,40 @@ def home_zh(request):
     }
     return render_mobile_first(request, "home", ctx)
 
+
+# --- Pages (advertiser) ---
+@ensure_csrf_cookie
+def advertiser_en(request):
+    lang = _lang_from_request(request)  # respects ?lang=en etc.
+    ctx = {
+        "meta": _meta_for_advertiser(lang, request),
+        "wallet_user": get_wallet_user(request),
+    }
+    return render_mobile_first(request, "home_advertiser", ctx)
+
+@ensure_csrf_cookie
+def advertiser_ko(request):
+    ctx = {
+        "meta": _meta_for_advertiser("ko", request),
+        "wallet_user": get_wallet_user(request),
+    }
+    return render_mobile_first(request, "home_advertiser", ctx)
+
+@ensure_csrf_cookie
+def advertiser_ja(request):
+    ctx = {
+        "meta": _meta_for_advertiser("ja", request),
+        "wallet_user": get_wallet_user(request),
+    }
+    return render_mobile_first(request, "home_advertiser", ctx)
+
+@ensure_csrf_cookie
+def advertiser_zh(request):
+    ctx = {
+        "meta": _meta_for_advertiser("zh", request),
+        "wallet_user": get_wallet_user(request),
+    }
+    return render_mobile_first(request, "home_advertiser", ctx)
 
 # ---- Rewards listing (now sends real campaigns to template) ----
 # ---- Rewards listing (now sends real campaigns to template) ----

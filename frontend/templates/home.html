@@ -348,10 +348,30 @@
                             tabindex="-1"
                             aria-label="Select language"
                         >
-                            <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-                            <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-                            <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-                            <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="en"
+                                data-flag="🇺🇸"
+                            >🇺🇸 English</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ko"
+                                data-flag="🇰🇷"
+                            >🇰🇷 한국어</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ja"
+                                data-flag="🇯🇵"
+                            >🇯🇵 日本語</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="zh"
+                                data-flag="🇨🇳"
+                            >🇨🇳 中文</li>
                         </ul>
                     </div>
                 </nav>
@@ -373,10 +393,12 @@
                         を受け取れます。
             {% elif meta.lang == 'zh' %}
               推广应用或网站并参与问卷，
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">通过透明的去中心化营销获得加密货币奖励</span>。
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">通过透明的去中心化营销获得加密货币奖励</span>
+                        。
             {% else %}
               Promote apps or websites and answer surveys —
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">earn crypto through transparent, decentralized marketing</span>.
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">earn crypto through transparent, decentralized marketing</span>
+                        .
             {% endif %}
                     </h1>
                     <p>
@@ -391,10 +413,12 @@
             {% endif %}
                     </p>
                     <div class="cta">
-                        <a class="btn" href="#projects">
+                        <!-- Go to the localized Rewards list -->
+                        <a class="btn" href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
                             {% if meta.lang == 'ko' %}캠페인 둘러보기{% elif meta.lang == 'ja' %}キャンペーンを見る{% elif meta.lang == 'zh' %}查看活动{% else %}Explore Campaigns{% endif %}
                         </a>
-                        <a class="btn-outline" href="#">
+                        <!-- Go to the localized Advertiser guide -->
+                        <a class="btn-outline" href="{% if meta.lang == 'ko' %}/ko/advertiser/{% elif meta.lang == 'ja' %}/ja/advertiser/{% elif meta.lang == 'zh' %}/zh/advertiser/{% else %}/advertiser/{% endif %}">
                             {% if meta.lang == 'ko' %}봇 없이 자연스럽게 홍보하는 방법 보기{% elif meta.lang == 'ja' %}ボットに頼らない有機的なプロモーション方法を見る{% elif meta.lang == 'zh' %}了解不靠机器人实现自然推广的方法{% else %}See how you can get organic promotion without bots{% endif %}
                         </a>
                     </div>
@@ -408,10 +432,10 @@
                 <div class="step">
                     <div class="reveal">
                         <h3>
-                          {% if meta.lang == 'ko' %}광고주 웹사이트 홍보{% elif meta.lang == 'ja' %}広告主のサイトを宣伝{% elif meta.lang == 'zh' %}推广广告主网站{% else %}Promote an advertiser’s website{% endif %}
+                            {% if meta.lang == 'ko' %}광고주 웹사이트 홍보{% elif meta.lang == 'ja' %}広告主のサイトを宣伝{% elif meta.lang == 'zh' %}推广广告主网站{% else %}Promote an advertiser’s website{% endif %}
                         </h3>
                         <p>
-                          {% if meta.lang == 'ko' %}
+                            {% if meta.lang == 'ko' %}
                           X, 페이스북, 블로그에 링크와 후기를 올리면 승인 후 암호화폐가 지급됩니다.
                           {% elif meta.lang == 'ja' %}
                           XやFacebook、ブログにリンクと短いレビューを投稿。承認後に暗号資産が付与されます。
@@ -431,34 +455,36 @@
                         <div class="body">
                             <!-- ~80% X-like post -->
                             <div style="display:flex; gap:12px;">
-                              <div style="width:40px;height:40px;border-radius:999px;background:#1f2937;"></div>
-                              <div style="flex:1;">
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                  <strong style="font-weight:800;">Alex</strong>
-                                  <span style="opacity:.8">@alex</span>
-                                  <span style="opacity:.6">· 2h</span>
-                                </div>
-                                <div style="margin:8px 0 10px; color:#d6e6df;">
-                                  Exploring <strong>LinkHash</strong> — transparent, decentralized marketing where contributors earn crypto for real actions.
+                                <div style="width:40px;height:40px;border-radius:999px;background:#1f2937;"></div>
+                                <div style="flex:1;">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <strong style="font-weight:800;">Alex</strong>
+                                        <span style="opacity:.8">@alex</span>
+                                        <span style="opacity:.6">· 2h</span>
+                                    </div>
+                                    <div style="margin:8px 0 10px; color:#d6e6df;">
+                                        Exploring
+                                        <strong>LinkHash</strong>
+                                        — transparent, decentralized marketing where contributors earn crypto for real actions.
                                   LHX just tapped a new ATH. 🚀
-                                  <a href="https://link-hash.com" style="text-decoration:underline;">https://link-hash.com</a>
+                                        <a href="https://link-hash.com" style="text-decoration:underline;">https://link-hash.com</a>
+                                    </div>
+                                    <div style="border:1px solid #22303e; border-radius:12px; overflow:hidden;">
+                                        <div style="height:140px; background:#0b1117;">
+                                            <img src="{% static 'img/landing/twitter.png' %}" alt="Link preview" style="width:100%; height:100%; object-fit:cover; display:block;">
+                                        </div>
+                                        <div style="padding:10px 12px;">
+                                            <div style="font-weight:700;">LinkHash — Earn Crypto for Real Engagement</div>
+                                            <div style="font-size:12px; color:#9fb0aa; margin-top:2px;">New campaign live • ATH milestone reached</div>
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; gap:24px; font-size:12px; opacity:.8; margin-top:10px;">
+                                        <span>↩ 12</span>
+                                        <span>🔁 34</span>
+                                        <span>❤ 210</span>
+                                        <span>📊 5k</span>
+                                    </div>
                                 </div>
-                                <div style="border:1px solid #22303e; border-radius:12px; overflow:hidden;">
-                                  <div style="height:140px; background:#0b1117;">
-                                    <img src="{% static 'img/landing/twitter.png' %}" alt="Link preview" style="width:100%; height:100%; object-fit:cover; display:block;">
-                                  </div>
-                                  <div style="padding:10px 12px;">
-                                    <div style="font-weight:700;">LinkHash — Earn Crypto for Real Engagement</div>
-                                    <div style="font-size:12px; color:#9fb0aa; margin-top:2px;">New campaign live • ATH milestone reached</div>
-                                  </div>
-                                </div>
-                                <div style="display:flex; gap:24px; font-size:12px; opacity:.8; margin-top:10px;">
-                                  <span>↩ 12</span>
-                                  <span>🔁 34</span>
-                                  <span>❤ 210</span>
-                                  <span>📊 5k</span>
-                                </div>
-                              </div>
                             </div>
                             <div class="preview-actions" style="margin-top:10px;">
                                 <span class="fake-chip">X</span>
@@ -472,10 +498,10 @@
                 <div class="step">
                     <div class="reveal">
                         <h3>
-                          {% if meta.lang == 'ko' %}광고주 앱 설치와 리뷰{% elif meta.lang == 'ja' %}広告主のアプリをインストールしてレビュー{% elif meta.lang == 'zh' %}安装广告主应用并撰写评论{% else %}Install an advertiser’s app and leave a review{% endif %}
+                            {% if meta.lang == 'ko' %}광고주 앱 설치와 리뷰{% elif meta.lang == 'ja' %}広告主のアプリをインストールしてレビュー{% elif meta.lang == 'zh' %}安装广告主应用并撰写评论{% else %}Install an advertiser’s app and leave a review{% endif %}
                         </h3>
                         <p>
-                          {% if meta.lang == 'ko' %}
+                            {% if meta.lang == 'ko' %}
                           앱을 설치하고 스토어에 리뷰를 남기면 승인 후 암호화폐가 지급됩니다.
                           {% elif meta.lang == 'ja' %}
                           アプリをインストールしてストアにレビューを投稿。承認後に暗号資産が付与されます。
@@ -495,41 +521,43 @@
                         <div class="body">
                             <!-- ~80% Play Store-like layout -->
                             <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-                              <div style="display:flex; gap:12px; align-items:center;">
-                                <div style="width:64px;height:64px;border-radius:14px;overflow:hidden;background:#0b1117;">
-                                  <img src="{% static 'img/logo-square-1024.png' %}" alt="App icon" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                <div style="display:flex; gap:12px; align-items:center;">
+                                    <div style="width:64px;height:64px;border-radius:14px;overflow:hidden;background:#0b1117;">
+                                        <img src="{% static 'img/logo-square-1024.png' %}" alt="App icon" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:800;">LinkHash</div>
+                                        <div style="font-size:12px; color:#9fb0aa;">Marketing</div>
+                                        <div style="font-size:12px; margin-top:4px;">★★★★☆
+                                            <span style="opacity:.75;">4.8 • 1K+ reviews</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                  <div style="font-weight:800;">LinkHash</div>
-                                  <div style="font-size:12px; color:#9fb0aa;">Marketing</div>
-                                  <div style="font-size:12px; margin-top:4px;">★★★★☆ <span style="opacity:.75;">4.8 • 1K+ reviews</span></div>
-                                </div>
-                              </div>
-                              <button class="btn" type="button">Install</button>
+                                <button class="btn" type="button">Install</button>
                             </div>
                             <div style="display:flex; gap:8px; margin:12px 0;">
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/logo-square-1024.png' %}" alt="s1" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/cards/bitcoin-close.jpg' %}" alt="s2" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/landing/twitter.png' %}" alt="s3" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
+                                <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
+                                    <img src="{% static 'img/logo-square-1024.png' %}" alt="s1" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                                <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
+                                    <img src="{% static 'img/cards/bitcoin-close.jpg' %}" alt="s2" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                                <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
+                                    <img src="{% static 'img/landing/twitter.png' %}" alt="s3" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
                             </div>
                             <div style="display:flex; gap:16px; border-bottom:1px solid #1d2836; margin-bottom:10px;">
-                              <div style="padding:8px 0; font-weight:700; border-bottom:2px solid #23d16a;">About this app</div>
-                              <div style="padding:8px 0; opacity:.8;">Reviews</div>
-                              <div style="padding:8px 0; opacity:.8;">Privacy</div>
+                                <div style="padding:8px 0; font-weight:700; border-bottom:2px solid #23d16a;">About this app</div>
+                                <div style="padding:8px 0; opacity:.8;">Reviews</div>
+                                <div style="padding:8px 0; opacity:.8;">Privacy</div>
                             </div>
                             <div style="font-size:13px; color:#cfe0d8; margin-bottom:10px;">
-                              Earn crypto for real actions across social, app reviews, and surveys. Rules and progress are public.
+                                Earn crypto for real actions across social, app reviews, and surveys. Rules and progress are public.
                             </div>
                             <div style="border-top:1px solid #1d2836; padding-top:10px;">
-                              <div style="font-weight:700; margin-bottom:6px;">User reviews</div>
-                              <div style="font-size:12px; color:#cfe0d8; margin-bottom:6px;">“Clear tasks and fast approval. Payouts on-chain.”</div>
-                              <div style="font-size:12px; color:#cfe0d8;">“Simple to use, fair rewards.”</div>
+                                <div style="font-weight:700; margin-bottom:6px;">User reviews</div>
+                                <div style="font-size:12px; color:#cfe0d8; margin-bottom:6px;">“Clear tasks and fast approval. Payouts on-chain.”</div>
+                                <div style="font-size:12px; color:#cfe0d8;">“Simple to use, fair rewards.”</div>
                             </div>
                         </div>
                     </div>
@@ -538,10 +566,10 @@
                 <div class="step">
                     <div class="reveal">
                         <h3>
-                          {% if meta.lang == 'ko' %}광고주 설문에 응답{% elif meta.lang == 'ja' %}広告主のアンケートに回答{% elif meta.lang == 'zh' %}参与广告主问卷{% else %}Answer a survey from one of our advertisers{% endif %}
+                            {% if meta.lang == 'ko' %}광고주 설문에 응답{% elif meta.lang == 'ja' %}広告主のアンケートに回答{% elif meta.lang == 'zh' %}参与广告主问卷{% else %}Answer a survey from one of our advertisers{% endif %}
                         </h3>
                         <p>
-                          {% if meta.lang == 'ko' %}
+                            {% if meta.lang == 'ko' %}
                           광고주가 제시한 주제·제품·의견에 대한 설문을 완료하면 승인 후 암호화폐가 지급됩니다.
                           {% elif meta.lang == 'ja' %}
                           広告主が提示するトピック・製品・意見に関するアンケートを完了。承認後に暗号資産が付与されます。
@@ -574,7 +602,12 @@
                             <div class="form-row">
                                 <div>
                                     <label>Confidence (0–100)</label>
-                                    <input type="number" min="0" max="100" placeholder="e.g. 70">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        placeholder="e.g. 70"
+                                    >
                                 </div>
                                 <div>
                                     <label>Email (optional)</label>

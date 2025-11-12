@@ -53,6 +53,11 @@ urlpatterns = [
     path("api/rewards/apply", v.rewards_apply_submit, name="rewards_apply_submit"),
 
     path("ckeditor/", include("ckeditor_uploader.urls")), 
+
+    path("advertiser/", v.advertiser_en, name="advertiser_en"),
+    path("ko/advertiser/", v.advertiser_ko, name="advertiser_ko"),
+    path("ja/advertiser/", v.advertiser_ja, name="advertiser_ja"),
+    path("zh/advertiser/", v.advertiser_zh, name="advertiser_zh"),
 ]
 
 if settings.DEBUG:
