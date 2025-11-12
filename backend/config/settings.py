@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
 # Add your server IP/hosts as needed
-ALLOWED_HOSTS = ["link-hash.com", "www.link-hash.com", "54.180.247.151", "localhost", "127.0.0.1", "m.link-hash.com"]
+ALLOWED_HOSTS = ["link-hash.com", "www.link-hash.com", "54.180.247.151", "localhost", "127.0.0.1", "m.link-hash.com", "54.180.136.68"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://link-hash.com",
