@@ -65,11 +65,11 @@
       .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
       .nav .links{display:flex; gap:24px; align-items:center;}
       .nav .links a{color:#cfe7dd; opacity:.9}
-      .nav .links a.active{font-weight:800; color:#d8ffe7; text-shadow:0 0 14px rgba(35,209,106,.22)}
+      .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
       .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
       .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
 
-      /* ===== HERO (Advertiser) ===== */
+      /* ===== HERO ===== */
       .hero{position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,.06);}
       .hero::before{
         content:""; position:absolute; inset:-10%; background:
@@ -77,58 +77,205 @@
           radial-gradient(60rem 40rem at 120% 10%, rgba(22,163,74,.10), transparent 60%);
         filter: blur(40px); z-index:0; opacity:.6;
       }
-      .hero .container{min-height:90vh; display:flex; align-items:center; position:relative; z-index:1;}
-      .hero h1{font-size:54px; line-height:1.12; margin:0 0 16px; letter-spacing:0.3px; word-break:keep-all; text-wrap:balance;}
-      .hero p{color:var(--muted); font-size:18px; margin:0 0 28px;}
+      /* make hero flush to viewport under the 72px sticky nav */
+      .hero .container{display:flex; align-items:center; position:relative; z-index:1; min-height:calc(100vh - 72px);}
+      @supports (height: 100dvh){
+        .hero .container{min-height:calc(100dvh - 72px);}
+      }
+      .hero h1{font-size:46px; line-height:1.16; margin:0 0 12px; letter-spacing:0.4px;}
+      .hero p{color:var(--muted); font-size:17px; margin:0 0 24px;}
+      .hero .cta{display:flex; gap:12px; flex-wrap:wrap;}
       .hero .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(22,163,74,.14); border:1px solid rgba(35,209,106,.35); color:#aef2c9; font-weight:700; margin-bottom:16px;}
-      .cta{display:flex; gap:12px; flex-wrap:wrap;}
-      .muted{color:#b4c5bf}
 
-      /* ===== SECTIONS ===== */
-      .section{padding:80px 0; background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.65)), var(--noise);}
-      .section h2{font-size:36px; margin:0 0 12px;}
-      .section p.lead{color:#9fb0aa; margin:0 0 26px;}
-      .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
-      .grid-2{display:grid; grid-template-columns:1.2fr 1fr; gap:22px; align-items:center;}
-      .card{background:linear-gradient(180deg, #0f1419, #0c1116); border:1px solid rgba(255,255,255,.06); border-radius:16px; box-shadow:var(--shadow-lg); padding:22px;}
-      .card h3{margin:0 0 8px;}
-      .card p{margin:0; color:#b9c9c3}
-      .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
-      .chip{padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px; display:inline-flex; align-items:center; gap:6px;}
+      /* ===== HOW (shorter) ===== */
+      .how{border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06); background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.65)), var(--noise);}
+      .steps{display:flex; flex-direction:column; gap:26px; padding:28px 0;}
+      .step{display:grid; grid-template-columns:1.1fr 1fr; gap:22px; align-items:center; min-height:56vh;}
+      .step h3{font-size:28px; margin:0 0 10px;}
+      .step p{margin:0; color:#b4c5bf}
 
-      /* ===== Mini mock windows ===== */
+      /* Noticeable reveal animations */
+      .reveal{opacity:0; transform:translateY(36px); transition:opacity .55s ease, transform .55s cubic-bezier(.22,.87,.31,1);}
+      .reveal.in{opacity:1; transform:none;}
       .mini{
         border:1px solid rgba(255,255,255,.08); border-radius:16px;
         background:linear-gradient(180deg, #0f1419, #0c1116); box-shadow:var(--shadow-md);
-        overflow:hidden;
+        overflow:hidden; opacity:0; transform:translateY(36px) scale(.92);
+        transition:opacity .65s ease, transform .65s cubic-bezier(.2,1,.22,1);
       }
+      .mini.in{opacity:1; transform:none;}
+      .mini.pop{animation:popIn .7s cubic-bezier(.2,1,.22,1) both;}
+      @keyframes popIn{
+        0%{opacity:0; transform:translateY(42px) scale(.9)}
+        60%{opacity:1; transform:translateY(-4px) scale(1.02)}
+        100%{opacity:1; transform:translateY(0) scale(1)}
+      }
+
       .mini .chrome{display:flex; align-items:center; gap:6px; height:36px; padding:0 12px; border-bottom:1px solid rgba(255,255,255,.06); background:rgba(14,18,25,.65);}
       .dot{width:10px; height:10px; border-radius:999px; background:#334050;}
       .dot.red{background:#ff6b6b} .dot.yellow{background:#ffd166} .dot.green{background:#06d6a0}
       .mini .body{padding:16px;}
 
-      /* ===== Simple mock charts ===== */
-      .chart{height:220px; background:linear-gradient(180deg,#0c1116,#0b0f14); border:1px solid #1a222e; border-radius:12px; padding:12px; position:relative}
-      .chart .y{position:absolute; left:10px; top:10px; font-size:12px; color:#8ea19a}
-      .chart .x{position:absolute; right:10px; bottom:8px; font-size:12px; color:#8ea19a}
-      .bars{position:absolute; left:50px; right:16px; bottom:24px; top:18px; display:flex; align-items:flex-end; gap:10px}
-      .bar{width:28px; background:linear-gradient(180deg,#23d16a,#19b357); box-shadow:var(--glow); border-radius:6px 6px 0 0; height:60%}
-      .bar:nth-child(2){height:68%} .bar:nth-child(3){height:72%} .bar:nth-child(4){height:84%} .bar:nth-child(5){height:62%} .bar:nth-child(6){height:96%}
+      /* mini: APPLY form (enriched) */
+      .mini .form-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;}
+      .mini label{display:block; font-weight:700; font-size:12px; margin:0 0 6px; color:#d0e6dc}
+      .mini input, .mini select, .mini .fake-input{width:100%; padding:10px 12px; border:1px solid #2a333f; border-radius:10px; background:#0b1117; color:#e6f1ee; font-size:13px;}
+      .mini .fake-chip{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid #1d2836; background:#0b1218; color:#cde6da; font-size:12px; margin-right:6px;}
+      .mini .preview-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:12px;}
 
-      .line{position:absolute; left:50px; right:16px; top:18px; bottom:24px; pointer-events:none}
-      .line svg{width:100%; height:100%}
-      .dotp{fill:#23d16a}
+      /* mini: REWARDS list (enriched, with thumbs) */
+      .mini .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+      .mini .card{background:#0b1117; border:1px solid #1d2836; border-radius:12px; padding:12px;}
+      .mini .card h4{margin:0 0 6px; font-size:14px;}
+      .mini .card p{margin:0 0 8px; color:#9fb0aa; font-size:12px;}
+      .mini .thumb{height:88px; border-radius:8px; overflow:hidden; background:#0b1117; margin-bottom:8px;}
+      .mini .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.95}
+      .mini .pill{background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:6px 8px; font-size:11px; color:#cde6da; display:inline-flex; align-items:center; gap:6px;}
+      .mini .progress{height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:6px;}
+      .mini .bar{height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)}
+      .mini .tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;}
+      .mini .tag{padding:4px 8px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:11px;}
 
-      /* ===== CTA band ===== */
-      .cta-band{padding:26px; border:1px solid rgba(255,255,255,.08); border-radius:16px; background:linear-gradient(180deg,#0f1419,#0c1116); display:flex; align-items:center; justify-content:space-between; gap:18px; box-shadow:var(--shadow-lg);}
+      /* mini: REWARD DETAILS (enriched) */
+      .mini .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
 
-      /* ===== Footer ===== */
+      /* ===== EXPLAINER CARDS ===== */
+      .section{padding:88px 0; background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.65)), var(--noise);}
+      .section h2{font-size:36px; margin:0 0 12px;}
+      .section p.lead{color:#9fb0aa; margin:0 0 28px;}
+      .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+      .card{background:linear-gradient(180deg, #0f1419, #0c1116); border:1px solid rgba(255,255,255,.06); border-radius:16px; box-shadow:var(--shadow-lg); padding:22px; transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;}
+      .card:hover{transform:translateY(-3px); border-color:rgba(35,209,106,.35); box-shadow:0 40px 80px rgba(22,163,74,.18)}
+      .card h3{margin:0 0 8px;}
+      .card p{margin:0; color:#b9c9c3}
+      .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+      .chip{padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px; display:inline-flex; align-items:center; gap:6px;}
+
+      /* ===== PROJECTS (CAROUSEL) ===== */
+      .projects{padding:90px 0 110px; background:radial-gradient(90rem 50rem at -15% 10%, rgba(22,163,74,.10), transparent 60%), linear-gradient(180deg, #0a0d11, #0b0e12);}
+      .projects h2{font-size:34px; margin:0 0 6px;}
+      .projects .sub{color:#9fb0aa; margin:0 0 22px;}
+      .project-card{width:360px; height:460px; display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(180deg, #0d1217, #0b0f14); border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow-md);}
+      .project-card .thumb{position:relative; height:190px; background:#0b1117; overflow:hidden;}
+      .project-card .thumb img{width:100%; height:100%; object-fit:cover; display:block; opacity:.92; transform:scale(1.03)}
+      .task-badges{position:absolute; left:12px; bottom:12px; display:flex; gap:8px;}
+      .task-badge{padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(14,18,25,.8); border:1px solid rgba(255,255,255,.08);}
+      .task-badge.visit{color:#a0f2bd; border-color:#2a6f47}
+      .task-badge.link{color:#b2f5ff; border-color:#2a455e}
+      .project-card .body{flex:1; padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px;}
+      .project-card h3{font-size:18px; margin:0}
+      .project-card p{color:#b7c8c1; font-size:14px; margin:0 0 6px}
+      .meta{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
+      .meta .pill{background:#0b1218; border:1px solid #1d2836; border-radius:10px; padding:8px 10px; font-size:12px; color:#cde6da; display:flex; align-items:center; gap:8px;}
+      .progress{height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px; overflow:hidden; margin-top:6px;}
+      .progress .bar{height:100%; width:0; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)}
+      .project-card .foot{display:flex; justify-content:flex-end; margin-top:auto;}
+      .project-card .foot .btn{padding:10px 12px;}
+      .swiper{padding:8px}
+      .swiper-slide{width:auto}
+
+      .section-head{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:8px;}
+      .more-link{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-weight:700; border:1px solid rgba(255,255,255,.08); background:rgba(14,18,25,.6); color:#d9f6e6}
+      .more-link:hover{border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18)}
+
+      /* ===== FOOTER ===== */
       .footer{padding:28px 0; border-top:1px solid rgba(255,255,255,.06); color:#a7b9b1; background:#0a0c10;}
 
-      /* Responsive */
-      @media (max-width:1140px){ .container{width:1000px} .grid-2{grid-template-columns:1fr} .grid-3{grid-template-columns:1fr 1fr} }
-      @media (max-width:900px){ .container{width:920px} .grid-3{grid-template-columns:1fr} .hero h1{font-size:42px} }
-      @media (max-width:600px){ .container{width:92%} .hero h1{font-size:34px} }
+      /* Desktop-first */
+      @media (max-width:1140px){ .container{width:1000px} }
+      @media (max-width:1000px){
+        .container{width:920px}
+        .step{grid-template-columns:1fr; min-height:auto;}
+      }
+      /* ===== Language dropdown (nav) ===== */
+      .lang{ position:relative; margin-left:8px; }
+      .lang-btn{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:10px 12px; font-weight:700; border-radius:12px;
+        border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6;
+        cursor:pointer;
+      }
+      .lang-btn:hover{ border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18) }
+      .lang .chev{ opacity:.8 }
+
+      .lang-menu{
+        position:absolute; top:110%; right:0; width:210px;
+        background:linear-gradient(180deg, #0f1419, #0c1116);
+        border:1px solid rgba(255,255,255,.08);
+        border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45);
+        padding:6px; display:none; z-index:70;
+      }
+      .lang.open .lang-menu{ display:block; animation:menuIn .14s ease-out }
+      @keyframes menuIn{ from{ transform:translateY(-6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+
+      .lang-item{
+        display:flex; align-items:center; gap:10px; padding:10px 10px; border-radius:10px;
+        cursor:pointer; color:#cfe7dd; font-weight:700;
+      }
+      .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
+      .flag{
+        width:18px; height:18px; border-radius:3px; display:inline-block; overflow:hidden;
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+        background: linear-gradient(180deg, #22303e, #10161c);
+      }
+      .lang-btn .flag{
+        /* Dynamic via JS; placeholder tone so layout doesn't shift */
+      }
+
+      /* Minimal “flags” using gradients—no network requests */
+      .flag-emoji{
+        display:inline-flex; align-items:center; justify-content:center;
+        width:18px; height:18px; line-height:18px;
+        font-size:14px; border-radius:3px;
+        background:rgba(255,255,255,.06);
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+      }
+      /* Make sure it stays aligned in your existing flex row */
+      .links{ display:flex; gap:24px; align-items:center; }
+
+      .empty-wrap{
+        padding:18px; border:1px solid rgba(255,255,255,.08);
+        border-radius:14px; background:linear-gradient(180deg,#0f1419,#0c1116);
+        color:#b4c5bf; display:flex; align-items:center; justify-content:space-between; gap:12px;
+      }
+      .empty-wrap .msg{font-size:14px}
+      .empty-wrap .hint{opacity:.75; font-size:12px}
+
+      /* --- Swiper layout hardening --- */
+      #campaign-swiper,
+      #past-swiper { position: relative; overflow: hidden; }
+      #campaign-swiper .swiper-wrapper,
+      #past-swiper .swiper-wrapper{
+        display: flex !important;
+        box-sizing: content-box;
+        flex-wrap: wrap !important;
+      }
+      #campaign-swiper .swiper-slide,
+      #past-swiper .swiper-slide{
+        flex: 0 0 auto !important;
+      }
+
+      /* ===== Advertiser-specific overrides (kept separate so the shared header stays identical) ===== */
+      .hero.hero-alt .container{
+        min-height:calc(100vh - 72px);
+        display:grid; grid-template-columns:1.2fr 1fr; gap:28px; align-items:center;
+      }
+      .hero.hero-alt .eyebrow{
+        display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+        background:rgba(22,163,74,.14); border:1px solid rgba(35,209,106,.35); color:#aef2c9; font-weight:800;
+        margin-bottom:14px;
+      }
+      .hero.hero-alt h1{ font-size:48px; line-height:1.12; margin:0 0 10px; }
+      .hero.hero-alt p{ font-size:18px; color:#bcd5cc; margin:0 0 18px; }
+      .hero-points{display:grid; gap:10px; margin:14px 0 18px;}
+      .hero-points .row{display:flex; align-items:flex-start; gap:10px; color:#cfe7dd}
+      .hero-aside{align-self:stretch}
+      .hero-aside .mini{opacity:1; transform:none}
+      .trust{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+      .trust .chip{padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px; display:inline-flex; align-items:center; gap:6px;}
+      @media (max-width:1000px){
+        .hero.hero-alt .container{grid-template-columns:1fr;}
+      }
         </style>
     </head>
     <body>
@@ -141,8 +288,8 @@
                     <span>LinkHash</span>
                 </div>
                 <nav class="links">
-                    <!-- Mark HOME as active/highlighted -->
-                    <a class="active" href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
+                    <!-- Home highlighted -->
+                    <a href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}" style="font-weight:700;color:#d8ffe7">
                         {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
                     </a>
                     <a href="{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}">
@@ -160,14 +307,13 @@
                     {% if wallet_user %}
                     <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
                     <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
-                        {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ログアウト{% elif meta.lang == 'zh' %}退出{% else %}Logout{% endif %}
+                        {% if meta.lang == 'ko' %}로그아웃{% elif meta.lang == 'ja' %}ダッシュボード{% elif meta.lang == 'zh' %}仪表盘{% else %}Logout{% endif %}
                     </a>
                     {% else %}
                     <a class="btn" href="#" onclick="connectWallet && connectWallet();return false;">
                         {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
                     </a>
                     {% endif %}
-                    <!-- Language dropdown -->
                     <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
                         <button
                             class="lang-btn"
@@ -230,114 +376,178 @@
                 </nav>
             </div>
         </header>
-        <!-- ===== HERO ===== -->
-        <section class="hero">
+        <!-- ===== HERO (ALT LAYOUT) ===== -->
+        <section class="hero hero-alt">
             <div class="container">
+                <!-- Left: value prop + bullets -->
                 <div class="content">
-                    <div class="badge">Advertiser · Guide</div>
+                    <div class="eyebrow">Advertiser · Guide</div>
                     <h1>
                         {% if meta.lang == 'ko' %}
-              봇 없이 자연스럽게 홍보하는 방법
-                        <br>
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">투명한 탈중앙 마케팅으로</span>
-                        성과를 만듭니다.
+              봇 없이 자연스러운 홍보,
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">완전 공개·탈중앙</span>
+                        운영으로 안전하게 성과를 냅니다.
             {% elif meta.lang == 'ja' %}
-              ボットに頼らない自然なプロモーション
-                        <br>
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">透明で分散化された運用</span>
-                        で成果を出します。
+              ボットに頼らず、
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">完全公開・分散型</span>
+                        の運用で安全に成果を。
             {% elif meta.lang == 'zh' %}
-              不用机器人也能获得自然推广
-                        <br>
-                        通过
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">透明的去中心化运营</span>
-                        实现效果。
+              不靠机器人，依托
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">全公开与去中心化</span>
+                        运营，稳步拿结果。
             {% else %}
-              Get organic promotion without bots.
-                        <br>
-                        Drive results with
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">transparent, decentralized</span>
-                        marketing.
+              Organic promotion without bots, powered by
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">fully transparent, decentralized</span>
+                        operations.
             {% endif %}
                     </h1>
                     <p>
                         {% if meta.lang == 'ko' %}
-              광고주는 예산과 목표를 정하고, 참여자는 규칙에 맞춰 행동합니다. 승인 기준과 보상 진행은 모두 공개됩니다.
+              광고주는 목표·예산을 설정하고, 참여자는 공개 규칙에 따라 행동합니다. 검증과 지급 현황은 실시간으로 확인 가능합니다.
             {% elif meta.lang == 'ja' %}
-              広告主は予算と目標を設定し、参加者はルールに沿って行動。審査基準と支払い進行はすべて公開。
+              広告主は目標・予算を設定。参加者は公開ルールに従い行動。検証と支払いはリアルタイムで可視化されます。
             {% elif meta.lang == 'zh' %}
-              广告主设定预算与目标，参与者按规则完成任务。审核标准与发放进度全公开。
+              广告主设定目标和预算；参与者按公开规则执行。审核与发放进度，全程实时可见。
             {% else %}
-              Advertisers set budget and goals; contributors act under clear rules. Review criteria and payouts are public.
+              Set goals and budget; contributors act under public rules. Verification and payouts are visible in real time.
             {% endif %}
                     </p>
+                    <div class="hero-points">
+                        <div class="row">✅ {% if meta.lang == 'ko' %}클릭팜·봇 배제, 실제 유입 중심{% elif meta.lang == 'ja' %}クリックファーム・ボット排除、実流入重視{% elif meta.lang == 'zh' %}剔除点击农场与机器人，重视真实流量{% else %}Excludes click farms & bots; prioritizes real traffic{% endif %}</div>
+                        <div class="row">✅ {% if meta.lang == 'ko' %}지급·심사 기준 100% 공개{% elif meta.lang == 'ja' %}支払い・審査基準を100%公開{% elif meta.lang == 'zh' %}支付与审核标准100%公开{% else %}100% public payout & review criteria{% endif %}</div>
+                        <div class="row">✅ {% if meta.lang == 'ko' %}AI 분석으로 다음 캠페인 최적화{% elif meta.lang == 'ja' %}AI分析で次回キャンペーンを最適化{% elif meta.lang == 'zh' %}AI 分析助力下次活动优化{% else %}AI analytics to optimize your next campaign{% endif %}</div>
+                    </div>
                     <div class="cta">
                         <a class="btn" href="#why">
                             {% if meta.lang == 'ko' %}왜 LinkHash인가{% elif meta.lang == 'ja' %}LinkHashの強み{% elif meta.lang == 'zh' %}为什么选 LinkHash{% else %}Why LinkHash{% endif %}
                         </a>
                         <a class="btn-outline" href="#" onclick="goApply();return false;">
-                            {% if meta.lang == 'ko' %}바로 캠페인 신청하기{% elif meta.lang == 'ja' %}今すぐ申請{% elif meta.lang == 'zh' %}立即申请{% else %}Apply now{% endif %}
+                            {% if meta.lang == 'ko' %}캠페인 신청하기{% elif meta.lang == 'ja' %}今すぐ申請{% elif meta.lang == 'zh' %}立即申请{% else %}Apply now{% endif %}
                         </a>
                     </div>
+                    <div class="trust">
+                        <span class="chip">White-hat</span>
+                        <span class="chip">Public KPIs</span>
+                        <span class="chip">Anti-spam</span>
+                        <span class="chip">Crypto payouts</span>
+                    </div>
                 </div>
+                <!-- Right: verification mock window (different from home) -->
+                <aside class="hero-aside">
+                    <div class="mini">
+                        <div class="chrome">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <div class="body">
+                            <div style="display:grid; gap:10px">
+                                <div style="display:flex; align-items:center; justify-content:space-between">
+                                    <strong>Verification Queue</strong>
+                                    <span class="chip" style="padding:6px 10px; border-radius:999px; border:1px solid #22303e; background:#0a1117; color:#c7e8d9; font-size:12px">LIVE</span>
+                                </div>
+                                <div class="card" style="background:#0b1117; border:1px solid #1d2836; border-radius:12px; padding:12px;">
+                                    <div style="display:flex; gap:10px; align-items:center">
+                                        <div style="width:34px;height:34px;border-radius:8px;background:#0a1117;border:1px solid #1d2836"></div>
+                                        <div style="flex:1">
+                                            <div style="font-weight:700">X Post Review</div>
+                                            <div style="font-size:12px; color:#9fb0aa">Link + product summary • clean history</div>
+                                        </div>
+                                        <span class="chip">OK</span>
+                                    </div>
+                                </div>
+                                <div class="card" style="background:#0b1117; border:1px solid #1d2836; border-radius:12px; padding:12px;">
+                                    <div style="display:flex; gap:10px; align-items:center">
+                                        <div style="width:34px;height:34px;border-radius:8px;background:#0a1117;border:1px solid #1d2836"></div>
+                                        <div style="flex:1">
+                                            <div style="font-weight:700">Blog Review</div>
+                                            <div style="font-size:12px; color:#9fb0aa">Unique content • topical keywords</div>
+                                        </div>
+                                        <span class="chip">OK</span>
+                                    </div>
+                                </div>
+                                <div class="card" style="background:#0b1117; border:1px solid #1d2836; border-radius:12px; padding:12px;">
+                                    <div style="display:flex; gap:10px; align-items:center">
+                                        <div style="width:34px;height:34px;border-radius:8px;background:#0a1117;border:1px solid #1d2836"></div>
+                                        <div style="flex:1">
+                                            <div style="font-weight:700">App Review</div>
+                                            <div style="font-size:12px; color:#9fb0aa">Install screenshot • rating matches</div>
+                                        </div>
+                                        <span class="chip">OK</span>
+                                    </div>
+                                </div>
+                                <div class="progress" style="height:8px; background:#0b1218; border:1px solid #1d2836; border-radius:999px;">
+                                    <div class="bar" style="width:74%; height:100%; background:linear-gradient(90deg,#19b357,#23d16a); box-shadow:var(--glow)"></div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa;">
+                                    <span>Queue cleared</span>
+                                    <span>74%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </section>
         <!-- ===== WHY LINKHASH ===== -->
         <section id="why" class="section">
-            <div class="container grid-2">
-                <div>
-                    <h2>
-                        {% if meta.lang == 'ko' %}광고주는 투명하게, 참여자는 공정하게{% elif meta.lang == 'ja' %}広告主には透明性、参加者には公正さ{% elif meta.lang == 'zh' %}对广告主透明，对参与者公平{% else %}Transparency for advertisers, fairness for contributors{% endif %}
-                    </h2>
-                    <p class="lead">
-                        {% if meta.lang == 'ko' %}
-              LinkHash는 데이터로 배치하고 결과를 공개합니다. 봇이나 클릭팜이 아닌 실제 행동에 암호화폐 보상을 지급합니다.
-            {% elif meta.lang == 'ja' %}
-              LinkHashはデータで配置し、結果を公開。ボットやクリックファームではなく実行された行動に暗号報酬を支払います。
-            {% elif meta.lang == 'zh' %}
-              LinkHash 以数据投放并公开结果。为真实行为而非点击农场或机器人发放加密奖励。
-            {% else %}
-              LinkHash places with data and makes outcomes public. We reward real actions—not click farms or bots—with crypto.
-            {% endif %}
-                    </p>
-                    <div class="grid-3">
-                        <div class="card">
-                            <h3>{% if meta.lang == 'ko' %}투명한 진행{% elif meta.lang == 'ja' %}透明な進行{% elif meta.lang == 'zh' %}过程透明{% else %}Transparent progress{% endif %}</h3>
-                            <p>{% if meta.lang == 'ko' %}규칙, 심사 기준, 지급 현황이 모두 공개됩니다.{% elif meta.lang == 'ja' %}ルール・審査基準・支払い状況を公開。{% elif meta.lang == 'zh' %}规则、审核标准、发放进度全部公开。{% else %}Rules, review criteria, and payouts are public end-to-end.{% endif %}</p>
-                        </div>
-                        <div class="card">
-                            <h3>{% if meta.lang == 'ko' %}자연스러운 노출{% elif meta.lang == 'ja' %}自然な露出{% elif meta.lang == 'zh' %}自然曝光{% else %}Organic reach{% endif %}</h3>
-                            <p>{% if meta.lang == 'ko' %}X, 블로그, 앱스토어 등 실제 채널에서 얻는 유입만 인정합니다.{% elif meta.lang == 'ja' %}Xやブログ・アプリストア等の実チャネルのみを評価。{% elif meta.lang == 'zh' %}只认可来自 X、博客、应用商店等真实渠道的流量。{% else %}We only count real exposure on X, blogs, and app stores.{% endif %}</p>
-                        </div>
-                        <div class="card">
-                            <h3>{% if meta.lang == 'ko' %}암호화폐 보상{% elif meta.lang == 'ja' %}暗号報酬{% elif meta.lang == 'zh' %}加密奖励{% else %}Crypto rewards{% endif %}</h3>
-                            <p>{% if meta.lang == 'ko' %}승인된 행동에 즉시 보상이 지급됩니다.{% elif meta.lang == 'ja' %}承認済みの行動へ即時支払い。{% elif meta.lang == 'zh' %}对通过审核的行为即时发放奖励。{% else %}Approved actions are paid out instantly from the pool.{% endif %}</p>
+            <div class="container">
+                <h2>
+                    {% if meta.lang == 'ko' %}광고주는 투명하게, 참여자는 공정하게{% elif meta.lang == 'ja' %}広告主には透明性、参加者には公正さ{% elif meta.lang == 'zh' %}对广告主透明，对参与者公平{% else %}Transparency for advertisers, fairness for contributors{% endif %}
+                </h2>
+                <p class="lead">
+                    {% if meta.lang == 'ko' %}
+            LinkHash는 데이터로 배치하고 결과를 공개합니다. 봇이나 클릭팜이 아닌 실제 행동에 암호화폐 보상을 지급합니다.
+          {% elif meta.lang == 'ja' %}
+            LinkHashはデータで配置し、結果を公開。ボットやクリックファームではなく実行された行動に暗号報酬を支払います。
+          {% elif meta.lang == 'zh' %}
+            LinkHash 以数据投放并公开结果。为真实行为而非点击农场或机器人发放加密奖励。
+          {% else %}
+            We place with data and make outcomes public. We reward real actions—not click farms or bots—with crypto.
+          {% endif %}
+                </p>
+                <div class="cards" style="grid-template-columns:1.2fr 1fr 1fr">
+                    <div class="card">
+                        <h3>{% if meta.lang == 'ko' %}완전 공개 운영{% elif meta.lang == 'ja' %}完全公開の運用{% elif meta.lang == 'zh' %}全程公开{% else %}Fully public operations{% endif %}</h3>
+                        <p>{% if meta.lang == 'ko' %}규칙, 심사 기준, 지급 현황을 끝까지 공개합니다.{% elif meta.lang == 'ja' %}ルール、審査基準、支払い状況を最後まで公開。{% elif meta.lang == 'zh' %}规则、审核标准与发放状态全链路公开。{% else %}Rules, review criteria, and payouts are public end-to-end.{% endif %}</p>
+                        <div class="chips" style="margin-top:12px">
+                            <span class="chip">Public KPIs</span>
+                            <span class="chip">Audit trail</span>
+                            <span class="chip">Anti-spam</span>
                         </div>
                     </div>
+                    <div class="card">
+                        <h3>{% if meta.lang == 'ko' %}자연스러운 유입{% elif meta.lang == 'ja' %}自然な流入{% elif meta.lang == 'zh' %}自然流量{% else %}Organic reach{% endif %}</h3>
+                        <p>{% if meta.lang == 'ko' %}X, 블로그, 앱스토어 등 실제 채널만 인정합니다.{% elif meta.lang == 'ja' %}X・ブログ・アプリストア等の実チャネルのみ評価。{% elif meta.lang == 'zh' %}仅认可 X、博客、应用商店等真实渠道。{% else %}We only count real exposure on X, blogs, and app stores.{% endif %}</p>
+                    </div>
+                    <div class="card">
+                        <h3>{% if meta.lang == 'ko' %}즉시 보상{% elif meta.lang == 'ja' %}即時の報酬{% elif meta.lang == 'zh' %}即时奖励{% else %}Instant payouts{% endif %}</h3>
+                        <p>{% if meta.lang == 'ko' %}승인 즉시 풀에서 보상됩니다.{% elif meta.lang == 'ja' %}承認後すぐにプールから支払い。{% elif meta.lang == 'zh' %}审核通过即从奖励池发放。{% else %}Approved actions are instantly paid from the pool.{% endif %}</p>
+                    </div>
                 </div>
-                <!-- Mock chart window -->
-                <div class="mini">
+                <!-- Simple trend mock (no 'Sample data' text) -->
+                <div class="mini" style="margin-top:24px">
                     <div class="chrome">
                         <span class="dot red"></span>
                         <span class="dot yellow"></span>
                         <span class="dot green"></span>
                     </div>
                     <div class="body">
-                        <div class="chart">
+                        <div class="chart" style="height:220px">
                             <div class="y">{% if meta.lang == 'ko' %}성과 지표{% elif meta.lang == 'ja' %}指標{% elif meta.lang == 'zh' %}指标{% else %}KPI{% endif %}</div>
-                            <div class="x">Week →</div>
+                            <div class="x">{% if meta.lang == 'ko' %}주차{% elif meta.lang == 'ja' %}週{% elif meta.lang == 'zh' %}周{% else %}Weeks{% endif %}</div>
                             <div class="bars">
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
+                                <div class="bar" style="height:62%"></div>
+                                <div class="bar" style="height:70%"></div>
+                                <div class="bar" style="height:76%"></div>
+                                <div class="bar" style="height:84%"></div>
+                                <div class="bar" style="height:88%"></div>
+                                <div class="bar" style="height:94%"></div>
                             </div>
                             <div class="line">
                                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                                     <polyline
-                                        points="0,80 16,74 32,70 48,58 64,62 80,40 100,34"
+                                        points="0,78 16,72 32,66 48,58 64,48 80,42 100,36"
                                         fill="none"
                                         stroke="#23d16a"
                                         stroke-width="3"
@@ -346,15 +556,12 @@
                                     <circle
                                         class="dotp"
                                         cx="100"
-                                        cy="34"
+                                        cy="36"
                                         r="2.6"
                                     />
                                 </svg>
                             </div>
                         </div>
-                        <p class="muted" style="margin-top:10px">
-                            {% if meta.lang == 'ko' %}예시 데이터: 비정상 클릭 제거, 전환 품질 중심의 KPI 추세.{% elif meta.lang == 'ja' %}例示データ：不正クリック除外、転換品質中心のKPI推移。{% elif meta.lang == 'zh' %}示例数据：剔除异常点击，关注转化质量的KPI走势。{% else %}Sample data: abnormal clicks removed; KPI trend focused on conversion quality.{% endif %}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -365,99 +572,62 @@
                 <h2>
                     {% if meta.lang == 'ko' %}왜 일반 대행은 위험한가요{% elif meta.lang == 'ja' %}従来の代理店が危険な理由{% elif meta.lang == 'zh' %}传统代理的风险{% else %}Why traditional agencies fall short{% endif %}
                 </h2>
-                <div class="grid-3">
+                <div class="cards">
                     <div class="card">
-                        <h3>{% if meta.lang == 'ko' %}클릭팜과 봇{% elif meta.lang == 'ja' %}クリックファームとボット{% elif meta.lang == 'zh' %}点击农场与机器人{% else %}Click farms & bots{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}표면 수치만 늘리고 실제 유입과 전환은 약합니다.{% elif meta.lang == 'ja' %}見かけの数値だけ増え、実流入や転換が弱い。{% elif meta.lang == 'zh' %}只拉高表面数据，真实流入与转化偏弱。{% else %}They inflate vanity metrics but deliver little real traffic or conversion.{% endif %}</p>
+                        <h3>{% if meta.lang == 'ko' %}클릭팜·봇{% elif meta.lang == 'ja' %}クリックファーム・ボット{% elif meta.lang == 'zh' %}点击农场与机器人{% else %}Click farms & bots{% endif %}</h3>
+                        <p>{% if meta.lang == 'ko' %}표면 수치만 늘리고 실제 전환은 약합니다.{% elif meta.lang == 'ja' %}見かけの数値だけ増え、転換は弱い。{% elif meta.lang == 'zh' %}只拉高表面数据，转化弱。{% else %}Inflates vanity metrics while conversion lags.{% endif %}</p>
                     </div>
                     <div class="card">
-                        <h3>{% if meta.lang == 'ko' %}총판·외주 구조{% elif meta.lang == 'ja' %}多重下請け{% elif meta.lang == 'zh' %}层层外包{% else %}Multi-layer outsourcing{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}품질 관리가 어렵고 예산이 어디에 쓰였는지 불투명합니다.{% elif meta.lang == 'ja' %}品質管理が難しく、予算の使途が不透明。{% elif meta.lang == 'zh' %}难以把控质量，预算去向不透明。{% else %}Quality drifts and budget usage becomes opaque across layers.{% endif %}</p>
+                        <h3>{% if meta.lang == 'ko' %}총판·외주{% elif meta.lang == 'ja' %}多重下請け{% elif meta.lang == 'zh' %}层层外包{% else %}Multi-layer outsourcing{% endif %}</h3>
+                        <p>{% if meta.lang == 'ko' %}품질 관리가 어렵고 예산 사용이 불투명합니다.{% elif meta.lang == 'ja' %}品質管理が難しく、予算の使途が不透明。{% elif meta.lang == 'zh' %}质量难控，预算去向不透明。{% else %}Quality drifts and budgets become opaque.{% endif %}</p>
                     </div>
                     <div class="card">
                         <h3>{% if meta.lang == 'ko' %}결과의 불연속성{% elif meta.lang == 'ja' %}結果の不連続{% elif meta.lang == 'zh' %}结果不稳定{% else %}Inconsistent outcomes{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}담당자나 외주처에 따라 편차가 크고 재현성이 낮습니다.{% elif meta.lang == 'ja' %}担当や外注先に依存してばらつきが大きい。{% elif meta.lang == 'zh' %}强依赖承接方与人员，波动大且难以复现。{% else %}Results vary by subcontractor and are hard to reproduce reliably.{% endif %}</p>
+                        <p>{% if meta.lang == 'ko' %}담당자에 따라 편차가 크고 재현성이 낮습니다.{% elif meta.lang == 'ja' %}担当に依存し再現性が低い。{% elif meta.lang == 'zh' %}依赖承接方，难以复现。{% else %}Dependent on subcontractor; low reproducibility.{% endif %}</p>
                     </div>
                 </div>
             </div>
         </section>
         <!-- ===== HOW LINKHASH SOLVES IT ===== -->
         <section class="section" id="solution">
-            <div class="container grid-2">
-                <div>
-                    <h2>
-                        {% if meta.lang == 'ko' %}LinkHash 방식{% elif meta.lang == 'ja' %}LinkHashの方法{% elif meta.lang == 'zh' %}LinkHash 方法{% else %}The LinkHash way{% endif %}
-                    </h2>
-                    <p class="lead">
-                        {% if meta.lang == 'ko' %}공개 규칙과 검증으로 봇을 배제하고, 실제 행동에 공정한 암호화폐 보상을 지급합니다.{% elif meta.lang == 'ja' %}公開ルールと検証でボットを排除し、実行された行動へ公正な暗号報酬を付与。{% elif meta.lang == 'zh' %}公开规则与审核排除机器人，对真实行为给予公平加密奖励。{% else %}Public rules and verification exclude bots; real actions earn fair crypto rewards.{% endif %}
-                    </p>
-                    <div class="card" style="margin-bottom:12px">
-                        <h3>{% if meta.lang == 'ko' %}공정한 보상 설계{% elif meta.lang == 'ja' %}公正な報酬設計{% elif meta.lang == 'zh' %}公平的奖励设计{% else %}Fair reward design{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}리뷰 품질, 링크 적합성, 앱 리뷰의 신뢰성 등 핵심 기준을 명확히 정의합니다.{% elif meta.lang == 'ja' %}レビュー品質・リンク適合性・アプリレビューの信頼性などを明確に定義。{% elif meta.lang == 'zh' %}明确界定评测质量、链接契合度、应用评价可信度等核心标准。{% else %}We define clear criteria—review quality, topical fit, and app-review credibility—before launch.{% endif %}</p>
-                    </div>
-                    <div class="card">
-                        <h3>{% if meta.lang == 'ko' %}데이터 기반 배치{% elif meta.lang == 'ja' %}データドリブン配置{% elif meta.lang == 'zh' %}数据驱动投放{% else %}Data-driven placements{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}유입 품질과 전환 확률을 보고 채널을 배치합니다.{% elif meta.lang == 'ja' %}流入品質と転換確率に基づきチャネルを配置。{% elif meta.lang == 'zh' %}基于流量质量与转化概率来配置渠道。{% else %}Channels are chosen by quality of traffic and likelihood of conversion.{% endif %}</p>
-                    </div>
-                </div>
-                <!-- Mock review list window -->
-                <div class="mini">
-                    <div class="chrome">
-                        <span class="dot red"></span>
-                        <span class="dot yellow"></span>
-                        <span class="dot green"></span>
-                    </div>
-                    <div class="body">
-                        <div class="card" style="padding:14px">
-                            <h3 style="margin:0 0 6px">{% if meta.lang == 'ko' %}검증 예시{% elif meta.lang == 'ja' %}検証サンプル{% elif meta.lang == 'zh' %}审核示例{% else %}Verification sample{% endif %}</h3>
-                            <ul style="list-style:none; padding:0; margin:0; display:grid; gap:8px; color:#cfe7dd">
-                                <li>✓ {% if meta.lang == 'ko' %}X 게시글: 링크와 제품 요약 포함, 계정 역사 양호{% elif meta.lang == 'ja' %}X投稿：リンクと製品要約、健全なアカウント履歴{% elif meta.lang == 'zh' %}X 帖子：含链接与产品摘要，账号历史良好{% else %}X post: link + product summary, healthy account history{% endif %}</li>
-                                <li>✓ {% if meta.lang == 'ko' %}블로그 리뷰: 중복/복붙 금지, 키워드 적합{% elif meta.lang == 'ja' %}ブログレビュー：重複・コピペ不可、キーワード適合{% elif meta.lang == 'zh' %}博客评测：禁止重复/粘贴，关键词契合{% else %}Blog review: no duplicates, topical keywords{% endif %}</li>
-                                <li>✓ {% if meta.lang == 'ko' %}앱 리뷰: 실제 설치 후 스크린샷, 별점과 코멘트 일치{% elif meta.lang == 'ja' %}アプリレビュー：実インストールのスクショ、星とコメントの整合{% elif meta.lang == 'zh' %}应用评价：真实安装截图，星级与评论一致{% else %}App review: real install screenshot; star rating matches comment{% endif %}</li>
-                            </ul>
+            <div class="container">
+                <h2>
+                    {% if meta.lang == 'ko' %}LinkHash 방식{% elif meta.lang == 'ja' %}LinkHashの方法{% elif meta.lang == 'zh' %}LinkHash 方法{% else %}The LinkHash way{% endif %}
+                </h2>
+                <p class="lead">
+                    {% if meta.lang == 'ko' %}공개 규칙과 검증으로 봇을 배제하고, 실제 행동에 공정한 암호화폐 보상을 지급합니다.{% elif meta.lang == 'ja' %}公開ルールと検証でボットを排除し、実行された行動へ公正な暗号報酬を付与。{% elif meta.lang == 'zh' %}公开规则与审核排除机器人，对真实行为给予公平加密奖励。{% else %}Public rules and verification exclude bots; real actions earn fair crypto rewards.{% endif %}
+                </p>
+                <div class="step" style="grid-template-columns:1fr 1.1fr">
+                    <div class="reveal in">
+                        <div class="card" style="margin-bottom:12px">
+                            <h3>{% if meta.lang == 'ko' %}공정한 보상 설계{% elif meta.lang == 'ja' %}公正な報酬設計{% elif meta.lang == 'zh' %}公平的奖励设计{% else %}Fair reward design{% endif %}</h3>
+                            <p>{% if meta.lang == 'ko' %}리뷰 품질, 링크 적합성, 앱 리뷰 신뢰성 등 기준을 명확히 정의합니다.{% elif meta.lang == 'ja' %}レビュー品質・リンク適合性・アプリレビューの信頼性を明確化。{% elif meta.lang == 'zh' %}明确评测质量、链接契合度、应用评价可信度等标准。{% else %}Clear criteria for review quality, topical fit, and app-review credibility.{% endif %}</p>
+                        </div>
+                        <div class="card">
+                            <h3>{% if meta.lang == 'ko' %}데이터 기반 배치{% elif meta.lang == 'ja' %}データドリブン配置{% elif meta.lang == 'zh' %}数据驱动投放{% else %}Data-driven placements{% endif %}</h3>
+                            <p>{% if meta.lang == 'ko' %}유입 품질과 전환 확률을 보고 채널을 배치합니다.{% elif meta.lang == 'ja' %}流入品質と転換確率に基づきチャネル選定。{% elif meta.lang == 'zh' %}基于流量质量与转化概率配置渠道。{% else %}Channels are chosen by quality of traffic and likelihood of conversion.{% endif %}</p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-        <!-- ===== AI ANALYTICS ===== -->
-        <section class="section" id="ai">
-            <div class="container grid-2">
-                <div>
-                    <h2>
-                        {% if meta.lang == 'ko' %}AI 기반 분석과 컨설팅{% elif meta.lang == 'ja' %}AI分析とコンサルティング{% elif meta.lang == 'zh' %}AI 分析与咨询{% else %}AI analytics & consultation{% endif %}
-                    </h2>
-                    <p class="lead">
-                        {% if meta.lang == 'ko' %}성과를 설명 가능한 지표로 분해하고, 다음 캠페인의 최적 구성을 제안합니다.{% elif meta.lang == 'ja' %}成果を説明可能な指標に分解し、次回の最適構成を提案。{% elif meta.lang == 'zh' %}把结果拆解为可解释指标，并为下一次活动给出最优建议。{% else %}We decompose results into explainable metrics and recommend the optimal mix for your next campaign.{% endif %}
-                    </p>
-                    <div class="chips">
-                        <span class="chip">Attribution</span>
-                        <span class="chip">Quality score</span>
-                        <span class="chip">Budget rebalancing</span>
-                    </div>
-                </div>
-                <!-- Mock analytics window -->
-                <div class="mini">
-                    <div class="chrome">
-                        <span class="dot red"></span>
-                        <span class="dot yellow"></span>
-                        <span class="dot green"></span>
-                    </div>
-                    <div class="body">
-                        <div class="chart" style="height:200px">
-                            <div class="y">Quality</div>
-                            <div class="x">Channels</div>
-                            <div class="bars">
-                                <div class="bar" style="height:78%"></div>
-                                <div class="bar" style="height:64%"></div>
-                                <div class="bar" style="height:88%"></div>
-                                <div class="bar" style="height:56%"></div>
-                                <div class="bar" style="height:92%"></div>
+                    <div class="mini">
+                        <div class="chrome">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <div class="body">
+                            <div class="chart" style="height:200px">
+                                <div class="y">{% if meta.lang == 'ko' %}품질 점수{% elif meta.lang == 'ja' %}品質スコア{% elif meta.lang == 'zh' %}质量分{% else %}Quality score{% endif %}</div>
+                                <div class="x">{% if meta.lang == 'ko' %}채널{% elif meta.lang == 'ja' %}チャネル{% elif meta.lang == 'zh' %}渠道{% else %}Channels{% endif %}</div>
+                                <div class="bars">
+                                    <div class="bar" style="height:78%"></div>
+                                    <div class="bar" style="height:64%"></div>
+                                    <div class="bar" style="height:88%"></div>
+                                    <div class="bar" style="height:56%"></div>
+                                    <div class="bar" style="height:92%"></div>
+                                </div>
                             </div>
+                            <!-- removed any 'Sample data' wording -->
                         </div>
-                        <p class="muted" style="margin-top:10px">
-                            {% if meta.lang == 'ko' %}예시: 채널별 품질 점수와 추천 예산 비율.{% elif meta.lang == 'ja' %}例：チャネル別品質スコアと推奨予算比率。{% elif meta.lang == 'zh' %}示例：各渠道质量得分与建议预算比例。{% else %}Example: per-channel quality score and suggested budget share.{% endif %}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -468,28 +638,23 @@
                 <h2>
                     {% if meta.lang == 'ko' %}시작 방법{% elif meta.lang == 'ja' %}始め方{% elif meta.lang == 'zh' %}如何开始{% else %}How to get started{% endif %}
                 </h2>
-                <div class="grid-3">
+                <div class="cards">
                     <div class="card">
-                        <h3>1. {% if meta.lang == 'ko' %}목표와 예산 설정{% elif meta.lang == 'ja' %}目標と予算設定{% elif meta.lang == 'zh' %}设定目标与预算{% else %}Define goals & budget{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}웹사이트, 앱, 설문 중 무엇을 홍보할지 선택하고 KPI를 정합니다.{% elif meta.lang == 'ja' %}サイト・アプリ・調査から選び、KPIを決める。{% elif meta.lang == 'zh' %}在网站、应用、问卷中选择并设定KPI。{% else %}Choose website, app, or survey and set your KPIs.{% endif %}</p>
+                        <h3>1. {% if meta.lang == 'ko' %}목표·예산 설정{% elif meta.lang == 'ja' %}目標・予算設定{% elif meta.lang == 'zh' %}设定目标与预算{% else %}Define goals & budget{% endif %}</h3>
+                        <p>{% if meta.lang == 'ko' %}웹사이트·앱·설문 중 목적과 KPI를 정합니다.{% elif meta.lang == 'ja' %}サイト・アプリ・調査から目的とKPIを決定。{% elif meta.lang == 'zh' %}在网站、应用、问卷中选择并设定KPI。{% else %}Choose website, app, or survey and set KPIs.{% endif %}</p>
                     </div>
                     <div class="card">
                         <h3>2. {% if meta.lang == 'ko' %}규칙 공개{% elif meta.lang == 'ja' %}ルール公開{% elif meta.lang == 'zh' %}公开规则{% else %}Publish rules{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}허용 채널, 금지 사항, 심사 기준을 명확히 공개합니다.{% elif meta.lang == 'ja' %}許可チャネル・禁止事項・審査基準を明確に公開。{% elif meta.lang == 'zh' %}明确公开允许渠道、禁用事项与审核标准。{% else %}Make allowed channels, do-nots, and review criteria explicit.{% endif %}</p>
+                        <p>{% if meta.lang == 'ko' %}허용 채널·금지 사항·심사 기준을 명확히 공개합니다.{% elif meta.lang == 'ja' %}許可チャネル・禁止事項・審査基準を明確に公開。{% elif meta.lang == 'zh' %}明确公开允许渠道、禁用事项与审核标准。{% else %}Make allowed channels, do-nots, and review criteria explicit.{% endif %}</p>
                     </div>
                     <div class="card">
                         <h3>3. {% if meta.lang == 'ko' %}라이브 운영{% elif meta.lang == 'ja' %}ライブ運用{% elif meta.lang == 'zh' %}实时运营{% else %}Go live{% endif %}</h3>
-                        <p>{% if meta.lang == 'ko' %}진행 상황과 보상 지급이 실시간으로 업데이트됩니다.{% elif meta.lang == 'ja' %}進行状況と支払いがリアルタイム更新。{% elif meta.lang == 'zh' %}进度与发放实时更新。{% else %}Progress and payouts update in real time.{% endif %}</p>
+                        <p>{% if meta.lang == 'ko' %}진행 상황과 보상 지급이 실시간 업데이트됩니다.{% elif meta.lang == 'ja' %}進行状況と支払いがリアルタイム更新。{% elif meta.lang == 'zh' %}进度与发放实时更新。{% else %}Progress and payouts update in real time.{% endif %}</p>
                     </div>
                 </div>
-                <div class="cta-band" style="margin-top:20px">
-                    <div>
-                        <strong style="font-size:18px">
-                            {% if meta.lang == 'ko' %}지금 바로 캠페인을 시작하세요{% elif meta.lang == 'ja' %}今すぐキャンペーンを開始{% elif meta.lang == 'zh' %}立即开始你的活动{% else %}Start your campaign now{% endif %}
-                        </strong>
-                        <div class="muted" style="margin-top:6px">
-                            {% if meta.lang == 'ko' %}간단한 신청서 작성 후 담당자가 확인합니다.{% elif meta.lang == 'ja' %}簡単な申請後、担当が確認します。{% elif meta.lang == 'zh' %}提交简单申请后会有工作人员审核。{% else %}Fill a short request and our team will review it promptly.{% endif %}
-                        </div>
+                <div class="empty-wrap" style="margin-top:22px">
+                    <div class="msg">
+                        {% if meta.lang == 'ko' %}간단한 신청서 작성 후 담당자가 확인합니다.{% elif meta.lang == 'ja' %}簡単な申請後、担当が確認します。{% elif meta.lang == 'zh' %}提交简单申请后会有工作人员审核。{% else %}Fill a short request and our team will review it promptly.{% endif %}
                     </div>
                     <a class="btn" href="#" onclick="goApply();return false;">
                         {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}申請{% elif meta.lang == 'zh' %}申请{% else %}Apply{% endif %}
@@ -510,14 +675,14 @@
         </footer>
         <!-- ===== JS: language + wallet + apply router ===== -->
         <script>
-      // Apply route resolver (same behavior you described)
+      // Apply route resolver
       function goApply(){
         const lang = (document.documentElement.getAttribute('lang') || '{{ meta.lang|default:"en" }}').toLowerCase();
         if(lang === 'en') window.location.href = '/rewards/apply/?lang=en';
         else window.location.href = `/rewards/apply/${lang}/`;
       }
 
-      // Language dropdown (same as other pages)
+      // Language dropdown
       (function(){
         const $wrap = document.getElementById('langSwitcher');
         if(!$wrap) return;
@@ -571,7 +736,7 @@
         });
       })();
 
-      // Wallet stubs (reuse if included elsewhere)
+      // Wallet stubs (reuse your real ones if included globally)
       async function connectWallet(){ alert('Wallet script missing'); }
       async function logoutWallet(){ alert('Wallet script missing'); }
         </script>
