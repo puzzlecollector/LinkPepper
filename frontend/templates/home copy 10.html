@@ -268,13 +268,17 @@
 
 #campaign-swiper .swiper-wrapper,
 #past-swiper .swiper-wrapper{
+  /* Swiper relies on this; if something overrides it, slides stack vertically */
   display: flex !important;
   box-sizing: content-box;
+  /* For 2-row grid mode Swiper internally switches to wrapped layout;
+     enforce wrap so rows are possible even if a global reset interferes. */
   flex-wrap: wrap !important;
 }
 
 #campaign-swiper .swiper-slide,
 #past-swiper .swiper-slide{
+  /* Keep slides side-by-side and let Swiper control their width */
   flex: 0 0 auto !important;
 }
         </style>
@@ -305,6 +309,7 @@
                     <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
                         {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
                     </a>
+                    <!-- Wallet button (unchanged) -->
                     {% if wallet_user %}
                     <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
                     <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
@@ -315,6 +320,9 @@
                         {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
                     </a>
                     {% endif %}
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
                     <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
                         <button
                             class="lang-btn"
@@ -348,10 +356,30 @@
                             tabindex="-1"
                             aria-label="Select language"
                         >
-                            <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-                            <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-                            <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-                            <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="en"
+                                data-flag="🇺🇸"
+                            >🇺🇸 English</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ko"
+                                data-flag="🇰🇷"
+                            >🇰🇷 한국어</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ja"
+                                data-flag="🇯🇵"
+                            >🇯🇵 日本語</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="zh"
+                                data-flag="🇨🇳"
+                            >🇨🇳 中文</li>
                         </ul>
                     </div>
                 </nav>
@@ -365,7 +393,7 @@
                     <h1>
                         {% if meta.lang == 'ko' %}
               앱이나 웹사이트를 홍보하고 설문에 응답하면
-                        <span style="color:#aaf5c7; text-shadow:var(--glow); white-space:nowrap">투명한 탈중앙 마케팅으로 암호화폐 보상</span>
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">투명한 탈중앙 마케팅으로 암호화폐 보상</span>
                         을 받습니다.
             {% elif meta.lang == 'ja' %}
               アプリやサイトを宣伝しアンケートに回答すると、
@@ -408,7 +436,7 @@
                 <div class="step">
                     <div class="reveal">
                         <h3>
-                          {% if meta.lang == 'ko' %}광고주 웹사이트 홍보{% elif meta.lang == 'ja' %}広告主のサイトを宣伝{% elif meta.lang == 'zh' %}推广广告主网站{% else %}Promote an advertiser’s website{% endif %}
+                          {% if meta.lang == 'ko' %}클라이언트 웹사이트 홍보{% elif meta.lang == 'ja' %}クライアントのサイトを宣伝{% elif meta.lang == 'zh' %}推广客户网站{% else %}Promote our client's website{% endif %}
                         </h3>
                         <p>
                           {% if meta.lang == 'ko' %}
@@ -418,7 +446,7 @@
                           {% elif meta.lang == 'zh' %}
                           在 X、Facebook、博客分享链接并写简评。审核通过后发放加密货币。
                           {% else %}
-                          Post the advertiser’s link on X, Facebook, or your blog with a short review. After approval, you earn crypto.
+                          Post the client’s link on X, Facebook, or your blog with a short review. After approval, you earn crypto.
                           {% endif %}
                         </p>
                     </div>
@@ -439,17 +467,17 @@
                                   <span style="opacity:.6">· 2h</span>
                                 </div>
                                 <div style="margin:8px 0 10px; color:#d6e6df;">
-                                  Exploring <strong>LinkHash</strong> — transparent, decentralized marketing where contributors earn crypto for real actions.
-                                  LHX just tapped a new ATH. 🚀
+                                  Trying <strong>LinkHash</strong> — transparent rewards for real actions. 
                                   <a href="https://link-hash.com" style="text-decoration:underline;">https://link-hash.com</a>
                                 </div>
                                 <div style="border:1px solid #22303e; border-radius:12px; overflow:hidden;">
-                                  <div style="height:140px; background:#0b1117;">
-                                    <img src="{% static 'img/landing/twitter.png' %}" alt="Link preview" style="width:100%; height:100%; object-fit:cover; display:block;">
-                                  </div>
+                                  <div style="height:140px; background:#0b1117;"></div>
                                   <div style="padding:10px 12px;">
-                                    <div style="font-weight:700;">LinkHash — Earn Crypto for Real Engagement</div>
-                                    <div style="font-size:12px; color:#9fb0aa; margin-top:2px;">New campaign live • ATH milestone reached</div>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                      <div style="width:16px;height:16px;border-radius:4px;background:#0b1117;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">X</div>
+                                      <div style="font-weight:700;">LinkHash</div>
+                                    </div>
+                                    <div style="font-size:12px; color:#9fb0aa; margin-top:2px;">Earn crypto for approved tasks</div>
                                   </div>
                                 </div>
                                 <div style="display:flex; gap:24px; font-size:12px; opacity:.8; margin-top:10px;">
@@ -472,7 +500,7 @@
                 <div class="step">
                     <div class="reveal">
                         <h3>
-                          {% if meta.lang == 'ko' %}광고주 앱 설치와 리뷰{% elif meta.lang == 'ja' %}広告主のアプリをインストールしてレビュー{% elif meta.lang == 'zh' %}安装广告主应用并撰写评论{% else %}Install an advertiser’s app and leave a review{% endif %}
+                          {% if meta.lang == 'ko' %}클라이언트 앱 설치와 리뷰{% elif meta.lang == 'ja' %}クライアントのアプリをインストールしてレビュー{% elif meta.lang == 'zh' %}安装客户应用并撰写评论{% else %}Install our client's app and leave a review{% endif %}
                         </h3>
                         <p>
                           {% if meta.lang == 'ko' %}
@@ -482,7 +510,7 @@
                           {% elif meta.lang == 'zh' %}
                           安装应用并在商店留下评论。审核通过后发放加密货币。
                           {% else %}
-                          Install the advertiser’s app and write a store review. After approval, you earn crypto.
+                          Install the client’s app and write a store review. After approval, you earn crypto.
                           {% endif %}
                         </p>
                     </div>
@@ -496,27 +524,19 @@
                             <!-- ~80% Play Store-like layout -->
                             <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
                               <div style="display:flex; gap:12px; align-items:center;">
-                                <div style="width:64px;height:64px;border-radius:14px;overflow:hidden;background:#0b1117;">
-                                  <img src="{% static 'img/logo-square-1024.png' %}" alt="App icon" style="width:100%;height:100%;object-fit:cover;display:block;">
-                                </div>
+                                <div style="width:64px;height:64px;border-radius:14px;background:linear-gradient(180deg,#173022,#0b1a13);"></div>
                                 <div>
                                   <div style="font-weight:800;">LinkHash</div>
                                   <div style="font-size:12px; color:#9fb0aa;">Marketing</div>
-                                  <div style="font-size:12px; margin-top:4px;">★★★★☆ <span style="opacity:.75;">4.8 • 1K+ reviews</span></div>
+                                  <div style="font-size:12px; margin-top:4px;">★★★★☆ <span style="opacity:.75;">4.2 • 1K+ reviews</span></div>
                                 </div>
                               </div>
                               <button class="btn" type="button">Install</button>
                             </div>
                             <div style="display:flex; gap:8px; margin:12px 0;">
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/logo-square-1024.png' %}" alt="s1" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/cards/bitcoin-close.jpg' %}" alt="s2" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/landing/twitter.png' %}" alt="s3" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
+                              <div style="height:120px; flex:1; border-radius:12px; background:#0b1117;"></div>
+                              <div style="height:120px; flex:1; border-radius:12px; background:#0b1117;"></div>
+                              <div style="height:120px; flex:1; border-radius:12px; background:#0b1117;"></div>
                             </div>
                             <div style="display:flex; gap:16px; border-bottom:1px solid #1d2836; margin-bottom:10px;">
                               <div style="padding:8px 0; font-weight:700; border-bottom:2px solid #23d16a;">About this app</div>
@@ -538,17 +558,17 @@
                 <div class="step">
                     <div class="reveal">
                         <h3>
-                          {% if meta.lang == 'ko' %}광고주 설문에 응답{% elif meta.lang == 'ja' %}広告主のアンケートに回答{% elif meta.lang == 'zh' %}参与广告主问卷{% else %}Answer a survey from one of our advertisers{% endif %}
+                          {% if meta.lang == 'ko' %}클라이언트 설문에 응답{% elif meta.lang == 'ja' %}クライアントのアンケートに回答{% elif meta.lang == 'zh' %}参与客户问卷{% else %}Answer a survey from one of our clients{% endif %}
                         </h3>
                         <p>
                           {% if meta.lang == 'ko' %}
-                          광고주가 제시한 주제·제품·의견에 대한 설문을 완료하면 승인 후 암호화폐가 지급됩니다.
+                          클라이언트가 제시한 주제·제품·의견에 대한 설문을 완료하면 승인 후 암호화폐가 지급됩니다.
                           {% elif meta.lang == 'ja' %}
-                          広告主が提示するトピック・製品・意見に関するアンケートを完了。承認後に暗号資産が付与されます。
+                          クライアントが提示するトピック・製品・意見に関するアンケートを完了。承認後に暗号資産が付与されます。
                           {% elif meta.lang == 'zh' %}
-                          完成广告主提出的主题、产品、观点相关问卷。审核通过后发放加密货币。
+                          完成客户提出的主题、产品、观点相关问卷。审核通过后发放加密货币。
                           {% else %}
-                          Complete a survey about a topic, product, or opinion provided by advertisers. After approval, you earn crypto.
+                          Complete a survey about a topic, product, or opinion provided by our clients. After approval, you earn crypto.
                           {% endif %}
                         </p>
                     </div>
@@ -559,30 +579,29 @@
                             <span class="dot green"></span>
                         </div>
                         <div class="body">
-                            <!-- LinkHash-style form with real question -->
-                            <div style="font-weight:800; margin-bottom:8px;">What is your year-end price forecast for ETH &amp; BMNR?</div>
+                            <!-- LinkHash-style form -->
                             <div class="form-row">
                                 <div>
-                                    <label>ETH price (USD)</label>
-                                    <input type="number" placeholder="e.g. 4200">
+                                    <label>Name</label>
+                                    <input placeholder="Alex">
                                 </div>
                                 <div>
-                                    <label>BMNR price (USD)</label>
-                                    <input type="number" placeholder="e.g. 1.25">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div>
-                                    <label>Confidence (0–100)</label>
-                                    <input type="number" min="0" max="100" placeholder="e.g. 70">
-                                </div>
-                                <div>
-                                    <label>Email (optional)</label>
+                                    <label>Email</label>
                                     <input placeholder="alex@example.com">
                                 </div>
                             </div>
-                            <label>Reasoning (optional)</label>
-                            <div class="fake-input" style="height:80px;">Key catalysts, risks, timeline…</div>
+                            <div class="form-row">
+                                <div>
+                                    <label>Which topic interests you most?</label>
+                                    <div class="fake-input">App growth / SEO / Community</div>
+                                </div>
+                                <div>
+                                    <label>Overall impression</label>
+                                    <div class="fake-input">😀 🙂 😐 🙁</div>
+                                </div>
+                            </div>
+                            <label>Your thoughts</label>
+                            <div class="fake-input" style="height:80px;">Type here…</div>
                             <div class="preview-actions">
                                 <button class="btn" type="button">Submit</button>
                             </div>
@@ -795,8 +814,9 @@
         grid: { rows: 2, fill: 'row' },
         slidesPerView: 3,
         grabCursor: true,
-        simulateTouch: true,
+        simulateTouch: true,   // allow mouse drag on desktop
         breakpoints: { 0:{slidesPerView:1}, 900:{slidesPerView:2}, 1200:{slidesPerView:3} }
+        // NOTE: intentionally no 'mousewheel' here (defaults to disabled)
     });
 
     const pastSwiper = new Swiper('#past-swiper', {
@@ -806,6 +826,7 @@
         grabCursor: true,
         simulateTouch: true,
         breakpoints: { 0:{slidesPerView:1}, 900:{slidesPerView:2}, 1200:{slidesPerView:3} }
+        // NOTE: intentionally no 'mousewheel' here (defaults to disabled)
     });
 
     // Progress bars on view
@@ -878,19 +899,23 @@
             alert('MetaMask not detected. Please install MetaMask.');
             return;
         }
+        // 1) Request account
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const address = (accounts && accounts[0]) ? accounts[0] : null;
         if(!address){ alert('No account selected.'); return; }
 
+        // 2) Ask backend for a fresh nonce + canonical message
         const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
         if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
         const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
 
+        // 3) Sign exact message provided by server
         const signature = await window.ethereum.request({
             method: 'personal_sign',
             params: [ message, address ]
         });
 
+        // 4) Verify on server (sets session)
         const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
         if(verifyRes && verifyRes.ok){
             window.location.reload();
@@ -925,9 +950,11 @@
         const $menu = $wrap.querySelector('.lang-menu');
         const current = ($wrap.dataset.current || 'en').toLowerCase();
 
+        // Set current flag on button
         const flagEl = $btn.querySelector('.flag-emoji');
         const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
         flagEl.textContent = flagMap[current] || '🇺🇸';
+        function open(){ $wrap.classList.add('open'); $btn.setAttribute('aria-expanded','true'); }
         function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
         $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
         document.addEventListener('click', ()=> close());
@@ -936,34 +963,41 @@
         function pathFor(lang){
             const loc = window.location;
             const path = loc.pathname;
-            const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
+            const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
 
+            // Known, localized base pages:
             const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
 
+            // Rewards Apply special cases (these routes exist explicitly)
             const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
             if(isApply){
-                if(lang === 'en') return '/rewards/apply/?lang=en';
+                if(lang === 'en') return '/rewards/apply/?lang=en'; // ensure session flips to EN
                 return `/rewards/apply/${lang}/`;
             }
 
             if(baseMap[clean]){
                 if(lang === 'en'){
+                // IMPORTANT: Append ?lang=en so middleware sets session to EN and does NOT redirect back to /ko|ja|zh/
                 const q = new URLSearchParams(loc.search);
                 q.set('lang','en');
                 return clean + (q.toString() ? `?${q.toString()}` : '');
                 }
+                // ko/ja/zh → prefix with language (single trailing slash on '/')
                 return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
             }
 
+            // Unknown/other page (e.g., /rewards/some-slug-5/) → keep path, toggle ?lang=xx
             const params = new URLSearchParams(loc.search);
             params.set('lang', lang);
             return path + (params.toString() ? `?${params.toString()}` : '');
         }
 
+
         $menu.querySelectorAll('.lang-item').forEach(li=>{
         li.addEventListener('click', ()=>{
             const lang = li.getAttribute('data-lang');
             const emoji = li.getAttribute('data-flag') || '';
+            // Instant visual feedback
             flagEl.textContent = emoji;
             $wrap.querySelector('.label').textContent =
             lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';

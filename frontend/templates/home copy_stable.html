@@ -96,20 +96,16 @@
           radial-gradient(60rem 40rem at 120% 10%, rgba(22,163,74,.10), transparent 60%);
         filter: blur(40px); z-index:0; opacity:.6;
       }
-      /* make hero flush to viewport under the 72px sticky nav */
-      .hero .container{display:flex; align-items:center; position:relative; z-index:1; min-height:calc(100vh - 72px);}
-      @supports (height: 100dvh){
-        .hero .container{min-height:calc(100dvh - 72px);}
-      }
-      .hero h1{font-size:46px; line-height:1.16; margin:0 0 12px; letter-spacing:0.4px;}
-      .hero p{color:var(--muted); font-size:17px; margin:0 0 24px;}
-      .hero .cta{display:flex; gap:12px; flex-wrap:wrap;}
+      .hero .container{height:520px; display:flex; align-items:center; position:relative; z-index:1;}
+      .hero h1{font-size:54px; line-height:1.12; margin:0 0 14px; letter-spacing:0.4px;}
+      .hero p{color:var(--muted); font-size:18px; margin:0 0 28px;}
+      .hero .cta{display:flex; gap:14px;}
       .hero .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(22,163,74,.14); border:1px solid rgba(35,209,106,.35); color:#aef2c9; font-weight:700; margin-bottom:16px;}
 
-      /* ===== HOW (shorter) ===== */
+      /* ===== HOW IT WORKS ===== */
       .how{border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06); background:linear-gradient(180deg, rgba(12,16,20,.65), rgba(10,12,16,.65)), var(--noise);}
-      .steps{display:flex; flex-direction:column; gap:26px; padding:28px 0;}
-      .step{display:grid; grid-template-columns:1.1fr 1fr; gap:22px; align-items:center; min-height:56vh;}
+      .steps{display:flex; flex-direction:column; gap:38px; padding:40px 0;}
+      .step{display:grid; grid-template-columns:1.1fr 1fr; gap:22px; align-items:center; min-height:72vh;}
       .step h3{font-size:28px; margin:0 0 10px;}
       .step p{margin:0; color:#b4c5bf}
 
@@ -268,13 +264,17 @@
 
 #campaign-swiper .swiper-wrapper,
 #past-swiper .swiper-wrapper{
+  /* Swiper relies on this; if something overrides it, slides stack vertically */
   display: flex !important;
   box-sizing: content-box;
+  /* For 2-row grid mode Swiper internally switches to wrapped layout;
+     enforce wrap so rows are possible even if a global reset interferes. */
   flex-wrap: wrap !important;
 }
 
 #campaign-swiper .swiper-slide,
 #past-swiper .swiper-slide{
+  /* Keep slides side-by-side and let Swiper control their width */
   flex: 0 0 auto !important;
 }
         </style>
@@ -305,6 +305,7 @@
                     <a class="btn-outline" href="{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}">
                         {% if meta.lang == 'ko' %}캠페인 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}申请发起活动{% else %}Apply for campaign{% endif %}
                     </a>
+                    <!-- Wallet button (unchanged) -->
                     {% if wallet_user %}
                     <span class="btn-outline">👛 {{ wallet_user.address|slice:":6" }}…{{ wallet_user.address|slice:"-4:" }}</span>
                     <a class="btn" href="#" onclick="logoutWallet && logoutWallet();return false;">
@@ -315,6 +316,9 @@
                         {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
                     </a>
                     {% endif %}
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
+                    <!-- NEW: Language dropdown (to the RIGHT of wallet button) -->
                     <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
                         <button
                             class="lang-btn"
@@ -348,10 +352,30 @@
                             tabindex="-1"
                             aria-label="Select language"
                         >
-                            <li class="lang-item" role="option" data-lang="en" data-flag="🇺🇸">🇺🇸 English</li>
-                            <li class="lang-item" role="option" data-lang="ko" data-flag="🇰🇷">🇰🇷 한국어</li>
-                            <li class="lang-item" role="option" data-lang="ja" data-flag="🇯🇵">🇯🇵 日本語</li>
-                            <li class="lang-item" role="option" data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="en"
+                                data-flag="🇺🇸"
+                            >🇺🇸 English</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ko"
+                                data-flag="🇰🇷"
+                            >🇰🇷 한국어</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="ja"
+                                data-flag="🇯🇵"
+                            >🇯🇵 日本語</li>
+                            <li
+                                class="lang-item"
+                                role="option"
+                                data-lang="zh"
+                                data-flag="🇨🇳"
+                            >🇨🇳 中文</li>
                         </ul>
                     </div>
                 </nav>
@@ -361,230 +385,305 @@
         <section class="hero">
             <div class="container">
                 <div class="content">
-                    <div class="badge">Web3 SEO Rewards</div>
+                    <div class="badge">Web3 · SEO · Rewards</div>
                     <h1>
                         {% if meta.lang == 'ko' %}
-              앱이나 웹사이트를 홍보하고 설문에 응답하면
-                        <span style="color:#aaf5c7; text-shadow:var(--glow); white-space:nowrap">투명한 탈중앙 마케팅으로 암호화폐 보상</span>
-                        을 받습니다.
+              커뮤니티에 보상이 돌아가는
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">투명한 화이트햇</span>
+                        캠페인으로 순위를 올리세요.
             {% elif meta.lang == 'ja' %}
-              アプリやサイトを宣伝しアンケートに回答すると、
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">透明で分散型のマーケティングを通じて暗号資産の報酬</span>
-                        を受け取れます。
+              コミュニティに報酬が還元される
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">透明なホワイトハット</span>
+                        キャンペーンで順位を伸ばす。
             {% elif meta.lang == 'zh' %}
-              推广应用或网站并参与问卷，
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">通过透明的去中心化营销获得加密货币奖励</span>。
+              通过
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">透明白帽</span>
+                        活动提升排名，让奖励回馈社区。
             {% else %}
-              Promote apps or websites and answer surveys —
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">earn crypto through transparent, decentralized marketing</span>.
+              Boost rankings with
+                        <span style="color:#aaf5c7; text-shadow:var(--glow)">transparent, white-hat</span>
+                        campaigns that pay your community.
             {% endif %}
                     </h1>
                     <p>
                         {% if meta.lang == 'ko' %}
-              X, 페이스북, 블로그에 링크와 후기를 올리거나 앱을 설치해 앱스토어에 리뷰를 남기고 설문에 응답하세요. 승인 기준과 보상 진행은 모두 공개됩니다.
+              광고주는 암호화폐 풀을 펀딩, 사용자는 방문/링크 과제를 수행합니다. 모든 수치가 공개됩니다.
             {% elif meta.lang == 'ja' %}
-              XやFacebook、ブログでリンクと短いレビューを投稿。アプリをインストールしてストアにレビュー。アンケートに回答。承認基準と進捗は公開されています。
+              広告主はCryptoでプールを資金化、ユーザーはVISIT/LINKタスクを実行。数値はすべて公開。
             {% elif meta.lang == 'zh' %}
-              在 X、Facebook、博客分享链接并写简评。安装应用并在商店留下评论。回答问卷。审核标准与发放进度均公开透明。
+              广告主用 Crypto 注资奖励池，用户完成访问/外链任务；所有数据公开透明。
             {% else %}
-              Share links with a short review on X, Facebook, or blogs. Install apps and leave store reviews. Answer surveys. Approval rules and payout progress are public.
+              Advertisers fund pools in crypto. Users complete visit & link-share tasks. Everyone sees the numbers.
             {% endif %}
                     </p>
                     <div class="cta">
                         <a class="btn" href="#projects">
                             {% if meta.lang == 'ko' %}캠페인 둘러보기{% elif meta.lang == 'ja' %}キャンペーンを見る{% elif meta.lang == 'zh' %}查看活动{% else %}Explore Campaigns{% endif %}
                         </a>
-                        <a class="btn-outline" href="#">
-                            {% if meta.lang == 'ko' %}봇 없이 자연스럽게 홍보하는 방법 보기{% elif meta.lang == 'ja' %}ボットに頼らない有機的なプロモーション方法を見る{% elif meta.lang == 'zh' %}了解不靠机器人实现自然推广的方法{% else %}See how you can get organic promotion without bots{% endif %}
-                        </a>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- ===== HOW (3 concise paths, slightly shorter) ===== -->
+        <!-- ===== HOW IT WORKS (with stronger animations & enriched previews) ===== -->
         <section class="how">
             <div class="container steps">
-                <!-- Block 1: Promote a website (X style) -->
+                <!-- Step 1: Apply -->
                 <div class="step">
                     <div class="reveal">
-                        <h3>
-                          {% if meta.lang == 'ko' %}광고주 웹사이트 홍보{% elif meta.lang == 'ja' %}広告主のサイトを宣伝{% elif meta.lang == 'zh' %}推广广告主网站{% else %}Promote an advertiser’s website{% endif %}
-                        </h3>
+                        <h3>1) {% if meta.lang == 'ko' %}클라이언트가 암호화폐 풀을 펀딩{% elif meta.lang == 'ja' %}クライアントがCryptoプールに資金投入{% elif meta.lang == 'zh' %}客户注资 Crypto 奖励池{% else %}Client funds a crypto pool{% endif %}</h3>
                         <p>
-                          {% if meta.lang == 'ko' %}
-                          X, 페이스북, 블로그에 링크와 후기를 올리면 승인 후 암호화폐가 지급됩니다.
-                          {% elif meta.lang == 'ja' %}
-                          XやFacebook、ブログにリンクと短いレビューを投稿。承認後に暗号資産が付与されます。
-                          {% elif meta.lang == 'zh' %}
-                          在 X、Facebook、博客分享链接并写简评。审核通过后发放加密货币。
-                          {% else %}
-                          Post the advertiser’s link on X, Facebook, or your blog with a short review. After approval, you earn crypto.
-                          {% endif %}
+                            {% if meta.lang == 'ko' %}
+                예산과 기간을 선택하면 명확한 규칙(VISIT/LINK, 허용 링크, 가이드)을 공개합니다. 라이브 풀 규모도 함께 표시됩니다.
+              {% elif meta.lang == 'ja' %}
+                予算と期間を選び、明確なルール（VISIT/LINK、許可リンク、注意事項）を公開。ライブのプール残高も表示。
+              {% elif meta.lang == 'zh' %}
+                选择预算与周期，公开清晰规则（VISIT/LINK、可用平台、注意事项）并展示奖励池规模。
+              {% else %}
+                Choose budget & dates. We publish clear rules (platforms, links allowed, dos/don’ts) and show the live pool size.
+              {% endif %}
                         </p>
                     </div>
-                    <div class="mini" aria-label="X-like post preview">
+                    <div class="mini" aria-label="Apply mini preview">
                         <div class="chrome">
                             <span class="dot red"></span>
                             <span class="dot yellow"></span>
                             <span class="dot green"></span>
                         </div>
                         <div class="body">
-                            <!-- ~80% X-like post -->
-                            <div style="display:flex; gap:12px;">
-                              <div style="width:40px;height:40px;border-radius:999px;background:#1f2937;"></div>
-                              <div style="flex:1;">
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                  <strong style="font-weight:800;">Alex</strong>
-                                  <span style="opacity:.8">@alex</span>
-                                  <span style="opacity:.6">· 2h</span>
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                                <strong style="font-size:14px">{% if meta.lang == 'ko' %}캠페인 런칭 신청{% elif meta.lang == 'ja' %}キャンペーン申請{% elif meta.lang == 'zh' %}发起活动申请{% else %}Request a New Campaign{% endif %}</strong>
+                                <span class="fake-chip">Web3</span>
+                                <span class="fake-chip">SEO</span>
+                                <span class="fake-chip">{% if meta.lang == 'ko' %}화이트햇{% elif meta.lang == 'ja' %}ホワイトハット{% elif meta.lang == 'zh' %}白帽{% else %}White-hat{% endif %}</span>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label>Email *</label>
+                                    <input placeholder="name@example.com" disabled>
                                 </div>
-                                <div style="margin:8px 0 10px; color:#d6e6df;">
-                                  Exploring <strong>LinkHash</strong> — transparent, decentralized marketing where contributors earn crypto for real actions.
-                                  LHX just tapped a new ATH. 🚀
-                                  <a href="https://link-hash.com" style="text-decoration:underline;">https://link-hash.com</a>
+                                <div>
+                                    <label>{% if meta.lang == 'ko' %}전화번호{% elif meta.lang == 'ja' %}電話番号{% elif meta.lang == 'zh' %}电话{% else %}Phone{% endif %} *</label>
+                                    <input placeholder="+82 10 1234 1234" disabled>
                                 </div>
-                                <div style="border:1px solid #22303e; border-radius:12px; overflow:hidden;">
-                                  <div style="height:140px; background:#0b1117;">
-                                    <img src="{% static 'img/landing/twitter.png' %}" alt="Link preview" style="width:100%; height:100%; object-fit:cover; display:block;">
-                                  </div>
-                                  <div style="padding:10px 12px;">
-                                    <div style="font-weight:700;">LinkHash — Earn Crypto for Real Engagement</div>
-                                    <div style="font-size:12px; color:#9fb0aa; margin-top:2px;">New campaign live • ATH milestone reached</div>
-                                  </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label>{% if meta.lang == 'ko' %}국가{% elif meta.lang == 'ja' %}国/地域{% elif meta.lang == 'zh' %}国家{% else %}Country{% endif %}</label>
+                                    <input placeholder="{% if meta.lang == 'ko' %}대한민국{% elif meta.lang == 'ja' %}日本{% elif meta.lang == 'zh' %}中国{% else %}South Korea{% endif %}" disabled>
                                 </div>
-                                <div style="display:flex; gap:24px; font-size:12px; opacity:.8; margin-top:10px;">
-                                  <span>↩ 12</span>
-                                  <span>🔁 34</span>
-                                  <span>❤ 210</span>
-                                  <span>📊 5k</span>
+                                <div>
+                                    <label>{% if meta.lang == 'ko' %}캠페인 제목{% elif meta.lang == 'ja' %}キャンペーン名{% elif meta.lang == 'zh' %}活动标题{% else %}Campaign Title{% endif %}</label>
+                                    <input placeholder="SimpleQuant Blog Launch" disabled>
                                 </div>
-                              </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label>URL</label>
+                                    <input placeholder="https://example.com" disabled>
+                                </div>
+                                <div>
+                                    <label>{% if meta.lang == 'ko' %}총 리워드 풀 (암호화폐){% elif meta.lang == 'ja' %}総プール (Crypto){% elif meta.lang == 'zh' %}总奖励池 (Crypto){% else %}Total Reward Pool (Crypto){% endif %}</label>
+                                    <input placeholder="2500" disabled>
+                                </div>
+                            </div>
+                            <div class="preview-actions">
+                                <!-- Removed 'Open form' button per request -->
+                                <button class="btn" onclick="location.href='{% if meta.lang == 'ko' %}/rewards/apply/ko/{% elif meta.lang == 'ja' %}/rewards/apply/ja/{% elif meta.lang == 'zh' %}/rewards/apply/zh/{% else %}/rewards/apply/{% endif %}'">
+                                    {% if meta.lang == 'ko' %}신청하기{% elif meta.lang == 'ja' %}申請する{% elif meta.lang == 'zh' %}去申请{% else %}Apply now{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Step 2: Rewards list (with thumbnails & clearer copy) -->
+                <div class="step">
+                    <div class="reveal">
+                        <h3>2) {% if meta.lang == 'ko' %}과제가 공개되고 검증{% elif meta.lang == 'ja' %}タスク公開と検証{% elif meta.lang == 'zh' %}任务上线并验证{% else %}Tasks go live & are verified{% endif %}</h3>
+                        <p>
+                            {% if meta.lang == 'ko' %}
+                참여자는
+                            <b>VISIT</b>
+                            (페이지에서 코드 찾기) 또는
+                            <b>LINK</b>
+                            (리뷰+백링크) 미션을 선택합니다. 안티 스팸 + 리뷰로 화이트햇을 보장합니다.
+              {% elif meta.lang == 'ja' %}
+                参加者は
+                            <b>VISIT</b>
+                            （ページでコード発見）または
+                            <b>LINK</b>
+                            （レビュー＋被リンク）を選択。スパム対策と審査でホワイトハット運用。
+              {% elif meta.lang == 'zh' %}
+                参与者选择
+                            <b>VISIT</b>
+                            （在页面找代码）或
+                            <b>LINK</b>
+                            （评测＋外链）。反垃圾与审核确保白帽标准。
+              {% else %}
+                Contributors pick
+                            <b>VISIT</b>
+                            (find a code) or
+                            <b>LINK</b>
+                            (review + backlink). Anti-spam & review keep it white-hat.
+              {% endif %}
+                        </p>
+                    </div>
+                    <div class="mini" aria-label="Rewards list mini preview">
+                        <div class="chrome">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <div class="body">
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                                <strong style="font-size:14px">{% if meta.lang == 'ko' %}캠페인 목록{% elif meta.lang == 'ja' %}キャンペーン一覧{% elif meta.lang == 'zh' %}活动列表{% else %}Campaigns{% endif %}</strong>
+                                <div class="tags">
+                                    <span class="tag">VISIT</span>
+                                    <span class="tag">LINK</span>
+                                    <span class="tag">{% if meta.lang == 'ko' %}즉시 보상{% elif meta.lang == 'ja' %}即時{% elif meta.lang == 'zh' %}即时{% else %}Instant{% endif %}</span>
+                                </div>
+                            </div>
+                            <div class="grid">
+                                <!-- VISIT sample -->
+                                <div class="card">
+                                    <div class="thumb">
+                                        <img src="{% static 'img/cards/green-office.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop'" alt="">
+                                    </div>
+                                    <h4>SimpleQuant: Blog launch</h4>
+                                    <p>
+                                        {% if meta.lang == 'ko' %}
+                                        <strong>VISIT – 코드 찾기:</strong>
+                                        지정된 페이지 하단/FAQ에
+                                        <code>CODE: X6K9Q2</code>
+                                        같은 문구가 있습니다. 페이지를 읽고 코드를 찾아 제출하면 자동으로 검증됩니다.
+                    {% elif meta.lang == 'ja' %}
+                                        <strong>VISIT – コード発見:</strong>
+                                        指定ページのフッター/FAQに
+                                        <code>CODE: X6K9Q2</code>
+                                        のような文字列があります。ページを確認し、見つけたコードを提出すると自動検証されます。
+                    {% elif meta.lang == 'zh' %}
+                                        <strong>VISIT – 找代码：</strong>
+                                        指定页面底部/FAQ 会有形如
+                                        <code>CODE: X6K9Q2</code>
+                                        的字样。阅读页面后找到并提交代码，系统自动验证。
+                    {% else %}
+                                        <strong>VISIT – Find a code:</strong>
+                                        The target page shows a token like
+                                        <code>CODE: X6K9Q2</code>
+                                        (often in the footer/FAQ). Read, find it, submit — verified automatically.
+                    {% endif %}
+                                    </p>
+                                    <div class="row">
+                                        <span class="pill">
+                                            <strong>{% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>
+                                            &nbsp;2,000 USDT
+                                        </span>
+                                        <span class="pill">
+                                            <strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}人数{% elif meta.lang == 'zh' %}参与者{% else %}People{% endif %}</strong>
+                                            &nbsp;842
+                                        </span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" style="width:63%"></div>
+                                    </div>
+                                </div>
+                                <!-- LINK sample -->
+                                <div class="card">
+                                    <div class="thumb">
+                                        <img src="{% static 'img/cards/bitcoin-close.jpg' %}" onerror="this.src='https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=1200&auto=format&fit=crop'" alt="">
+                                    </div>
+                                    <h4>Naver review sprint</h4>
+                                    <p>
+                                        {% if meta.lang == 'ko' %}
+                                        <strong>LINK – 리뷰+백링크:</strong>
+                                        Naver/블로그/인스타 등 허용 플랫폼에 진정성 있는 리뷰를 작성하고, 캠페인 페이지로
+                                        <em>dofollow</em>
+                                        링크를 삽입합니다. 스팸/복붙/무관 키워드는 불가.
+                    {% elif meta.lang == 'ja' %}
+                                        <strong>LINK – レビュー＋被リンク:</strong>
+                                        Naver/ブログ/Instagramなど許可プラットフォームで誠実なレビューを投稿し、キャンペーンページへ
+                                        <em>dofollow</em>
+                                        リンクを付与。スパム/コピペ/無関係キーワードは不可。
+                    {% elif meta.lang == 'zh' %}
+                                        <strong>LINK – 评测＋外链：</strong>
+                                        在 Naver/博客/Instagram 等允许平台发布真实评测，并附上指向活动页的
+                                        <em>dofollow</em>
+                                        外链。禁止垃圾/抄袭/不相关关键词。
+                    {% else %}
+                                        <strong>LINK – Review + backlink:</strong>
+                                        Publish a genuine review on approved platforms (e.g., Naver, blogs, Instagram) and include a
+                                        <em>dofollow</em>
+                                        link back to the campaign. No spam/copy-paste/off-topic keywords.
+                    {% endif %}
+                                    </p>
+                                    <div class="row">
+                                        <span class="pill">
+                                            <strong>{% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>
+                                            &nbsp;5,000 USDT
+                                        </span>
+                                        <span class="pill">
+                                            <strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}人数{% elif meta.lang == 'zh' %}参与者{% else %}People{% endif %}</strong>
+                                            &nbsp;412
+                                        </span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="bar" style="width:40%"></div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="preview-actions" style="margin-top:10px;">
-                                <span class="fake-chip">X</span>
-                                <span class="fake-chip">Facebook</span>
-                                <span class="fake-chip">Blog</span>
+                                <button class="btn" onclick="location.href='{% if meta.lang == 'ko' %}/ko/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}'">
+                                    {% if meta.lang == 'ko' %}캠페인 더 보기{% elif meta.lang == 'ja' %}もっと見る{% elif meta.lang == 'zh' %}查看更多{% else %}Browse campaigns{% endif %}
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Block 2: Promote an app (Play Store style) -->
+                <!-- Step 3: Reward details -->
                 <div class="step">
                     <div class="reveal">
-                        <h3>
-                          {% if meta.lang == 'ko' %}광고주 앱 설치와 리뷰{% elif meta.lang == 'ja' %}広告主のアプリをインストールしてレビュー{% elif meta.lang == 'zh' %}安装广告主应用并撰写评论{% else %}Install an advertiser’s app and leave a review{% endif %}
-                        </h3>
+                        <h3>3) {% if meta.lang == 'ko' %}검증 후 즉시 보상{% elif meta.lang == 'ja' %}検証後すぐに報酬{% elif meta.lang == 'zh' %}验证通过即刻发放{% else %}Rewards claimed instantly{% endif %}</h3>
                         <p>
-                          {% if meta.lang == 'ko' %}
-                          앱을 설치하고 스토어에 리뷰를 남기면 승인 후 암호화폐가 지급됩니다.
-                          {% elif meta.lang == 'ja' %}
-                          アプリをインストールしてストアにレビューを投稿。承認後に暗号資産が付与されます。
-                          {% elif meta.lang == 'zh' %}
-                          安装应用并在商店留下评论。审核通过后发放加密货币。
-                          {% else %}
-                          Install the advertiser’s app and write a store review. After approval, you earn crypto.
-                          {% endif %}
+                            {% if meta.lang == 'ko' %}
+                승인된 액션마다 암호화폐가 지급됩니다. 풀 잔액, 참여자 수, 클레임률 등 모든 진행 상황이 공개됩니다.
+              {% elif meta.lang == 'ja' %}
+                承認されたアクションごとにCrypto支払い。残高・参加者・クレーム率など進行状況はすべて公開。
+              {% elif meta.lang == 'zh' %}
+                每次通过的提交都会从奖励池即时支付 Crypto。剩余池、参与人数、领取率等进度公开透明。
+              {% else %}
+                Every approved action pays from the pool in Crypto. Pool left, participants, claim % — all public for trust.
+              {% endif %}
                         </p>
                     </div>
-                    <div class="mini" aria-label="Play Store-like preview">
+                    <div class="mini" aria-label="Reward details mini preview">
                         <div class="chrome">
                             <span class="dot red"></span>
                             <span class="dot yellow"></span>
                             <span class="dot green"></span>
                         </div>
                         <div class="body">
-                            <!-- ~80% Play Store-like layout -->
-                            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-                              <div style="display:flex; gap:12px; align-items:center;">
-                                <div style="width:64px;height:64px;border-radius:14px;overflow:hidden;background:#0b1117;">
-                                  <img src="{% static 'img/logo-square-1024.png' %}" alt="App icon" style="width:100%;height:100%;object-fit:cover;display:block;">
-                                </div>
-                                <div>
-                                  <div style="font-weight:800;">LinkHash</div>
-                                  <div style="font-size:12px; color:#9fb0aa;">Marketing</div>
-                                  <div style="font-size:12px; margin-top:4px;">★★★★☆ <span style="opacity:.75;">4.8 • 1K+ reviews</span></div>
-                                </div>
-                              </div>
-                              <button class="btn" type="button">Install</button>
+                            <h4 style="margin:0 0 6px;">SimpleQuant: Blog launch</h4>
+                            <p style="margin:0 0 10px; color:#9fb0aa">{% if meta.lang == 'ko' %}아티클 하단 코드 제출로 보상{% elif meta.lang == 'ja' %}記事末尾のコード提出で報酬{% elif meta.lang == 'zh' %}文章底部提交代码即可领奖{% else %}Submit the code at the end of the article to earn{% endif %}</p>
+                            <div class="row">
+                                <span class="pill">
+                                    <strong>{% if meta.lang == 'ko' %}풀{% elif meta.lang == 'ja' %}プール{% elif meta.lang == 'zh' %}奖励池{% else %}Pool{% endif %}</strong>
+                                    &nbsp; 2,000&nbsp;USDT
+                                </span>
+                                <span class="pill">
+                                    <strong>{% if meta.lang == 'ko' %}참여자{% elif meta.lang == 'ja' %}人数{% elif meta.lang == 'zh' %}参与者{% else %}People{% endif %}</strong>
+                                    &nbsp; 842
+                                </span>
                             </div>
-                            <div style="display:flex; gap:8px; margin:12px 0;">
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/logo-square-1024.png' %}" alt="s1" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/cards/bitcoin-close.jpg' %}" alt="s2" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
-                              <div style="height:120px; flex:1; border-radius:12px; overflow:hidden; background:#0b1117;">
-                                <img src="{% static 'img/landing/twitter.png' %}" alt="s3" style="width:100%;height:100%;object-fit:cover;display:block;">
-                              </div>
+                            <div class="progress" style="margin-top:8px;">
+                                <div class="bar" style="width:63%"></div>
                             </div>
-                            <div style="display:flex; gap:16px; border-bottom:1px solid #1d2836; margin-bottom:10px;">
-                              <div style="padding:8px 0; font-weight:700; border-bottom:2px solid #23d16a;">About this app</div>
-                              <div style="padding:8px 0; opacity:.8;">Reviews</div>
-                              <div style="padding:8px 0; opacity:.8;">Privacy</div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; color:#9fb0aa; margin-top:6px;">
+                                <span>63% {% if meta.lang == 'ko' %}클레임{% elif meta.lang == 'ja' %}達成{% elif meta.lang == 'zh' %}已领取{% else %}claimed{% endif %}</span>
+                                <span>2025-09-01 → 2025-10-31</span>
                             </div>
-                            <div style="font-size:13px; color:#cfe0d8; margin-bottom:10px;">
-                              Earn crypto for real actions across social, app reviews, and surveys. Rules and progress are public.
-                            </div>
-                            <div style="border-top:1px solid #1d2836; padding-top:10px;">
-                              <div style="font-weight:700; margin-bottom:6px;">User reviews</div>
-                              <div style="font-size:12px; color:#cfe0d8; margin-bottom:6px;">“Clear tasks and fast approval. Payouts on-chain.”</div>
-                              <div style="font-size:12px; color:#cfe0d8;">“Simple to use, fair rewards.”</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Block 3: Survey (LinkHash form style) -->
-                <div class="step">
-                    <div class="reveal">
-                        <h3>
-                          {% if meta.lang == 'ko' %}광고주 설문에 응답{% elif meta.lang == 'ja' %}広告主のアンケートに回答{% elif meta.lang == 'zh' %}参与广告主问卷{% else %}Answer a survey from one of our advertisers{% endif %}
-                        </h3>
-                        <p>
-                          {% if meta.lang == 'ko' %}
-                          광고주가 제시한 주제·제품·의견에 대한 설문을 완료하면 승인 후 암호화폐가 지급됩니다.
-                          {% elif meta.lang == 'ja' %}
-                          広告主が提示するトピック・製品・意見に関するアンケートを完了。承認後に暗号資産が付与されます。
-                          {% elif meta.lang == 'zh' %}
-                          完成广告主提出的主题、产品、观点相关问卷。审核通过后发放加密货币。
-                          {% else %}
-                          Complete a survey about a topic, product, or opinion provided by advertisers. After approval, you earn crypto.
-                          {% endif %}
-                        </p>
-                    </div>
-                    <div class="mini" aria-label="Survey form preview">
-                        <div class="chrome">
-                            <span class="dot red"></span>
-                            <span class="dot yellow"></span>
-                            <span class="dot green"></span>
-                        </div>
-                        <div class="body">
-                            <!-- LinkHash-style form with real question -->
-                            <div style="font-weight:800; margin-bottom:8px;">What is your year-end price forecast for ETH &amp; BMNR?</div>
-                            <div class="form-row">
-                                <div>
-                                    <label>ETH price (USD)</label>
-                                    <input type="number" placeholder="e.g. 4200">
-                                </div>
-                                <div>
-                                    <label>BMNR price (USD)</label>
-                                    <input type="number" placeholder="e.g. 1.25">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div>
-                                    <label>Confidence (0–100)</label>
-                                    <input type="number" min="0" max="100" placeholder="e.g. 70">
-                                </div>
-                                <div>
-                                    <label>Email (optional)</label>
-                                    <input placeholder="alex@example.com">
-                                </div>
-                            </div>
-                            <label>Reasoning (optional)</label>
-                            <div class="fake-input" style="height:80px;">Key catalysts, risks, timeline…</div>
-                            <div class="preview-actions">
-                                <button class="btn" type="button">Submit</button>
+                            <div class="preview-actions" style="margin-top:10px;">
+                                <button class="btn" onclick="location.href='{% if meta.lang == 'ko' %}/rewards/{% elif meta.lang == 'ja' %}/ja/rewards/{% elif meta.lang == 'zh' %}/zh/rewards/{% else %}/rewards/{% endif %}'">
+                                    {% if meta.lang == 'ko' %}세부 보기{% elif meta.lang == 'ja' %}詳細を見る{% elif meta.lang == 'zh' %}查看详情{% else %}View details{% endif %}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -795,8 +894,9 @@
         grid: { rows: 2, fill: 'row' },
         slidesPerView: 3,
         grabCursor: true,
-        simulateTouch: true,
+        simulateTouch: true,   // allow mouse drag on desktop
         breakpoints: { 0:{slidesPerView:1}, 900:{slidesPerView:2}, 1200:{slidesPerView:3} }
+        // NOTE: intentionally no 'mousewheel' here (defaults to disabled)
     });
 
     const pastSwiper = new Swiper('#past-swiper', {
@@ -806,6 +906,7 @@
         grabCursor: true,
         simulateTouch: true,
         breakpoints: { 0:{slidesPerView:1}, 900:{slidesPerView:2}, 1200:{slidesPerView:3} }
+        // NOTE: intentionally no 'mousewheel' here (defaults to disabled)
     });
 
     // Progress bars on view
@@ -878,19 +979,23 @@
             alert('MetaMask not detected. Please install MetaMask.');
             return;
         }
+        // 1) Request account
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const address = (accounts && accounts[0]) ? accounts[0] : null;
         if(!address){ alert('No account selected.'); return; }
 
+        // 2) Ask backend for a fresh nonce + canonical message
         const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
         if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
         const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
 
+        // 3) Sign exact message provided by server
         const signature = await window.ethereum.request({
             method: 'personal_sign',
             params: [ message, address ]
         });
 
+        // 4) Verify on server (sets session)
         const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
         if(verifyRes && verifyRes.ok){
             window.location.reload();
@@ -925,9 +1030,11 @@
         const $menu = $wrap.querySelector('.lang-menu');
         const current = ($wrap.dataset.current || 'en').toLowerCase();
 
+        // Set current flag on button
         const flagEl = $btn.querySelector('.flag-emoji');
         const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
         flagEl.textContent = flagMap[current] || '🇺🇸';
+        function open(){ $wrap.classList.add('open'); $btn.setAttribute('aria-expanded','true'); }
         function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
         $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
         document.addEventListener('click', ()=> close());
@@ -936,34 +1043,41 @@
         function pathFor(lang){
             const loc = window.location;
             const path = loc.pathname;
-            const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
+            const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/'); // strip locale prefix if any
 
+            // Known, localized base pages:
             const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
 
+            // Rewards Apply special cases (these routes exist explicitly)
             const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
             if(isApply){
-                if(lang === 'en') return '/rewards/apply/?lang=en';
+                if(lang === 'en') return '/rewards/apply/?lang=en'; // ensure session flips to EN
                 return `/rewards/apply/${lang}/`;
             }
 
             if(baseMap[clean]){
                 if(lang === 'en'){
+                // IMPORTANT: Append ?lang=en so middleware sets session to EN and does NOT redirect back to /ko|ja|zh/
                 const q = new URLSearchParams(loc.search);
                 q.set('lang','en');
                 return clean + (q.toString() ? `?${q.toString()}` : '');
                 }
+                // ko/ja/zh → prefix with language (single trailing slash on '/')
                 return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
             }
 
+            // Unknown/other page (e.g., /rewards/some-slug-5/) → keep path, toggle ?lang=xx
             const params = new URLSearchParams(loc.search);
             params.set('lang', lang);
             return path + (params.toString() ? `?${params.toString()}` : '');
         }
 
+
         $menu.querySelectorAll('.lang-item').forEach(li=>{
         li.addEventListener('click', ()=>{
             const lang = li.getAttribute('data-lang');
             const emoji = li.getAttribute('data-flag') || '';
+            // Instant visual feedback
             flagEl.textContent = emoji;
             $wrap.querySelector('.label').textContent =
             lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
