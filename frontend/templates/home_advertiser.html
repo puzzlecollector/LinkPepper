@@ -620,6 +620,23 @@
   }
   window.connectWallet = connectWallet;
   window.logoutWallet  = logoutWallet;
+
+  // --- Add this: language-aware Apply router for all "Apply now" buttons ---
+  function currentLang(){
+    // Prefer the <html lang="..">; fall back to meta.lang server value.
+    const lang = (document.documentElement.getAttribute('lang') || '{{ meta.lang|default:"en" }}').toLowerCase();
+    return (lang === 'ko' || lang === 'ja' || lang === 'zh') ? lang : 'en';
+  }
+  function goApply(){
+    const lang = currentLang();
+    if(lang === 'en'){
+      window.location.href = '/rewards/apply/?lang=en';
+    }else{
+      window.location.href = `/rewards/apply/${lang}/`;
+    }
+  }
+  // Make available to inline onclick handlers
+  window.goApply = goApply;
         </script>
         <script>
   (function(){
