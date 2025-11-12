@@ -55,19 +55,58 @@
       .container{width:1200px; margin:0 auto; padding:0 20px;}
 
       /* ===== NAV ===== */
-      .nav{
-        position:sticky; top:0; z-index:60; backdrop-filter: blur(10px);
-        background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
-        border-bottom:1px solid rgba(255,255,255,.06);
-      }
-      .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
-      .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; color:#d8ffe7; text-shadow:0 0 18px rgba(35,209,106,.24);}
-      .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
-      .nav .links{display:flex; gap:24px; align-items:center;}
-      .nav .links a{color:#cfe7dd; opacity:.9}
-      .nav .links a.active{font-weight:800; color:#d8ffe7; text-shadow:0 0 14px rgba(35,209,106,.22)}
-      .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
-      .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+      /* ===== NAV ===== */
+    .nav{
+    position:sticky; top:0; z-index:60; backdrop-filter: blur(10px);
+    background:linear-gradient(180deg, rgba(15,17,21,.65), rgba(15,17,21,.35));
+    border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav .row{display:flex; align-items:center; justify-content:space-between; height:72px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; color:#d8ffe7; text-shadow:0 0 18px rgba(35,209,106,.24);}
+    .brand .dot{width:10px;height:10px;border-radius:999px;background:var(--green);box-shadow:var(--glow)}
+    .nav .links{display:flex; gap:24px; align-items:center;}
+    .nav .links a{color:#cfe7dd; opacity:.9}
+    .nav .links a:hover{color:#fff; text-shadow:0 0 12px rgba(35,209,106,.25)}
+    /* Optional: highlight current link like home.html can do */
+    .nav .links a.active{font-weight:800; color:#d8ffe7; text-shadow:0 0 14px rgba(35,209,106,.22)}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; font-weight:700; border-radius:12px; background:linear-gradient(180deg,#19b357,#119e49); color:#05160c; box-shadow:var(--glow); border:1px solid #2fe07a}
+    .btn-outline{padding:10px 14px; border-radius:12px; border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6}
+
+    /* ===== Language dropdown (nav) ===== */
+    .lang{ position:relative; margin-left:8px; }
+    .lang-btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:10px 12px; font-weight:700; border-radius:12px;
+    border:1px solid #2a333f; background: rgba(14,18,25,.6); color:#d9f6e6;
+    cursor:pointer;
+    }
+    .lang-btn:hover{ border-color:rgba(35,209,106,.35); box-shadow:0 0 16px rgba(35,209,106,.18) }
+    .lang .chev{ opacity:.8 }
+
+    .lang-menu{
+    position:absolute; top:110%; right:0; width:210px;
+    background:linear-gradient(180deg, #0f1419, #0c1116);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45);
+    padding:6px; display:none; z-index:70;
+    }
+    .lang.open .lang-menu{ display:block; animation:menuIn .14s ease-out }
+    @keyframes menuIn{ from{ transform:translateY(-6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+
+    .lang-item{
+    display:flex; align-items:center; gap:10px; padding:10px 10px; border-radius:10px;
+    cursor:pointer; color:#cfe7dd; font-weight:700;
+    }
+    .lang-item:hover{ background:#0b1218; border:1px solid #1d2836 }
+
+    /* Minimal flag “badges” like home.html */
+    .flag-emoji{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:18px; height:18px; line-height:18px;
+    font-size:14px; border-radius:3px;
+    background:rgba(255,255,255,.06);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+    }
 
       /* ===== HERO (Advertiser) ===== */
       .hero{position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,.06);}
@@ -141,7 +180,6 @@
                     <span>LinkHash</span>
                 </div>
                 <nav class="links">
-                    <!-- Mark HOME as active/highlighted -->
                     <a class="active" href="{% if meta.lang == 'ko' %}/ko/{% elif meta.lang == 'ja' %}/ja/{% elif meta.lang == 'zh' %}/zh/{% else %}/{% endif %}">
                         {% if meta.lang == 'ko' %}홈{% elif meta.lang == 'ja' %}ホーム{% elif meta.lang == 'zh' %}主页{% else %}Home{% endif %}
                     </a>
@@ -167,7 +205,7 @@
                         {% if meta.lang == 'ko' %}지갑 연결{% elif meta.lang == 'ja' %}ウォレット接続{% elif meta.lang == 'zh' %}连接钱包{% else %}Connect Wallet{% endif %}
                     </a>
                     {% endif %}
-                    <!-- Language dropdown -->
+                    <!-- Language dropdown (same as home.html) -->
                     <div class="lang" id="langSwitcher" data-current="{{ meta.lang|default:'en' }}">
                         <button
                             class="lang-btn"
@@ -500,7 +538,8 @@
         <!-- ===== FOOTER ===== -->
         <footer class="footer">
             <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
-                <div>©
+                <div>
+                    ©
                     <strong>LinkHash</strong>
                 </div>
                 <div style="opacity:.7">
@@ -510,70 +549,134 @@
         </footer>
         <!-- ===== JS: language + wallet + apply router ===== -->
         <script>
-      // Apply route resolver (same behavior you described)
-      function goApply(){
-        const lang = (document.documentElement.getAttribute('lang') || '{{ meta.lang|default:"en" }}').toLowerCase();
-        if(lang === 'en') window.location.href = '/rewards/apply/?lang=en';
-        else window.location.href = `/rewards/apply/${lang}/`;
+  // --- CSRF helper ---
+  function getCookie(name){
+    const m = document.cookie.match(new RegExp('(^|; )' + encodeURIComponent(name) + '=([^;]*)'));
+    return m ? decodeURIComponent(m[2]) : null;
+  }
+  async function apiGet(url){
+    const r = await fetch(url, { credentials: 'same-origin' });
+    if(!r.ok) throw new Error((await r.text()) || ('GET ' + url + ' failed'));
+    return r.json();
+  }
+  async function apiPost(url, json){
+    const r = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken') || ''
+      },
+      body: JSON.stringify(json || {})
+    });
+    if(!r.ok){
+      let msg;
+      try{ msg = (await r.json()).error }catch(e){ msg = await r.text(); }
+      throw new Error(msg || ('POST ' + url + ' failed'));
+    }
+    return r.json();
+  }
+
+  // --- Wallet login (same as home.html) ---
+  async function connectWallet(){
+    try{
+      if(!window.ethereum){
+        alert('MetaMask not detected. Please install MetaMask.');
+        return;
+      }
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const address = (accounts && accounts[0]) ? accounts[0] : null;
+      if(!address){ alert('No account selected.'); return; }
+
+      const nonceRes = await apiGet(`/api/auth/nonce?address=${encodeURIComponent(address)}`);
+      if(!nonceRes.ok){ throw new Error(nonceRes.error || 'nonce error'); }
+      const message = nonceRes.message || `LinkHash login\n\nNonce: ${nonceRes.nonce}\n\nThis signature proves you control this wallet.`;
+
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [ message, address ]
+      });
+
+      const verifyRes = await apiPost('/api/auth/verify', { address, signature, message });
+      if(verifyRes && verifyRes.ok){
+        window.location.reload();
+      }else{
+        alert('Login failed.');
+      }
+    }catch(err){
+      console.error(err);
+      alert('Wallet login failed: ' + (err && err.message ? err.message : err));
+    }
+  }
+
+  async function logoutWallet(){
+    try{
+      await apiPost('/api/auth/logout', {});
+      window.location.reload();
+    }catch(err){
+      console.error(err);
+      alert('Logout failed: ' + (err && err.message ? err.message : err));
+    }
+  }
+  window.connectWallet = connectWallet;
+  window.logoutWallet  = logoutWallet;
+        </script>
+        <script>
+  (function(){
+    const $wrap = document.getElementById('langSwitcher');
+    if(!$wrap) return;
+    const $btn  = $wrap.querySelector('.lang-btn');
+    const $menu = $wrap.querySelector('.lang-menu');
+    const current = ($wrap.dataset.current || 'en').toLowerCase();
+
+    const flagEl = $btn.querySelector('.flag-emoji');
+    const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
+    flagEl.textContent = flagMap[current] || '🇺🇸';
+
+    function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
+    $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
+    document.addEventListener('click', ()=> close());
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
+
+    function pathFor(lang){
+      const loc = window.location;
+      const path = loc.pathname;
+      const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
+      const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
+
+      const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
+      if(isApply){
+        if(lang === 'en') return '/rewards/apply/?lang=en';
+        return `/rewards/apply/${lang}/`;
       }
 
-      // Language dropdown (same as other pages)
-      (function(){
-        const $wrap = document.getElementById('langSwitcher');
-        if(!$wrap) return;
-        const $btn  = $wrap.querySelector('.lang-btn');
-        const $menu = $wrap.querySelector('.lang-menu');
-        const current = ($wrap.dataset.current || 'en').toLowerCase();
-
-        const flagEl = $btn.querySelector('.flag-emoji');
-        const flagMap = { en:'🇺🇸', ko:'🇰🇷', ja:'🇯🇵', zh:'🇨🇳' };
-        flagEl.textContent = flagMap[current] || '🇺🇸';
-        function open(){ $wrap.classList.add('open'); $btn.setAttribute('aria-expanded','true'); }
-        function close(){ $wrap.classList.remove('open'); $btn.setAttribute('aria-expanded','false'); }
-        $btn.addEventListener('click', (e)=>{ e.stopPropagation(); $wrap.classList.toggle('open'); $btn.setAttribute('aria-expanded', $wrap.classList.contains('open')); });
-        document.addEventListener('click', ()=> close());
-        document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
-
-        function pathFor(lang){
-          const loc = window.location;
-          const path = loc.pathname;
-          const clean = path.replace(/^\/(ko|ja|zh)(\/|$)/, '/');
-          const baseMap = { '/': true, '/rewards/': true, '/events/': true, '/leaderboard/': true };
-          const isApply = /^\/rewards\/apply(\/(ko|ja|zh)\/)?$/.test(path);
-          if(isApply){
-            if(lang === 'en') return '/rewards/apply/?lang=en';
-            return `/rewards/apply/${lang}/`;
-          }
-          if(baseMap[clean]){
-            if(lang === 'en'){
-              const q = new URLSearchParams(loc.search);
-              q.set('lang','en');
-              return clean + (q.toString() ? `?${q.toString()}` : '');
-            }
-            return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
-          }
-          const params = new URLSearchParams(loc.search);
-          params.set('lang', lang);
-          return path + (params.toString() ? `?${params.toString()}` : '');
+      if(baseMap[clean]){
+        if(lang === 'en'){
+          const q = new URLSearchParams(loc.search);
+          q.set('lang','en');
+          return clean + (q.toString() ? `?${q.toString()}` : '');
         }
+        return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
+      }
 
-        $menu.querySelectorAll('.lang-item').forEach(li=>{
-          li.addEventListener('click', ()=>{
-            const lang = li.getAttribute('data-lang');
-            const emoji= li.getAttribute('data-flag') || '';
-            $btn.querySelector('.flag-emoji').textContent = emoji;
-            $wrap.querySelector('.label').textContent =
-              lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
-            close();
-            const target = pathFor(lang);
-            if(target) window.location.href = target;
-          });
-        });
-      })();
+      const params = new URLSearchParams(loc.search);
+      params.set('lang', lang);
+      return path + (params.toString() ? `?${params.toString()}` : '');
+    }
 
-      // Wallet stubs (reuse if included elsewhere)
-      async function connectWallet(){ alert('Wallet script missing'); }
-      async function logoutWallet(){ alert('Wallet script missing'); }
+    $menu.querySelectorAll('.lang-item').forEach(li=>{
+      li.addEventListener('click', ()=>{
+        const lang = li.getAttribute('data-lang');
+        const emoji = li.getAttribute('data-flag') || '';
+        flagEl.textContent = emoji;
+        $wrap.querySelector('.label').textContent =
+          lang==='ko' ? '한국어' : lang==='ja' ? '日本語' : lang==='zh' ? '中文' : 'English';
+        close();
+        const target = pathFor(lang);
+        if(target) window.location.href = target;
+      });
+    });
+  })();
         </script>
     </body>
 </html>
