@@ -493,24 +493,25 @@
                     <div class="badge">Web3 · SEO · Rewards</div>
                     <h1>
                         {% if meta.lang == 'ko' %}
-              앱이나 웹사이트를 홍보하고 설문에 응답하면 —
+                        앱·웹을 홍보하고 설문에 응답하고
                         <span class="highlight">
-                            투명한
-                            <span class="nowrap">탈중앙</span> 마케팅으로 암호화폐 보상</span>
-                        을 받습니다.
-            {% elif meta.lang == 'ja' %}
-              アプリやサイトを宣伝しアンケートに回答すると—
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">透明で分散型のマーケティングで暗号資産報酬</span>
-                        を受け取れます。
-            {% elif meta.lang == 'zh' %}
-              推广应用或网站并参与问卷 —
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">通过透明的去中心化营销获得加密货币奖励</span>
-                        。
-            {% else %}
-              Promote apps or websites and answer surveys —
-                        <span style="color:#aaf5c7; text-shadow:var(--glow)">earn crypto through transparent, decentralized marketing</span>
-                        .
-            {% endif %}
+                            <span class="nowrap">암호화폐 보상</span>을 받으세요</span>
+                        {% elif meta.lang == 'ja' %}
+                        アプリ/サイトを宣伝し、アンケートに回答して
+                        <span class="highlight" style="text-shadow:var(--glow)">
+                            <span class="nowrap">暗号資産を獲得</span>
+                        </span>
+                        {% elif meta.lang == 'zh' %}
+                        推广应用/网站并参与问卷，
+                        <span class="highlight" style="text-shadow:var(--glow)">
+                            <span class="nowrap">获取加密货币奖励</span>
+                        </span>
+                        {% else %}
+                        Promote apps/sites, answer surveys, and
+                        <span class="highlight" style="text-shadow:var(--glow)">
+                            <span class="nowrap">earn crypto</span>
+                        </span>
+                        {% endif %}
                     </h1>
                     <p>
                         {% if meta.lang == 'ko' %}
