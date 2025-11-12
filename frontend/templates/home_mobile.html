@@ -75,19 +75,28 @@
 
       /* Make gray CTA same size + allow multi-line wrapping */
       .btn-outline{
-        display:inline-flex; align-items:flex-start;        /* helps multi-line alignment */
+        display:inline-flex; align-items:flex-start;
         gap:8px; padding:10px 12px; border-radius:12px;
         border:1px solid #2a333f; background:rgba(14,18,25,.6); color:#d9f6e6;
-        font-weight:800; font-size:13px;                   /* match .btn size */
-        white-space:normal;                                /* allow wrapping */
-        text-wrap:balance; word-break:keep-all;            /* nicer CJK/EN wrapping */
-        line-height:1.35;                                  /* comfortable multi-line */
-        max-width:100%;                                    /* don’t overflow container */
+        font-weight:800; font-size:13px;
+        line-height:1.35;
+        white-space:normal; text-wrap:balance; word-break:keep-all;
+
+        /* make it hug content instead of filling the row */
+        flex:0 0 auto;                 /* <-- key change */
+        width:auto;                     /* ensure shrink-to-fit */
+        inline-size:fit-content;        /* modern shrink-to-fit */
+        max-inline-size:100%;
+
+        /* force pleasant wrapping (≈ two lines). Adjust ch to taste. */
+        max-width:28ch;                 /* try 26–32ch depending on language length */
+        align-self:flex-start;          /* avoid stretching by the container */
       }
 
-      /* Optional: make layout tolerant so the long CTA doesn’t force a new row too early */
-      .cta .btn,
-      .cta .btn-outline{ flex:0 1 auto; }
+      /* keep the green button flexible but not forced full width */
+      .cta .btn{ flex:0 0 auto; }
+      .cta .btn-outline{ flex:0 0 auto; }   /* ensure no growing */
+      .cta{ align-items:flex-start; }       /* avoid cross-axis stretching */
 
       .pill-addr{max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 
@@ -151,9 +160,14 @@
       /* More breathing room between each card in #how */
       #how .step{
         display:grid; grid-template-columns:1fr;
-        gap:16px;                            /* was 12px */
+        gap:18px;                /* a touch more inner gap */
         align-items:start;
-        margin:26px 0 36px;                  /* was 16px 0 24px */
+        margin:32px 0 46px;      /* MORE space above/below each step */
+      }
+
+      /* Extra separation only BETWEEN steps (nice on mobile) */
+      #how .step + .step{
+        margin-top:48px;         /* this is the value to increase if you want even more */
       }
 
       /* (Optional) a little extra padding above/below the whole #how section */
