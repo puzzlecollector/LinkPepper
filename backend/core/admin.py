@@ -17,7 +17,8 @@ from .models import (
     SubmissionStatus,
     TaskType,
     Network,
-    Event
+    Event,
+    BannedIP
 )
 
 # ---------- Helpers
@@ -517,6 +518,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         "id", "campaign", "user",
         "submitted_wallet",           # NEW: value typed in the form
         "login_wallet",               # NEW: wallet of the logged-in user (or 'anonymous user')
+        "ip_address",
         "network_safe", "status",
         "post_url", "visited_url", "code_entered",
         "campaign_currency", "campaign_currency_network",
@@ -548,6 +550,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         "campaign_currency",
         "campaign_currency_network",
         "login_wallet_display",          # NEW: shows wallet from the linked WalletUser (or 'anonymous user')
+        "ip_address",
     )
 
     inlines = (PayoutInline,)
@@ -893,6 +896,13 @@ class EventAdmin(admin.ModelAdmin):
             )
             created += 1
         self.message_user(request, f"Created {created} duplicate event(s). Edit and publish when ready.", level=messages.SUCCESS)
+
+
+@admin.register(BannedIP)
+class BannedIPAdmin(admin.ModelAdmin):
+    list_display = ("ip_address", "reason", "hit_count", "banned_at")
+    search_fields = ("ip_address", "reason")
+    ordering = ("-banned_at",)
 
 
 # @admin.register(Network)

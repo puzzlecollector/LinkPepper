@@ -62,6 +62,7 @@ INSTALLED_APPS = [
 # --------------------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "core.middleware.IPBanMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "core.middleware.LanguageRoutingMiddleware",
     "core.middleware.WalletAuthMiddleware",

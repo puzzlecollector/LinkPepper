@@ -2,10 +2,10 @@
 from __future__ import annotations
 from typing import Optional
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import redirect
 
-from .models import WalletUser
+from .models import WalletUser, BannedIP
 
 SUPPORTED_LANGS = {"en", "ko", "ja", "zh"}
 
@@ -65,6 +65,18 @@ def _is_localhost(request: HttpRequest) -> bool:
     host = (request.get_host() or "").split(":")[0]
     ip = request.META.get("REMOTE_ADDR", "")
     return host in {"localhost", "127.0.0.1"} or ip in {"127.0.0.1", "::1"}
+
+def get_client_ip(request: HttpRequest) -> str:
+    """
+    Best-effort client IP detection.
+    - If you're behind a reverse proxy (e.g. Nginx, Cloudflare), configure it to set
+      X-Forwarded-For and trust only your proxy.
+    """
+    xff = request.META.get("HTTP_X_FORWARDED_FOR")
+    if xff:
+        # X-Forwarded-For: client, proxy1, proxy2, ...
+        return xff.split(",")[0].strip()
+    return (request.META.get("REMOTE_ADDR") or "").strip()
 
 class LanguageRoutingMiddleware:
     """
@@ -198,5 +210,23 @@ class MobileHostRedirectMiddleware:
             if _should_use_mobile(request):  # mobile preferred
                 target = f"https://{MOBILE_HOST}{request.get_full_path()}"
                 return HttpResponseRedirect(target)
+
+        return self.get_response(request)
+    
+
+class IPBanMiddleware:
+    """
+    Blocks requests from IPs stored in BannedIP.
+    Also sets request.client_ip for later use in views.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest):
+        ip = get_client_ip(request)
+        request.client_ip = ip  # convenient for views
+
+        if ip and BannedIP.objects.filter(ip_address=ip).exists():
+            return HttpResponseForbidden("Your IP address has been banned.")
 
         return self.get_response(request)

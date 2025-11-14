@@ -320,6 +320,8 @@ class Submission(models.Model):
     wallet_address = models.CharField(max_length=128)
     network = models.CharField(max_length=8, choices=Network.choices)
 
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
     transaction_id = models.CharField(max_length=180, blank=True, null=True, db_index=True)
 
     # Two task shapes (only one will be actually used depending on campaign.task_type):
@@ -375,6 +377,21 @@ class Submission(models.Model):
 
     def __str__(self) -> str:
         return f"Submission #{self.pk} to {self.campaign}"
+
+class BannedIP(models.Model):
+    """
+    Stores IPs that are not allowed to submit (or access, via middleware).
+    """
+    ip_address = models.GenericIPAddressField(unique=True)
+    reason = models.CharField(max_length=240, blank=True)
+    banned_at = models.DateTimeField(auto_now_add=True)
+    hit_count = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        ordering = ["-banned_at"]
+
+    def __str__(self) -> str:
+        return f"{self.ip_address} (hits={self.hit_count})"
 
 
 # ---------- Payout ledger (manual transfer logging) ----------

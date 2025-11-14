@@ -17,8 +17,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from eth_account.messages import encode_defunct
 from eth_account import Account
 from django.template.loader import select_template
-
 from django.conf import settings  # <-- add this
+from core.middleware import get_client_ip
 
 # Defaults for “How to use” guide links (can be overridden in settings.py)
 GUIDE_DEFAULTS = {
@@ -36,12 +36,53 @@ from .models import (
     TaskType,
     SubmissionStatus,
     Network,
-    Event
+    Event,
+    BannedIP
 )
 
 # ---------- helpers ----------
 # ---------- helpers ----------
-# ---------- helpers ----------
+SQLI_PATTERNS = [
+    r"(?i)\bunion\b\s+select\b",
+    r"(?i)\bor\b\s+1=1\b",
+    r"(?i)\band\b\s+1=1\b",
+    r"(?i)\bdrop\s+table\b",
+    r"(?i)\btruncate\s+table\b",
+    r"(?i)\binformation_schema\b",
+    r"(?i)\binsert\s+into\b",
+    r"(?i)\bupdate\b.+\bset\b",
+    r";\s*--",            # ; --
+    r"/\*.*\*/",          # /* ... */
+]
+
+def has_sql_injection_in_request(request) -> bool:
+    """
+    Naive heuristic: concatenate all POST values and run regex patterns.
+    If more than 0 matches, treat as SQL injection attempt.
+    """
+    combined = " ".join(str(v) for v in request.POST.values())
+    if not combined:
+        return False
+
+    for pattern in SQLI_PATTERNS:
+        if re.search(pattern, combined):
+            return True
+    return False
+
+
+def ban_ip_for_sql_injection(ip: str, reason: str = "SQL injection in submission"):
+    if not ip:
+        return
+    obj, created = BannedIP.objects.get_or_create(
+        ip_address=ip,
+        defaults={"reason": reason, "hit_count": 1},
+    )
+    if not created:
+        obj.hit_count = obj.hit_count + 1
+        if not obj.reason:
+            obj.reason = reason
+        obj.save(update_fields=["hit_count", "reason"])
+
 def _base_url(request):
     return f"{request.scheme}://{request.get_host()}"
 
@@ -847,10 +888,6 @@ def _clean_network(value: str) -> str | None:
 
 @require_POST
 def submit_link(request, slug):
-    # need = _need_login(request)
-    # if need:
-    #     return need
-
     user = get_wallet_user(request)
     campaign = get_object_or_404(Campaign, slug=slug)
 
@@ -858,6 +895,16 @@ def submit_link(request, slug):
         return HttpResponseBadRequest("wrong task type")
     if not campaign.is_open_now:
         return HttpResponseBadRequest("campaign closed")
+
+    # --- NEW: get IP & check for existing ban (in case middleware isn't used somewhere) ---
+    ip = getattr(request, "client_ip", None) or get_client_ip(request)
+    if ip and BannedIP.objects.filter(ip_address=ip).exists():
+        return HttpResponseForbidden("Your IP address has been banned.")
+
+    # --- NEW: detect SQL injection in submitted fields ---
+    if has_sql_injection_in_request(request):
+        ban_ip_for_sql_injection(ip, reason="SQL injection in LINK submission")
+        return HttpResponseForbidden("Your IP address has been banned.")
 
     post_url = (request.POST.get("post_url") or "").strip()
     comment = (request.POST.get("comment") or "").strip()
@@ -877,18 +924,16 @@ def submit_link(request, slug):
             comment=comment,
             status=SubmissionStatus.PENDING,
             proof_score=0,
+            ip_address=ip,   # NEW: store IP on submission
         )
     except IntegrityError:
         pass
 
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
+
 @require_POST
 def submit_visit(request, slug):
-    # need = _need_login(request)
-    # if need:
-    #     return need
-
     user = get_wallet_user(request)
     campaign = get_object_or_404(Campaign, slug=slug)
 
@@ -896,6 +941,16 @@ def submit_visit(request, slug):
         return HttpResponseBadRequest("wrong task type")
     if not campaign.is_open_now:
         return HttpResponseBadRequest("campaign closed")
+
+    # --- NEW: IP & ban check ---
+    ip = getattr(request, "client_ip", None) or get_client_ip(request)
+    if ip and BannedIP.objects.filter(ip_address=ip).exists():
+        return HttpResponseForbidden("Your IP address has been banned.")
+
+    # --- NEW: detect SQL injection ---
+    if has_sql_injection_in_request(request):
+        ban_ip_for_sql_injection(ip, reason="SQL injection in VISIT submission")
+        return HttpResponseForbidden("Your IP address has been banned.")
 
     code = (request.POST.get("code") or request.POST.get("visit_code") or "").strip()
     wallet = (request.POST.get("wallet2") or request.POST.get("wallet") or request.POST.get("wallet_address") or "").strip()
@@ -914,11 +969,13 @@ def submit_visit(request, slug):
             visited_url=visited_url,
             code_entered=code,
             status=SubmissionStatus.PENDING,
+            ip_address=ip,   # NEW
         )
     except IntegrityError:
         pass
 
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+
 
 
 # ---- SAMPLE CAMPAIGNS (UI preview) ----
