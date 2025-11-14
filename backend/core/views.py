@@ -44,16 +44,72 @@ from .models import (
 # ---------- helpers ----------
 # ---------- helpers ----------
 SQLI_PATTERNS = [
+    # --- Classic UNION-based injection ---
+    r"(?i)\bunion\b\s+all\s+select\b",
     r"(?i)\bunion\b\s+select\b",
-    r"(?i)\bor\b\s+1=1\b",
-    r"(?i)\band\b\s+1=1\b",
+
+    # --- Boolean tautologies / simple OR/AND tricks ---
+    r"(?i)\bor\b\s+1\s*=\s*1\b",
+    r"(?i)\band\b\s+1\s*=\s*1\b",
+    # generic "OR <number> = <number>" (e.g. OR 2+429-429-1=0+0+0+1)
+    r"(?i)\bor\b\s*[-+]?[0-9]+\s*=\s*[-+]?[0-9]+",
+    # generic "OR <expr> = <expr>" (very aggressive; OK for bot-blocking)
+    r"(?i)\bor\b[^;]+=\s*[^;]+",
+
+    # --- DDL / destructive operations ---
     r"(?i)\bdrop\s+table\b",
     r"(?i)\btruncate\s+table\b",
-    r"(?i)\binformation_schema\b",
+    r"(?i)\bdrop\s+database\b",
+
+    # --- DML operations often used maliciously ---
     r"(?i)\binsert\s+into\b",
     r"(?i)\bupdate\b.+\bset\b",
-    r";\s*--",            # ; --
-    r"/\*.*\*/",          # /* ... */
+    r"(?i)\bdelete\s+from\b",
+
+    # --- System / metadata access ---
+    r"(?i)\binformation_schema\b",
+    r"(?i)\bschema_name\s*\(",
+    r"(?i)\btable_name\s*\(",
+    r"(?i)\bcolumn_name\s*\(",
+
+    # --- Function calls used for timing / blind SQLi ---
+    r"(?i)\bpg_sleep\s*\(",
+    r"(?i)\bsleep\s*\(",
+    r"(?i)\bbenchmark\s*\(",
+    r"(?i)\bdbms_pipe\.receive_message\s*\(",
+    r"(?i)\bdbms_lock\.sleep\s*\(",
+    r"(?i)\bwaitfor\s+delay\b",
+
+    # --- DB-specific helpers often appearing in payloads ---
+    r"(?i)\bsysdate\s*\(",
+    r"(?i)\bif\s*\(\s*now\s*\(\s*\)\s*=\s*sysdate\s*\(",
+    r"(?i)\bconcat\s*\(",
+    r"(?i)\bcast\s*\(",
+    r"(?i)\bconvert\s*\(",
+
+    # --- EXEC / dynamic code execution ---
+    r"(?i)\bexec\s*\(",
+    r"(?i)\bexec\s+\w+",
+    r"(?i)\bexecute\s*\(",
+    r"(?i)\bxp_cmdshell\b",
+
+    # --- XOR-based / obfuscated payloads you saw ---
+    r"(?i)\bxor\s*\(",
+    r"(?i)xor\([^)]*sleep\s*\(",
+
+    # --- Comment / termination patterns commonly used in injection ---
+    r";\s*--",            # e.g. "1;--"
+    r"--\s*$",            # trailing comment at end of string
+    r"/\*.*\*/",          # /* ... */ style comments
+    r"(?i)\bunion\b[^\\n]*--",  # union ... -- comment
+    r"(?i)\bselect\b[^\\n]*--",
+
+    # --- @@ / server variables often used in scanners ---
+    r"@@\w+",
+
+    # --- Very generic "OR 'x'='x" style patterns ---
+    r"(?i)\bor\b\s*'.+'\s*=\s*'.+'",
+    r"(?i)\bor\b\s*\".+\"\s*=\s*\".+\"",
 ]
 
 def has_sql_injection_in_request(request) -> bool:
