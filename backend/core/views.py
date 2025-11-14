@@ -19,6 +19,7 @@ from eth_account import Account
 from django.template.loader import select_template
 from django.conf import settings  # <-- add this
 from core.middleware import get_client_ip
+import re
 
 # Defaults for “How to use” guide links (can be overridden in settings.py)
 GUIDE_DEFAULTS = {
