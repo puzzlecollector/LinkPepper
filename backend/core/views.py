@@ -943,6 +943,56 @@ def _clean_network(value: str) -> str | None:
         return v
     return None
 
+
+EVM_ADDRESS_RE = re.compile(r"^0x[a-fA-F0-9]{40}$")
+SOL_ADDRESS_RE = re.compile(r"^[1-9A-HJ-NP-Za-km-z]{32,44}$")  # basic Solana base58-ish check
+
+
+def is_valid_evm_address(addr: str) -> bool:
+    if not addr:
+        return False
+    return bool(EVM_ADDRESS_RE.match(addr.strip()))
+
+
+def is_valid_solana_address(addr: str) -> bool:
+    if not addr:
+        return False
+    return bool(SOL_ADDRESS_RE.match(addr.strip()))
+
+
+def get_wallet_validation_error(wallet: str, network: str) -> str | None:
+    """
+    Returns an error message string if invalid, or None if the wallet is valid
+    for the given network.
+    """
+    wallet = (wallet or "").strip()
+    network = (network or "").strip().upper()
+
+    if not wallet:
+        return "wallet address is required"
+
+    # Make sure the network itself is one of our known choices
+    valid_network_codes = {code for code, _ in Network.choices}
+    if network not in valid_network_codes:
+        return f"unsupported network: {network}"
+
+    # EVM-style networks (ETH, BNB, POL, BASE)
+    if network in {Network.ETH, Network.BNB, Network.POL, Network.BASE}:
+        if not is_valid_evm_address(wallet):
+            label = dict(Network.choices).get(network, network)
+            return f"invalid {label} wallet address"
+        return None
+
+    # Solana
+    if network == Network.SOL:
+        if not is_valid_solana_address(wallet):
+            label = dict(Network.choices).get(network, network)
+            return f"invalid {label} wallet address"
+        return None
+
+    # Fallback: if we ever add more networks and forget to handle them here
+    return f"unsupported network: {network}"
+
 @require_POST
 def submit_link(request, slug):
     user = get_wallet_user(request)
@@ -953,12 +1003,12 @@ def submit_link(request, slug):
     if not campaign.is_open_now:
         return HttpResponseBadRequest("campaign closed")
 
-    # --- NEW: get IP & check for existing ban (in case middleware isn't used somewhere) ---
+    # --- IP & ban check ---
     ip = getattr(request, "client_ip", None) or get_client_ip(request)
     if ip and BannedIP.objects.filter(ip_address=ip).exists():
         return HttpResponseForbidden("Your IP address has been banned.")
 
-    # --- NEW: detect SQL injection in submitted fields ---
+    # --- SQL injection check ---
     if has_sql_injection_in_request(request):
         ban_ip_for_sql_injection(ip, reason="SQL injection in LINK submission")
         return HttpResponseForbidden("Your IP address has been banned.")
@@ -971,6 +1021,21 @@ def submit_link(request, slug):
     if not wallet or not network:
         return HttpResponseBadRequest("wallet and network required")
 
+    # --- wallet format validation per network ---
+    error = get_wallet_validation_error(wallet, network)
+    if error:
+        return HttpResponseBadRequest(error)
+
+    # --- NEW: prevent duplicate submissions for same campaign ---
+
+    # 1) Same campaign + same wallet address
+    if Submission.objects.filter(campaign=campaign, wallet_address=wallet).exists():
+        return HttpResponseBadRequest("A submission with this wallet has already been received for this campaign.")
+
+    # 2) Same campaign + same logged-in wallet user (if any)
+    if user is not None and Submission.objects.filter(campaign=campaign, user=user).exists():
+        return HttpResponseBadRequest("You have already submitted for this campaign.")
+
     try:
         Submission.objects.create(
             campaign=campaign,
@@ -981,9 +1046,10 @@ def submit_link(request, slug):
             comment=comment,
             status=SubmissionStatus.PENDING,
             proof_score=0,
-            ip_address=ip,   # NEW: store IP on submission
+            ip_address=ip,   # keep storing IP
         )
     except IntegrityError:
+        # Optional: you could log this if needed
         pass
 
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
@@ -999,23 +1065,43 @@ def submit_visit(request, slug):
     if not campaign.is_open_now:
         return HttpResponseBadRequest("campaign closed")
 
-    # --- NEW: IP & ban check ---
+    # --- IP & ban check ---
     ip = getattr(request, "client_ip", None) or get_client_ip(request)
     if ip and BannedIP.objects.filter(ip_address=ip).exists():
         return HttpResponseForbidden("Your IP address has been banned.")
 
-    # --- NEW: detect SQL injection ---
+    # --- SQL injection check ---
     if has_sql_injection_in_request(request):
         ban_ip_for_sql_injection(ip, reason="SQL injection in VISIT submission")
         return HttpResponseForbidden("Your IP address has been banned.")
 
     code = (request.POST.get("code") or request.POST.get("visit_code") or "").strip()
-    wallet = (request.POST.get("wallet2") or request.POST.get("wallet") or request.POST.get("wallet_address") or "").strip()
+    wallet = (
+        request.POST.get("wallet2")
+        or request.POST.get("wallet")
+        or request.POST.get("wallet_address")
+        or ""
+    ).strip()
     network = _clean_network(request.POST.get("network"))
     visited_url = campaign.client_site_domain or (request.POST.get("visited_url") or "").strip()
 
     if not wallet or not network:
         return HttpResponseBadRequest("wallet and network required")
+
+    # --- wallet format validation per network ---
+    error = get_wallet_validation_error(wallet, network)
+    if error:
+        return HttpResponseBadRequest(error)
+
+    # --- NEW: prevent duplicate submissions for same campaign ---
+
+    # 1) Same campaign + same wallet address
+    if Submission.objects.filter(campaign=campaign, wallet_address=wallet).exists():
+        return HttpResponseBadRequest("A submission with this wallet has already been received for this campaign.")
+
+    # 2) Same campaign + same logged-in wallet user (if any)
+    if user is not None and Submission.objects.filter(campaign=campaign, user=user).exists():
+        return HttpResponseBadRequest("You have already submitted for this campaign.")
 
     try:
         Submission.objects.create(
@@ -1026,12 +1112,14 @@ def submit_visit(request, slug):
             visited_url=visited_url,
             code_entered=code,
             status=SubmissionStatus.PENDING,
-            ip_address=ip,   # NEW
+            ip_address=ip,   # keep storing IP
         )
     except IntegrityError:
+        # Optional: log if needed
         pass
 
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+
 
 
 

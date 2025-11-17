@@ -136,15 +136,6 @@
       textarea{min-height:110px}
         .note{color:#9fb0aa; font-size:13px}
         .note.important{border:1px solid #2fe07a33; background:#0b1218; padding:12px 12px; border-radius:12px; color:#cfe7dd}
-        .alert-error{
-          margin-top:8px;
-          padding:12px 14px;
-          border-radius:12px;
-          border:1px solid #5a2a2a;
-          background:rgba(127,29,29,.18);
-          color:#fecaca;
-          font-size:13px;
-        }
 
         /* NEW: instruction + favicon row */
         .note-row{
@@ -521,7 +512,7 @@
                 {% with t=campaign.task_type|stringformat:"s" %}
                   {% if t == "MIXED" %}{% with t="VISIT" %}{% endwith %}{% endif %}
 
-                    {% if t == "LINK" %}
+                  {% if t == "LINK" %}
                                 <h3 style="margin:0 0 8px;">
                                     {% if meta.lang == 'ko' %}링크 공유 과제 제출{% elif meta.lang == 'ja' %}リンク共有タスクの提出{% elif meta.lang == 'zh' %}提交外链分享任务{% else %}Submit Link Sharing Task{% endif %}
                                 </h3>
@@ -559,12 +550,6 @@
                                 <div class="note">
                                     {% if meta.lang == 'ko' %}포스트 URL과 지갑 주소를 입력해 주세요.{% elif meta.lang == 'ja' %}投稿URLとウォレットアドレスを入力してください。{% elif meta.lang == 'zh' %}请输入你的帖子链接与钱包地址。{% else %}Enter your post URL and wallet address.{% endif %}
                                 </div>
-                                {# NEW: show LINK submission errors (duplicate, invalid wallet, etc.) #}
-                                {% if link_error_message %}
-                                <div class="alert-error">
-                                    {{ link_error_message }}
-                                </div>
-                                {% endif %}
                                 <form method="post" action="{% if campaign.slug %}{% url 'submit_link' campaign.slug %}{% else %}#{% endif %}" style="margin-top:12px">
                                     {% csrf_token %}
                                     <div class="row">
@@ -608,7 +593,6 @@
                                     </div>
                                 </form>
                                 {% else %}
-
                     {# VISIT / SEARCH (and MIXED) -> VISIT ONLY #}
                                 <h3 style="margin:0 0 8px;">
                                     {% if meta.lang == 'ko' %}방문/검색 과제 제출{% elif meta.lang == 'ja' %}訪問/検索タスクの提出{% elif meta.lang == 'zh' %}提交访问/搜索任务{% else %}Submit Visit/Search Task{% endif %}
@@ -748,13 +732,6 @@
                                     </div>
                                 </div>
                                 {% endwith %}
-
-                                {# NEW: show VISIT submission errors (duplicate, invalid wallet, etc.) #}
-                                {% if visit_error_message %}
-                                <div class="alert-error">
-                                    {{ visit_error_message }}
-                                </div>
-                                {% endif %}
                                 <form method="post" action="{% if campaign.slug %}{% url 'submit_visit' campaign.slug %}{% else %}#{% endif %}" style="margin-top:12px">
                                     {% csrf_token %}
                                     <div class="row">
@@ -796,7 +773,7 @@
                                     </div>
                                 </form>
                                 {% endif %}
-                            {% endwith %}
+                {% endwith %}
                             </div>
                         </div>
                     </div>
