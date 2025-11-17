@@ -143,6 +143,16 @@
       .note{color:#9fb0aa; font-size:13px}
       .note.important{border:1px solid #2fe07a33; background:#0b1218; padding:12px; border-radius:12px; color:#cfe7dd}
 
+      .alert-error{
+        margin-top:8px;
+        padding:12px 14px;
+        border-radius:12px;
+        border:1px solid #5a2a2a;
+        background:rgba(127,29,29,.18);
+        color:#fecaca;
+        font-size:13px;
+      }
+
       /* Instruction + favicon row */
       .note-row{ display:flex; gap:10px; align-items:stretch; margin-bottom:10px; }
       .note-row .instr{ flex:1 1 auto; }
@@ -696,7 +706,16 @@
                                 <div class="note">
                                     {% if meta.lang == 'ko' %}포스트 URL과 지갑 주소를 입력해 주세요.{% elif meta.lang == 'ja' %}投稿URLとウォレットアドレスを入力してください。{% elif meta.lang == 'zh' %}请输入你的帖子链接与钱包地址。{% else %}Enter your post URL and wallet address.{% endif %}
                                 </div>
+
+                                {# LINK submission errors: invalid wallet, duplicate, etc. #}
+                                {% if link_error_message %}
+                                <div class="alert-error">
+                                    {{ link_error_message }}
+                                </div>
+                                {% endif %}
+
                                 <form method="post" action="{% if campaign.slug %}{% url 'submit_link' campaign.slug %}{% else %}#{% endif %}" style="margin-top:12px">
+
                                     {% csrf_token %}
                                     <div class="row">
                                         <input
@@ -838,7 +857,16 @@
                                     </div>
                                 </div>
                                 {% endwith %}
+
+                                {# VISIT submission errors: invalid wallet, duplicate, etc. #}
+                                {% if visit_error_message %}
+                                <div class="alert-error">
+                                    {{ visit_error_message }}
+                                </div>
+                                {% endif %}
+
                                 <form method="post" action="{% if campaign.slug %}{% url 'submit_visit' campaign.slug %}{% else %}#{% endif %}" style="margin-top:12px">
+
                                     {% csrf_token %}
                                     <div class="row">
                                         <input
@@ -948,6 +976,16 @@
         animateBars();
       }
       tabs.forEach(tab=> tab.addEventListener('click', ()=> switchTab(tab)));
+
+    (function(){
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('tab') === 'participate') {
+          const participateTab = document.getElementById('tab-participate');
+          if (participateTab) {
+            switchTab(participateTab);
+          }
+        }
+      })();
 
       // Progress bar (animate when visible)
       const io = new IntersectionObserver((entries)=>{
