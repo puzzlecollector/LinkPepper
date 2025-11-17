@@ -21,6 +21,7 @@ from django.conf import settings  # <-- add this
 from core.middleware import get_client_ip
 import re
 from django.contrib import messages
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
 
 # Defaults for “How to use” guide links (can be overridden in settings.py)
@@ -994,19 +995,31 @@ def get_wallet_validation_error(wallet: str, network: str) -> str | None:
 
     # Fallback: if we ever add more networks and forget to handle them here
     return f"unsupported network: {network}"
+
+def _redirect_to_participate(request):
+    """
+    Redirect back to the referring page (or rewards) and force tab=participate
+    in the query string so the Participate tab is opened on load.
+    """
+    referer = request.META.get("HTTP_REFERER") or request.build_absolute_uri("/") or "/rewards/"
+    parsed = urlparse(referer)
+    query_dict = dict(parse_qsl(parsed.query))
+    query_dict["tab"] = "participate"
+    new_query = urlencode(query_dict)
+    new_url = urlunparse(parsed._replace(query=new_query))
+    return redirect(new_url)
+
 @require_POST
 def submit_link(request, slug):
     user = get_wallet_user(request)
     campaign = get_object_or_404(Campaign, slug=slug)
 
     if campaign.task_type != TaskType.LINK:
-        # This really is a server-side misconfig, you can keep 400 here
         return HttpResponseBadRequest("wrong task type")
 
     if not campaign.is_open_now:
-        # Show a nice error on the same page
         messages.error(request, "This campaign is closed.", extra_tags="link")
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # --- IP & ban check ---
     ip = getattr(request, "client_ip", None) or get_client_ip(request)
@@ -1025,13 +1038,13 @@ def submit_link(request, slug):
 
     if not wallet or not network:
         messages.error(request, "Wallet and network are required.", extra_tags="link")
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # --- wallet format validation per network ---
     error = get_wallet_validation_error(wallet, network)
     if error:
         messages.error(request, error, extra_tags="link")
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # --- prevent duplicate submissions for same campaign ---
 
@@ -1042,7 +1055,7 @@ def submit_link(request, slug):
             "A submission with this wallet has already been received for this campaign.",
             extra_tags="link",
         )
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # 2) Same campaign + same logged-in wallet user (if any)
     if user is not None and Submission.objects.filter(campaign=campaign, user=user).exists():
@@ -1051,7 +1064,7 @@ def submit_link(request, slug):
             "You have already submitted for this campaign.",
             extra_tags="link",
         )
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     try:
         Submission.objects.create(
@@ -1063,12 +1076,13 @@ def submit_link(request, slug):
             comment=comment,
             status=SubmissionStatus.PENDING,
             proof_score=0,
-            ip_address=ip,   # keep storing IP
+            ip_address=ip,
         )
     except IntegrityError:
         # Optional: log this if needed
         pass
 
+    # success -> just go back (no forced tab change)
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
 
@@ -1078,12 +1092,11 @@ def submit_visit(request, slug):
     campaign = get_object_or_404(Campaign, slug=slug)
 
     if campaign.task_type != TaskType.VISIT:
-        # Again, true 400 scenario
         return HttpResponseBadRequest("wrong task type")
 
     if not campaign.is_open_now:
         messages.error(request, "This campaign is closed.", extra_tags="visit")
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # --- IP & ban check ---
     ip = getattr(request, "client_ip", None) or get_client_ip(request)
@@ -1107,13 +1120,13 @@ def submit_visit(request, slug):
 
     if not wallet or not network:
         messages.error(request, "Wallet and network are required.", extra_tags="visit")
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # --- wallet format validation per network ---
     error = get_wallet_validation_error(wallet, network)
     if error:
         messages.error(request, error, extra_tags="visit")
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # --- prevent duplicate submissions for same campaign ---
 
@@ -1124,7 +1137,7 @@ def submit_visit(request, slug):
             "A submission with this wallet has already been received for this campaign.",
             extra_tags="visit",
         )
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     # 2) Same campaign + same logged-in wallet user (if any)
     if user is not None and Submission.objects.filter(campaign=campaign, user=user).exists():
@@ -1133,7 +1146,7 @@ def submit_visit(request, slug):
             "You have already submitted for this campaign.",
             extra_tags="visit",
         )
-        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
+        return _redirect_to_participate(request)
 
     try:
         Submission.objects.create(
@@ -1144,12 +1157,13 @@ def submit_visit(request, slug):
             visited_url=visited_url,
             code_entered=code,
             status=SubmissionStatus.PENDING,
-            ip_address=ip,   # keep storing IP
+            ip_address=ip,
         )
     except IntegrityError:
         # Optional: log if needed
         pass
 
+    # success -> back to page
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
 

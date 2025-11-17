@@ -878,6 +878,15 @@
         });
       });
 
+      // NEW: open Participate tab if ?tab=participate
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'participate') {
+        const participateTab = document.getElementById('tab-participate');
+        if (participateTab) {
+          participateTab.click();
+        }
+      }
+
       // Progress bar
       function animateBars(){
         document.querySelectorAll('.progress .bar').forEach(b=>{
