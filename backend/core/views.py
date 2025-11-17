@@ -1260,12 +1260,33 @@ def rewards_detail(request, slug, pk):
         # claimed percent comes from model property; mirror template usage if needed
         claimed_percent = campaign_obj.claimed_percent if hasattr(campaign_obj, "claimed_percent") else 0
 
+    # --- NEW: pull error messages for LINK / VISIT submissions ---
+    link_error_message = None
+    visit_error_message = None
+
+    for msg in messages.get_messages(request):
+        tags = (msg.tags or "").split()
+        if "link" in tags:
+            link_error_message = str(msg)
+        if "visit" in tags:
+            visit_error_message = str(msg)
+
     ctx = {
-        "meta": meta, "lang": lang, "wallet_user": wallet_user,
-        "campaign": campaign_obj, "examples": examples,
-        "submitted": submitted, "quota_total": quota_total, "claimed_percent": claimed_percent,
+        "meta": meta,
+        "lang": lang,
+        "wallet_user": wallet_user,
+        "campaign": campaign_obj,
+        "examples": examples,
+        "submitted": submitted,
+        "quota_total": quota_total,
+        "claimed_percent": claimed_percent,
         "using_sample": using_sample,
+
+        # NEW
+        "link_error_message": link_error_message,
+        "visit_error_message": visit_error_message,
     }
+
     return render_mobile_first(request, "rewards_details", ctx)
 
 
