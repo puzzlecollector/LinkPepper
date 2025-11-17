@@ -20,6 +20,8 @@ from django.template.loader import select_template
 from django.conf import settings  # <-- add this
 from core.middleware import get_client_ip
 import re
+from django.contrib import messages
+
 
 # Defaults for “How to use” guide links (can be overridden in settings.py)
 GUIDE_DEFAULTS = {
@@ -992,16 +994,19 @@ def get_wallet_validation_error(wallet: str, network: str) -> str | None:
 
     # Fallback: if we ever add more networks and forget to handle them here
     return f"unsupported network: {network}"
-
 @require_POST
 def submit_link(request, slug):
     user = get_wallet_user(request)
     campaign = get_object_or_404(Campaign, slug=slug)
 
     if campaign.task_type != TaskType.LINK:
+        # This really is a server-side misconfig, you can keep 400 here
         return HttpResponseBadRequest("wrong task type")
+
     if not campaign.is_open_now:
-        return HttpResponseBadRequest("campaign closed")
+        # Show a nice error on the same page
+        messages.error(request, "This campaign is closed.", extra_tags="link")
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     # --- IP & ban check ---
     ip = getattr(request, "client_ip", None) or get_client_ip(request)
@@ -1019,22 +1024,34 @@ def submit_link(request, slug):
     network = _clean_network(request.POST.get("network"))
 
     if not wallet or not network:
-        return HttpResponseBadRequest("wallet and network required")
+        messages.error(request, "Wallet and network are required.", extra_tags="link")
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     # --- wallet format validation per network ---
     error = get_wallet_validation_error(wallet, network)
     if error:
-        return HttpResponseBadRequest(error)
+        messages.error(request, error, extra_tags="link")
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
-    # --- NEW: prevent duplicate submissions for same campaign ---
+    # --- prevent duplicate submissions for same campaign ---
 
     # 1) Same campaign + same wallet address
     if Submission.objects.filter(campaign=campaign, wallet_address=wallet).exists():
-        return HttpResponseBadRequest("A submission with this wallet has already been received for this campaign.")
+        messages.error(
+            request,
+            "A submission with this wallet has already been received for this campaign.",
+            extra_tags="link",
+        )
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     # 2) Same campaign + same logged-in wallet user (if any)
     if user is not None and Submission.objects.filter(campaign=campaign, user=user).exists():
-        return HttpResponseBadRequest("You have already submitted for this campaign.")
+        messages.error(
+            request,
+            "You have already submitted for this campaign.",
+            extra_tags="link",
+        )
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     try:
         Submission.objects.create(
@@ -1049,7 +1066,7 @@ def submit_link(request, slug):
             ip_address=ip,   # keep storing IP
         )
     except IntegrityError:
-        # Optional: you could log this if needed
+        # Optional: log this if needed
         pass
 
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
@@ -1061,9 +1078,12 @@ def submit_visit(request, slug):
     campaign = get_object_or_404(Campaign, slug=slug)
 
     if campaign.task_type != TaskType.VISIT:
+        # Again, true 400 scenario
         return HttpResponseBadRequest("wrong task type")
+
     if not campaign.is_open_now:
-        return HttpResponseBadRequest("campaign closed")
+        messages.error(request, "This campaign is closed.", extra_tags="visit")
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     # --- IP & ban check ---
     ip = getattr(request, "client_ip", None) or get_client_ip(request)
@@ -1086,22 +1106,34 @@ def submit_visit(request, slug):
     visited_url = campaign.client_site_domain or (request.POST.get("visited_url") or "").strip()
 
     if not wallet or not network:
-        return HttpResponseBadRequest("wallet and network required")
+        messages.error(request, "Wallet and network are required.", extra_tags="visit")
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     # --- wallet format validation per network ---
     error = get_wallet_validation_error(wallet, network)
     if error:
-        return HttpResponseBadRequest(error)
+        messages.error(request, error, extra_tags="visit")
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
-    # --- NEW: prevent duplicate submissions for same campaign ---
+    # --- prevent duplicate submissions for same campaign ---
 
     # 1) Same campaign + same wallet address
     if Submission.objects.filter(campaign=campaign, wallet_address=wallet).exists():
-        return HttpResponseBadRequest("A submission with this wallet has already been received for this campaign.")
+        messages.error(
+            request,
+            "A submission with this wallet has already been received for this campaign.",
+            extra_tags="visit",
+        )
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     # 2) Same campaign + same logged-in wallet user (if any)
     if user is not None and Submission.objects.filter(campaign=campaign, user=user).exists():
-        return HttpResponseBadRequest("You have already submitted for this campaign.")
+        messages.error(
+            request,
+            "You have already submitted for this campaign.",
+            extra_tags="visit",
+        )
+        return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
 
     try:
         Submission.objects.create(
@@ -1119,8 +1151,6 @@ def submit_visit(request, slug):
         pass
 
     return redirect(request.META.get("HTTP_REFERER", "/rewards/"))
-
-
 
 
 # ---- SAMPLE CAMPAIGNS (UI preview) ----
