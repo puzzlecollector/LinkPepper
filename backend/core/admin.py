@@ -736,11 +736,17 @@ class SubmissionAdmin(admin.ModelAdmin):
     @admin.action(description="Download Excel (submissions)")
     def export_as_excel(self, request, queryset):
         """
-        Export current queryset to an XLSX with two sheets:
-          - 'submissions': all Submission rows in the queryset
+        Export ALL submissions currently matching the filters/search on the changelist,
+        ignoring pagination and per-page selection.
+
+        - Uses Django's ChangeList to get the full filtered queryset.
         """
 
-        if not queryset.exists():
+        # Get the full filtered queryset (ALL rows matching current filters/search)
+        cl = self.get_changelist_instance(request)
+        full_qs = cl.get_queryset(request)
+
+        if not full_qs.exists():
             self.message_user(request, "No submissions to export.", level=messages.WARNING)
             return
 
@@ -778,8 +784,8 @@ class SubmissionAdmin(admin.ModelAdmin):
         # Header row
         ws_sub.append([h for (h, _) in sub_columns])
 
-        # Data rows
-        for s in queryset.select_related("campaign", "user"):
+        # Data rows (use full_qs, not queryset)
+        for s in full_qs.select_related("campaign", "user"):
             row = []
             for _, extractor in sub_columns:
                 try:
@@ -788,61 +794,6 @@ class SubmissionAdmin(admin.ModelAdmin):
                     value = ""
                 row.append(value)
             ws_sub.append(row)
-
-        # ========== SHEET 2: users (unique wallets per campaign) ==========
-        # ws_users = wb.create_sheet(title="users")
-
-        # user_headers = [
-        #     "Campaign ID",
-        #     "Campaign title",
-        #     "Wallet address",
-        #     "Network",
-        #     "Submissions count",
-        #     "First submission at",
-        #     "Last submission at",
-        # ]
-        # ws_users.append(user_headers)
-
-        # # Build a dict in Python: key = (campaign_id, wallet_address)
-        # users_map = {}
-
-        # for s in queryset.select_related("campaign"):
-        #     if not s.wallet_address:
-        #         continue
-        #     key = (s.campaign_id, s.wallet_address)
-        #     created_at = s.created_at
-
-        #     if key not in users_map:
-        #         users_map[key] = {
-        #             "campaign_id": s.campaign_id,
-        #             "campaign_title": s.campaign.title if s.campaign else "",
-        #             "wallet_address": s.wallet_address,
-        #             "network": s.network or "",
-        #             "submissions_count": 1,
-        #             "first_created": created_at,
-        #             "last_created": created_at,
-        #         }
-        #     else:
-        #         u = users_map[key]
-        #         u["submissions_count"] += 1
-        #         if created_at:
-        #             if not u["first_created"] or created_at < u["first_created"]:
-        #                 u["first_created"] = created_at
-        #             if not u["last_created"] or created_at > u["last_created"]:
-        #                 u["last_created"] = created_at
-
-        # # Sort by campaign, then wallet
-        # for key in sorted(users_map.keys(), key=lambda k: (k[0] or 0, k[1])):
-        #     u = users_map[key]
-        #     ws_users.append([
-        #         u["campaign_id"],
-        #         u["campaign_title"],
-        #         u["wallet_address"],
-        #         u["network"],
-        #         u["submissions_count"],
-        #         _fmt_dt(u["first_created"]),
-        #         _fmt_dt(u["last_created"]),
-        #     ])
 
         # ========== HTTP response ==========
         timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
@@ -854,6 +805,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         wb.save(response)
         return response
+
 
 
 # ---------- Payout
