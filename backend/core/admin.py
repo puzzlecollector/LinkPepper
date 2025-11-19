@@ -2,7 +2,9 @@
 from django.contrib import admin, messages
 from django.utils import timezone
 from django.utils.html import format_html
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q, Min, Max
+from django.http import HttpResponse
+from openpyxl import Workbook
 import os
 from django import forms
 from django.core.files.storage import default_storage
@@ -599,6 +601,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         "set_score_1",
         "set_score_3",
         "set_score_5",
+        "export_as_excel",
     )
     actions_on_top = True
     actions_on_bottom = True
@@ -717,6 +720,115 @@ class SubmissionAdmin(admin.ModelAdmin):
     def set_score_5(self, request, qs):
         n = qs.update(proof_score=5)
         self.message_user(request, f"Set score=5 for {n} submission(s).", level=messages.INFO)
+
+    @admin.action(description="Download Excel (submissions + users)")
+    def export_as_excel(self, request, queryset):
+        """
+        Export current queryset to an XLSX with two sheets:
+          - 'submissions' : one row per Submission
+          - 'users'       : unique (campaign, wallet_address) rows
+        """
+        # Safety: if nothing selected (or queryset empty), bail early
+        if not queryset.exists():
+            self.message_user(request, "No submissions to export.", level=messages.WARNING)
+            return
+
+        # Build workbook
+        wb = Workbook()
+
+        # ---------- Sheet 1: submissions ----------
+        ws_sub = wb.active
+        ws_sub.title = "submissions"
+
+        # Define columns: (Header, extractor)
+        # extractor can be a string field name or a callable(obj) -> value
+        sub_columns = [
+            ("ID", "id"),
+            ("Campaign ID", "campaign_id"),
+            ("Campaign title", lambda s: getattr(s.campaign, "title", "") if s.campaign else ""),
+            ("User ID", "user_id"),
+            ("Login wallet", lambda s: getattr(getattr(s.user, "address", None), "strip", lambda: getattr(s.user, "address", None))() if s.user else ""),
+            ("Submitted wallet", "wallet_address"),
+            ("Network", "network"),
+            ("Status", "status"),
+            ("Proof score", "proof_score"),
+            ("Is approved", "is_approved"),
+            ("Is paid", "is_paid"),
+            ("Post URL", "post_url"),
+            ("Visited URL", "visited_url"),
+            ("Code entered", "code_entered"),
+            ("Transaction ID", "transaction_id"),
+            ("IP address", "ip_address"),
+            ("User comment", "comment"),
+            ("Admin comment", "admin_comment"),
+            ("Created at", "created_at"),
+            ("Reviewed at", "reviewed_at"),
+        ]
+
+        # Header row
+        ws_sub.append([h for (h, _) in sub_columns])
+
+        # Data rows
+        for s in queryset.select_related("campaign", "user"):
+            row = []
+            for _, extractor in sub_columns:
+                if callable(extractor):
+                    value = extractor(s)
+                else:
+                    value = getattr(s, extractor, "")
+                row.append(value)
+            ws_sub.append(row)
+
+        # ---------- Sheet 2: users (unique wallet per campaign) ----------
+        ws_users = wb.create_sheet(title="users")
+
+        # Aggregate by (campaign, wallet_address)
+        agg_qs = (
+            queryset
+            .exclude(wallet_address__isnull=True)
+            .exclude(wallet_address__exact="")
+            .values("campaign_id", "campaign__title", "wallet_address", "network")
+            .annotate(
+                submissions_count=Count("id"),
+                first_created=Min("created_at"),
+                last_created=Max("created_at"),
+            )
+            .order_by("campaign_id", "wallet_address")
+        )
+
+        user_headers = [
+            "Campaign ID",
+            "Campaign title",
+            "Wallet address",
+            "Network",
+            "Submissions count",
+            "First submission at",
+            "Last submission at",
+        ]
+        ws_users.append(user_headers)
+
+        for row in agg_qs:
+            ws_users.append([
+                row["campaign_id"],
+                row["campaign__title"],
+                row["wallet_address"],
+                row["network"],
+                row["submissions_count"],
+                row["first_created"],
+                row["last_created"],
+            ])
+
+        # ---------- Build HTTP response ----------
+        timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"submissions_export_{timestamp}.xlsx"
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        wb.save(response)
+        return response
+
 
 # ---------- Payout
 
