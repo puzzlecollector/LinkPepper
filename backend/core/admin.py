@@ -9,6 +9,7 @@ import os
 from django import forms
 from django.core.files.storage import default_storage
 from django.utils.text import slugify
+from django.utils.timezone import localtime 
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from .models import (
     WalletUser,
@@ -27,6 +28,17 @@ from .models import (
 
 def _now():
     return timezone.now()
+
+def _fmt_dt(dt):
+    """Return a human-readable string for datetimes (and handle None)."""
+    if not dt:
+        return ""
+    try:
+        # Convert to local time then format
+        return localtime(dt).strftime("%Y-%m-%d %H:%M:%S")
+    except Exception:
+        # Failsafe; shouldn't happen normally
+        return str(dt)
 
 def _is_img_src(val: str) -> bool:
     """
@@ -760,8 +772,8 @@ class SubmissionAdmin(admin.ModelAdmin):
             ("IP address",             lambda s: s.ip_address or ""),
             ("User comment",           lambda s: s.comment or ""),
             ("Admin comment",          lambda s: s.admin_comment or ""),
-            ("Created at",             lambda s: s.created_at),
-            ("Reviewed at",            lambda s: s.reviewed_at),
+            ("Created at",             lambda s: _fmt_dt(s.created_at)),
+            ("Reviewed at",            lambda s: _fmt_dt(s.reviewed_at)),
         ]
 
         # Header row
@@ -774,7 +786,6 @@ class SubmissionAdmin(admin.ModelAdmin):
                 try:
                     value = extractor(s)
                 except Exception:
-                    # Failsafe: don't kill the whole export because one field is weird
                     value = ""
                 row.append(value)
             ws_sub.append(row)
@@ -800,7 +811,6 @@ class SubmissionAdmin(admin.ModelAdmin):
             if not s.wallet_address:
                 continue
             key = (s.campaign_id, s.wallet_address)
-
             created_at = s.created_at
 
             if key not in users_map:
@@ -816,7 +826,6 @@ class SubmissionAdmin(admin.ModelAdmin):
             else:
                 u = users_map[key]
                 u["submissions_count"] += 1
-
                 if created_at:
                     if not u["first_created"] or created_at < u["first_created"]:
                         u["first_created"] = created_at
@@ -832,8 +841,8 @@ class SubmissionAdmin(admin.ModelAdmin):
                 u["wallet_address"],
                 u["network"],
                 u["submissions_count"],
-                u["first_created"],
-                u["last_created"],
+                _fmt_dt(u["first_created"]),
+                _fmt_dt(u["last_created"]),
             ])
 
         # ========== HTTP response ==========
@@ -846,7 +855,6 @@ class SubmissionAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         wb.save(response)
         return response
-
 
 
 # ---------- Payout
