@@ -725,10 +725,10 @@ class SubmissionAdmin(admin.ModelAdmin):
     def export_as_excel(self, request, queryset):
         """
         Export current queryset to an XLSX with two sheets:
-          - 'submissions' : one row per Submission
-          - 'users'       : unique (campaign, wallet_address) rows
+          - 'submissions': all Submission rows in the queryset
+          - 'users'      : unique (campaign, wallet_address) entries
         """
-        # Safety: if nothing selected (or queryset empty), bail early
+
         if not queryset.exists():
             self.message_user(request, "No submissions to export.", level=messages.WARNING)
             return
@@ -736,33 +736,32 @@ class SubmissionAdmin(admin.ModelAdmin):
         # Build workbook
         wb = Workbook()
 
-        # ---------- Sheet 1: submissions ----------
+        # ========== SHEET 1: submissions ==========
         ws_sub = wb.active
         ws_sub.title = "submissions"
 
         # Define columns: (Header, extractor)
-        # extractor can be a string field name or a callable(obj) -> value
         sub_columns = [
-            ("ID", "id"),
-            ("Campaign ID", "campaign_id"),
-            ("Campaign title", lambda s: getattr(s.campaign, "title", "") if s.campaign else ""),
-            ("User ID", "user_id"),
-            ("Login wallet", lambda s: getattr(getattr(s.user, "address", None), "strip", lambda: getattr(s.user, "address", None))() if s.user else ""),
-            ("Submitted wallet", "wallet_address"),
-            ("Network", "network"),
-            ("Status", "status"),
-            ("Proof score", "proof_score"),
-            ("Is approved", "is_approved"),
-            ("Is paid", "is_paid"),
-            ("Post URL", "post_url"),
-            ("Visited URL", "visited_url"),
-            ("Code entered", "code_entered"),
-            ("Transaction ID", "transaction_id"),
-            ("IP address", "ip_address"),
-            ("User comment", "comment"),
-            ("Admin comment", "admin_comment"),
-            ("Created at", "created_at"),
-            ("Reviewed at", "reviewed_at"),
+            ("ID",                     lambda s: s.id),
+            ("Campaign ID",            lambda s: s.campaign_id),
+            ("Campaign title",         lambda s: s.campaign.title if s.campaign else ""),
+            ("User ID",                lambda s: s.user_id),
+            ("Login wallet",           lambda s: s.user.address if s.user and s.user.address else ""),
+            ("Submitted wallet",       lambda s: s.wallet_address or ""),
+            ("Network",                lambda s: s.network or ""),
+            ("Status",                 lambda s: s.status),
+            ("Proof score",            lambda s: s.proof_score),
+            ("Is approved",            lambda s: s.is_approved),
+            ("Is paid",                lambda s: s.is_paid),
+            ("Post URL",               lambda s: s.post_url or ""),
+            ("Visited URL",            lambda s: s.visited_url or ""),
+            ("Code entered",           lambda s: s.code_entered or ""),
+            ("Transaction ID",         lambda s: s.transaction_id or ""),
+            ("IP address",             lambda s: s.ip_address or ""),
+            ("User comment",           lambda s: s.comment or ""),
+            ("Admin comment",          lambda s: s.admin_comment or ""),
+            ("Created at",             lambda s: s.created_at),
+            ("Reviewed at",            lambda s: s.reviewed_at),
         ]
 
         # Header row
@@ -772,29 +771,16 @@ class SubmissionAdmin(admin.ModelAdmin):
         for s in queryset.select_related("campaign", "user"):
             row = []
             for _, extractor in sub_columns:
-                if callable(extractor):
+                try:
                     value = extractor(s)
-                else:
-                    value = getattr(s, extractor, "")
+                except Exception:
+                    # Failsafe: don't kill the whole export because one field is weird
+                    value = ""
                 row.append(value)
             ws_sub.append(row)
 
-        # ---------- Sheet 2: users (unique wallet per campaign) ----------
+        # ========== SHEET 2: users (unique wallets per campaign) ==========
         ws_users = wb.create_sheet(title="users")
-
-        # Aggregate by (campaign, wallet_address)
-        agg_qs = (
-            queryset
-            .exclude(wallet_address__isnull=True)
-            .exclude(wallet_address__exact="")
-            .values("campaign_id", "campaign__title", "wallet_address", "network")
-            .annotate(
-                submissions_count=Count("id"),
-                first_created=Min("created_at"),
-                last_created=Max("created_at"),
-            )
-            .order_by("campaign_id", "wallet_address")
-        )
 
         user_headers = [
             "Campaign ID",
@@ -807,18 +793,50 @@ class SubmissionAdmin(admin.ModelAdmin):
         ]
         ws_users.append(user_headers)
 
-        for row in agg_qs:
+        # Build a dict in Python: key = (campaign_id, wallet_address)
+        users_map = {}
+
+        for s in queryset.select_related("campaign"):
+            if not s.wallet_address:
+                continue
+            key = (s.campaign_id, s.wallet_address)
+
+            created_at = s.created_at
+
+            if key not in users_map:
+                users_map[key] = {
+                    "campaign_id": s.campaign_id,
+                    "campaign_title": s.campaign.title if s.campaign else "",
+                    "wallet_address": s.wallet_address,
+                    "network": s.network or "",
+                    "submissions_count": 1,
+                    "first_created": created_at,
+                    "last_created": created_at,
+                }
+            else:
+                u = users_map[key]
+                u["submissions_count"] += 1
+
+                if created_at:
+                    if not u["first_created"] or created_at < u["first_created"]:
+                        u["first_created"] = created_at
+                    if not u["last_created"] or created_at > u["last_created"]:
+                        u["last_created"] = created_at
+
+        # Sort by campaign, then wallet
+        for key in sorted(users_map.keys(), key=lambda k: (k[0] or 0, k[1])):
+            u = users_map[key]
             ws_users.append([
-                row["campaign_id"],
-                row["campaign__title"],
-                row["wallet_address"],
-                row["network"],
-                row["submissions_count"],
-                row["first_created"],
-                row["last_created"],
+                u["campaign_id"],
+                u["campaign_title"],
+                u["wallet_address"],
+                u["network"],
+                u["submissions_count"],
+                u["first_created"],
+                u["last_created"],
             ])
 
-        # ---------- Build HTTP response ----------
+        # ========== HTTP response ==========
         timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
         filename = f"submissions_export_{timestamp}.xlsx"
 
@@ -828,6 +846,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         wb.save(response)
         return response
+
 
 
 # ---------- Payout
